@@ -1,0 +1,14 @@
+desc 'run specs'
+task :specs  =&gt; [:merb_init] do
+
+  Spec::Rake::SpecTask.new('specs') do |t|
+    t.spec_opts = ["--format", "specdoc"]
+    t.libs = ['lib', 'server/lib' ]
+    t.spec_files = FileList['test/spec/**/*_spec.rb']
+  end
+end
+
+desc "load merb_init.rb"
+task :merb_init do
+  require File.dirname(__FILE__)+'/dist/conf/merb_init.rb'
+end

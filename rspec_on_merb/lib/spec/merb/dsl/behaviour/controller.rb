@@ -39,9 +39,10 @@ module Spec
 
         def post(path, opts={})  
           m = Multipart::Post.new
+          method = opts.delete(:request_method) || 'POST'
           body, head = m.prepare_query(opts)
-          request = ::Merb::FakeRequest.new(:request_uri => path, :path_info => path.sub(/\?.*$/,''))
-          request['REQUEST_METHOD'] = 'POST'
+          request = Spec::Merb::Fakes::FakeRequest.new({:request_uri => path, :path_info => path.sub(/\?.*$/,'')}, method)
+          request['REQUEST_METHOD'] = method
           request['CONTENT_TYPE'] = head
           request['CONTENT_LENGTH'] = body.length
           request.post_body = body

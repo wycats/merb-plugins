@@ -1,0 +1,44 @@
+RSPEC ON MERB
+
+As contributed by 
+Ari Lerner
+CitrusByte
+
+ADD THIS INTO YOUR test/spec directory (test/spec/spec_helper.rb)
+
+dir = File.expand_path(File.dirname(__FILE__))
+  $TESTING = true
+
+  $stdout = $stderr = File.open("/dev/null","a+")
+  require "rubygems"
+  require "spec"
+
+  require 'merb/merb_server'
+
+  dir = File.dirname(__FILE__)
+  Merb::Server.instance_eval {@@merb_raw_opts = []}
+  Merb::Server.merb_config
+  Merb::Server.config[:merb_root] = File.expand_path("#{dir}/../..")
+  Merb::Server.config[:dist_root] = File.expand_path("#{dir}/../../dist")
+  Merb::Server.config[:environment] = 'test'
+
+  require "merb"
+  require "active_record"
+  ActiveRecord::Base.verification_timeout = 14400
+
+  require "#{DIST_ROOT}/conf/merb_init"
+
+  require DIST_ROOT+"/conf/router.rb"
+  $LOAD_PATH &lt;&lt; DIST_ROOT+"/app/models/"
+  $LOAD_PATH &lt;&lt; DIST_ROOT+"/app/controllers/"
+  $LOAD_PATH &lt;&lt; DIST_ROOT+"/app/helpers/"
+  Dir[DIST_ROOT+"/plugins/*/lib"].each { |m| $LOAD_PATH &lt;&lt;  m }
+  Dir[MERB_ROOT+"/plugins/*/lib"].each { |m| $LOAD_PATH &lt;&lt; m }
+
+  require "spec/merb"
+
+  # Custom requires
+  require "#{dir}/login_service_helper"
+  $stdout = STDOUT
+
+  Spec::DSL::Behaviour.prepend_before(:each) { @si = SpecInitializer.new.run unless @no_refresh }
