@@ -1,0 +1,7 @@
+History.txt
+Manifest.txt
+README.txt
+Rakefile
+bin/merb_active_record
+lib/merb_active_record.rb
+test/test_merb_active_record.rb
