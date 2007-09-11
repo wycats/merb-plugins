@@ -3,10 +3,10 @@ module Merb
     module SessionMixin
       def setup_session
         MERB_LOGGER.info("Setting up session")
-        before = @_cookies[_session_id_key]
-        @_session, @_cookies[_session_id_key] = Merb::SequelSession.persist(@_cookies[_session_id_key])
+        before = cookies[_session_id_key]
+        @_session, cookies[_session_id_key] = Merb::SequelSession.persist(cookies[_session_id_key])
         @_fingerprint = Marshal.dump(@_session.data).hash
-        @_new_cookie = @_cookies[_session_id_key] != before
+        @_new_cookie = cookies[_session_id_key] != before
       end
     
       def finalize_session
