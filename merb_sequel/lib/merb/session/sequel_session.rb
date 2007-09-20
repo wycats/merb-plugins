@@ -18,9 +18,6 @@ module Merb
   
   
     table_name = (Merb::Plugins.config[:sequel][:session_table_name] || "sessions")
-    unless Sequel::Model.db.table_exists?(table_name.to_sym)
-      puts "Warning: The database did not contain a '#{table_name}' table for sessions."
-    end
   
     class SequelSession < Sequel::Model(table_name.to_sym)
       set_schema do
@@ -120,6 +117,16 @@ module Merb
           # raise MerbController::SessionOverflowError
         # end
       # end
+    end
+
+    unless Sequel::Model.db.table_exists?(table_name.to_sym)
+      puts "Warning: The database did not contain a '#{table_name}' table for sessions."
+
+      SequelSession.class_eval do
+        create_table unless table_exists?
+      end
+
+      puts "Created sessions table."
     end
   end
 end
