@@ -7,5 +7,6 @@ if defined?(Merb::Plugins)
     Merb::Orms::Sequel.connect
     Merb::Orms::Sequel.register_session_type
   end
-  # Merb::Plugins.add_rakefiles "merb_sequel/merbtasks"
+  
+  Merb::Plugins.add_rakefiles "merbtasks"
 end
