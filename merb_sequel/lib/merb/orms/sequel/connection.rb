@@ -36,12 +36,24 @@ module Merb
               password = config[:password]
               # Use Sequel::Model.db to access this object
               ::Sequel.mysql(config[:database], :host => host, :user => user, :password => password, :logger => MERB_LOGGER)
+            when 'postgresql'
+              require "sequel/postgres"
+              host = config[:host] || 'localhost'
+              user = config[:user] || config[:username] || 'root'
+              password = config[:password]
+              encoding = config[:encoding] || config[:charset] || nil
+              
+              if encoding
+                ::Sequel.postgres(config[:database], :host => host, :user => user, :password => password, :encoding => encoding, :logger => MERB_LOGGER)
+              else
+                ::Sequel.postgres(config[:database], :host => host, :user => user, :password => password, :logger => MERB_LOGGER)
+              end
             when 'sqlite'
               require "sequel/sqlite"
               if config[:database]
-                ::Sequel.sqlite config[:database]
+                ::Sequel.sqlite(config[:database], :logger => MERB_LOGGER)
               else
-                ::Sequel.sqlite
+                ::Sequel.sqlite(:logger => MERB_LOGGER)
               end
             else
               require "sequel/sqlite"
