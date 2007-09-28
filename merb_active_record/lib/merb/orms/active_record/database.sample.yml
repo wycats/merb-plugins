@@ -1,5 +1,5 @@
 ---
-# This is a sample database file for the Sequel ORM
+# This is a sample database file for the ActiveRecord ORM
 :development: &defaults
   :adapter: mysql
   :database: sample_development

@@ -1,4 +1,7 @@
 merb_active_record
 =================
 
-A plugin for the Merb framework that provides ....
+A plugin for the Merb framework that provides active record access
+
+After you install the plugin, you have access to the ar_migration generator in your merb projects
+example: /merb/root/script/generate ar_migration new_migration
