@@ -14,8 +14,6 @@ namespace :db do
 
   desc 'Create the local database defined in config/database.yml for the current MERB_ENV'
   task :create => :environment do
-    p ActiveRecord::Base.configurations
-    p MERB_ENV
     create_local_database(ActiveRecord::Base.configurations[MERB_ENV])
   end
 
