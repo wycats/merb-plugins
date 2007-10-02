@@ -1,12 +1,11 @@
 ---
-# This is a sample database file for the Sequel ORM
+# This is a sample database file for the DataMapper ORM
 :development: &defaults
-  :adapter: mysql
+  :adapter: postgresql
   :database: sample_development
   :username: teh_user
   :password: secrets
   :host: localhost
-  :socket: /tmp/mysql.sock
 
 :test:
   <<: *defaults

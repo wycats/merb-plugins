@@ -1,5 +1,5 @@
 require 'merb'
-class SequelMigrationGenerator < RubiGen::Base
+class DmMigrationGenerator < RubiGen::Base
   
   default_options :author => nil
   
@@ -32,7 +32,7 @@ class SequelMigrationGenerator < RubiGen::Base
   protected
     def banner
       <<-EOS
-Creates a new migration for merb using Sequel
+Creates a new migration for merb using DataMapper
 
 USAGE: #{$0} #{spec.name} NameOfMigration
 

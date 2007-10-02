@@ -1,9 +1,10 @@
+require 'data_mapper'
 module Merb
   module SessionMixin
     def setup_session
       MERB_LOGGER.info("Setting up session")
       before = cookies[_session_id_key]
-      @_session, cookies[_session_id_key] = Merb::SequelSession.persist(cookies[_session_id_key])
+      @_session, cookies[_session_id_key] = Merb::DataMapperSession.persist(cookies[_session_id_key])
       @_fingerprint = Marshal.dump(@_session.data).hash
       @_new_cookie = cookies[_session_id_key] != before
     end
@@ -15,14 +16,13 @@ module Merb
     end
   end
 
-  table_name = (Merb::Plugins.config[:sequel][:session_table_name] || "sessions")
+  table_name = (Merb::Plugins.config[:data_mapper][:session_table_name] || "sessions")
 
-  class SequelSession < Sequel::Model(table_name.to_sym)
-    set_schema do
-      primary_key :id
-      varchar :session_id
-      varchar :data
-    end
+  class DataMapperSession < DataMapper::Base
+    set_table_name table_name
+    #:id
+    property :session_id, :text
+    property :data, :text
   
     attr_accessor :needs_new_cookie
   
@@ -58,8 +58,15 @@ module Merb
         Marshal.load(Base64.decode64(data)) if data
       end
       
-      alias :create_table! :create_table
-      alias :drop_table! :drop_table
+      def create_table!
+        connection.execute <<-end_sql
+          CREATE TABLE #{table_name} (
+            id INTEGER PRIMARY KEY,
+            #{connection.quote_column_name('session_id')} TEXT UNIQUE,
+            #{connection.quote_column_name(@@data_column_name)} TEXT(255)
+          )
+end_sql
+      end
     end
   
     # Regenerate the Session ID
@@ -117,13 +124,16 @@ module Merb
     # end
   end
 
-  unless Sequel::Model.db.table_exists?(table_name.to_sym)
+  unless DataMapper.database.table_exists?(table_name)
     puts "Warning: The database did not contain a '#{table_name}' table for sessions."
 
-    SequelSession.class_eval do
-      create_table unless table_exists?
+    DataMapperSession.class_eval do
+      create_table!
     end
 
     puts "Created sessions table."
+  else
+    puts 'why here'
+    puts table_name
   end
 end

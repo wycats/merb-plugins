@@ -1,13 +1,13 @@
 require 'rubygems'
 require 'rake/gempackagetask'
 
-PLUGIN = "merb_sequel"
-NAME = "merb_sequel"
-VERSION = "0.0.5"
-AUTHOR = "Duane Johnson"
-EMAIL = "canadaduane@gmail.com"
-HOMEPAGE = "http://merb-plugins.rubyforge.org/merb_sequel/"
-SUMMARY = "Merb plugin that provides support for the Sequel database object"
+PLUGIN = "merb_data_mapper"
+NAME = "merb_data_mapper"
+VERSION = "0.0.1"
+AUTHOR = "Jason Toy"
+EMAIL = "jtoy@rubynow.com"
+HOMEPAGE = "http://merb-plugins.rubyforge.org/merb_data_mapper/"
+SUMMARY = "Merb plugin that provides DataMapper support for Merb"
 
 spec = Gem::Specification.new do |s|
   s.name = NAME

@@ -1,4 +1,4 @@
-class AddSessionsTable < Sequel::Migration
+class AddSessionsTable < DataMapper::Migration
   def up
     create_table :sessions do
       primary_key :id
