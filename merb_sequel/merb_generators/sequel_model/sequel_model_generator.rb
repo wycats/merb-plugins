@@ -35,12 +35,19 @@ class SequelModelGenerator < RubiGen::Base
         m.dependency "sequel_migration",["add_model_#{spec_filename}"], :table_name => table_name, :table_attributes => model_attributes
       end
       
-      unless options[:skip_testing]
-        m.dependency "sequel_model_test", [@name]
+      # Check to see if a scope has been set for which test framework to use.
+      # If we try to run the dependency without an :rspec or :test_unit scope an
+      # error will be raised.
+      scopes =RubiGen::Base.sources.map{|a| a.filters if a.respond_to?(:filters)}.compact.uniq.flatten
+      if scopes.include?(:rspec) || scopes.include?(:test_unit)
+        unless options[:skip_testing] 
+          m.dependency "sequel_model_test", [@name]
+        end
+      else
+        puts "\nSelect a scope for :rspec or :test_unit in script/generate if you want to generate test stubs\n\n"
       end
-      
-      
-    end
+
+    end    
   end
 
   protected
