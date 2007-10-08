@@ -65,8 +65,16 @@ module Merb
         @_obj, @_block = old_obj, old_block        
       end
       
+      def name(col)
+        "#{@_object_name}[#{col}]"
+      end
+      
+      def value(col)
+        @_obj.send(col)
+      end
+      
       def name_value(col, attrs)
-        {:name => "#{@_object_name}[#{col}]", :value => "#{@_obj.send(col)}"}.merge(attrs)
+        {:name => name(col), :value => value(col)}.merge(attrs)
       end
       
       def text_control(col, attrs = {})
@@ -119,6 +127,17 @@ module Merb
         attrs.merge!(:type => "radio")
         attrs.add_html_class!("radio")
         self_closing_tag("input", attrs)
+      end
+      
+      def text_area_control(col, attrs = {})
+        errorify_field(attrs, col)
+        text_area_field(value(col), attrs.merge(:name => name(col)))
+      end
+      
+      def text_area_field(val, attrs = {})
+        open_tag("textarea", attrs) +
+        val +
+        "</textarea>"
       end
       
       def submit_button(contents, attrs = {})

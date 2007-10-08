@@ -176,6 +176,28 @@ describe "radio button groups (data bound)" do
   end
 end
 
+describe "text area (basic)" do
+  include TagMatchers
+  it "should should return a basic text area based on the values passed in" do
+    text_area_field("foo", :name => "foo").should match_tag(:textarea, :name => "foo")
+  end
+end
+
+describe "text area (data bound)" do
+  it_should_behave_like "FakeBufferConsumer"
+  
+  it "should return a bound text area" do
+    form_for :obj do
+      ta = text_area_control(:foo)
+      tab = text_area_control(:foobad)
+      ta.should match_tag(:textarea, :name => "obj[foo]")
+      tab.should match_tag(:textarea, :name => "obj[foobad]", :class => "error")
+      ta.should include("foowee")
+    end
+  end
+end
+
+
 describe "submit_button" do
   it_should_behave_like "FakeBufferConsumer"
     
