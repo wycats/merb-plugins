@@ -18,13 +18,14 @@ module Merb
       end
       
       def form_for(obj, &block)
+        concat("<form>", block.binding)
         self.instance_eval do
           @obj = instance_variable_get("@#{obj}")
           @object_name = obj
           @block = block
           block.call
         end
-        capture(block)
+        concat("</form>", block.binding)        
       end
       
       def text_control(col)

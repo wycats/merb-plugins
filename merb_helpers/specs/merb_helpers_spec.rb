@@ -57,13 +57,14 @@ describe "text_control" do
   
   before :each do
     @obj = FakeModel.new
+    def _buffer(buf) @buffer ||= "" end    
   end
   
   it "should take a string object and return a useful text control" do
     f = form_for :obj do
-      text_control(:foo).should == "<input type='text' name='obj[foo]' value='foowee'/>"
+      text_control(:foo).should == "<form><input type='text' name='obj[foo]' value='foowee'/>"
     end
-    f.should == "..."
+    f.should == "<form><input type='text' name='obj[foo]' value='foowee'/></form>"
   end
   
 end
