@@ -19,17 +19,19 @@ module Merb
       
       def form_for(obj, &block)
         concat("<form>", block.binding)
-        self.instance_eval do
-          @obj = instance_variable_get("@#{obj}")
-          @object_name = obj
-          @block = block
-          block.call
-        end
-        concat("</form>", block.binding)        
+        
+        old_obj, @_obj = @_obj, instance_variable_get("@#{obj}")
+        @_object_name = obj
+        old_block, @_block = @_block, block
+        
+        block.call
+        
+        concat("</form>", block.binding)
+        @_obj, @_block = old_obj, old_block
       end
       
       def text_control(col)
-        concat("<input type='text' name='#{@object_name}[#{col}]' value='#{@obj.send(col)}'/>", @block.binding)
+        concat("<input type='text' name='#{@_object_name}[#{col}]' value='#{@_obj.send(col)}'/>", @_block.binding)
       end
       
     end
