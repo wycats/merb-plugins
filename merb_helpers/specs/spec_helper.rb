@@ -2,58 +2,7 @@ $TESTING=true
 $:.push File.join(File.dirname(__FILE__), '..', 'lib')
 require 'rubygems'
 require 'merb'
-
-module TagMatchers
-  class MatchTag
-    def initialize(name, attrs)
-      @name, @attrs = name, attrs
-    end
-
-    def matches?(target)
-      @errors = []
-      unless target.include?("<#{@name}")
-        @errors << "Expected a <#{@name}>, but was #{target}"
-      end
-      @attrs.each do |attr, val|
-        unless target.include?("#{attr}=\"#{val}\"")
-          @errors << "Expected #{attr}=\"#{val}\", but was #{target}"
-        end
-      end
-      @errors.size == 0
-    end
-    
-    def failure_message
-      @errors[0]
-    end
-  end
-  
-  class NotMatchTag
-    def initialize(attrs)
-      @attrs = attrs
-    end
-    
-    def matches?(target)
-      @errors = []
-      @attrs.each do |attr, val|
-        if target.include?("#{attr}=\"#{val}\"")
-          @errors << "Should not include #{attr}=\"#{val}\", but was #{target}"
-        end
-      end
-      @errors.size == 0
-    end
-    
-    def failure_message
-      @errors[0]
-    end
-  end
-  
-  def match_tag(name, attrs)
-    MatchTag.new(name, attrs)
-  end
-  def not_match_tag(attrs)
-    NotMatchTag.new(attrs)
-  end
-end
+require 'merb/test/rspec'
 
 class FakeModel
   def self.columns
@@ -125,8 +74,10 @@ class FakeColumn
   end
 end
 
+
+  
+
 describe "FakeBufferConsumer", :shared => true do
-  include TagMatchers
   
   before :each do
     @obj = FakeModel.new

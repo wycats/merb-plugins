@@ -82,7 +82,7 @@ end
 
 describe "text_field (basic)" do
   it "should return a basic text field based on the values passed in" do
-    text_field(:name => "foo", :value => "bar").should == "<input type=\"text\" name=\"foo\" value=\"bar\"/>"  
+    text_field(:name => "foo", :value => "bar").should match_tag( :input, :type => "text", :name => "foo", :value => "bar")
   end
 end
 
@@ -103,8 +103,6 @@ describe "text_control (data bound)" do
 end
 
 describe "checkbox_field (basic)" do
-  include TagMatchers
-  
   it "should return a basic checkbox based on the values passed in" do
     checkbox_field(:name => "foo", :checked => "checked").should match_tag(:input, :class => "checkbox", :name => "foo", :checked => "checked")
   end
@@ -132,7 +130,6 @@ describe "checkbox_control (data bound)" do
 end
 
 describe "hidden_field (basic)" do
-  include TagMatchers
   
   it "should return a basic checkbox based on the values passed in" do
     hidden_field(:name => "foo", :value => "bar").should match_tag(:input, :type => "hidden", :name => "foo", :value => "bar")
@@ -157,7 +154,6 @@ describe "hidden_control (data bound)" do
 end
 
 describe "radio button (basic)" do
-  include TagMatchers
   it "should should return a basic radio button based on the values passed in" do
     radio_field(:name => "foo", :value => "bar").should match_tag(:input, :type => "radio", :name => "foo", :value => "bar")
   end
@@ -177,7 +173,7 @@ describe "radio button groups (data bound)" do
 end
 
 describe "text area (basic)" do
-  include TagMatchers
+  # include TagMatchers
   it "should should return a basic text area based on the values passed in" do
     text_area_field("foo", :name => "foo").should match_tag(:textarea, :name => "foo")
   end
