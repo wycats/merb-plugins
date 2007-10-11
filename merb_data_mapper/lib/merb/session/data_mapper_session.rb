@@ -75,7 +75,6 @@ module Merb
       data[key] = val
     end
   
-    # Lazy-unmarshal session state.
     def data
       @unmarshalled_data || @unmarshalled_data = self.class.unmarshal(@data)
     end
@@ -86,7 +85,7 @@ module Merb
     before_save :serialize_data
     
     def serialize_data
-      @data = self.class.marshal(data)
+      @data = self.class.marshal(self.data)
     end
   end
 

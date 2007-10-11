@@ -3,5 +3,6 @@ merb_data_mapper
 
 A plugin for the Merb framework that provides DataMapper access
 
-After you install the plugin, you have access to the sequel_migration generator in your merb projects
-example: /merb/root/script/generate dm_migration new_migration
+To use sessions:
+set the session store to data_mapper in merb.yml
+add the dependency in dependencies.rb: dependency "merb_data_mapper"
