@@ -17,6 +17,10 @@ module Merb
         }
       end
       
+      def obj_from_ivar_or_sym(obj)
+        obj.is_a?(Symbol) ? instance_variable_get("@#{obj}") : obj
+      end
+      
       def form_tag(attrs = {}, &block)
         attrs.merge!( :enctype => "multipart/form-data" ) if attrs.delete(:multipart)
         fake_form_method = set_form_method(attrs)
@@ -27,7 +31,8 @@ module Merb
       end
       
       def form_for(obj, attrs={}, &block)
-        fake_form_method = set_form_method(attrs, instance_variable_get("@#{obj}"))
+        obj = obj_from_ivar_or_sym(obj)
+        fake_form_method = set_form_method(attrs, obj)
         concat(open_tag("form", attrs), block.binding)
         concat(generate_fake_form_method(fake_form_method), block.binding) if fake_form_method
         fields_for(obj, attrs, &block)
@@ -35,7 +40,8 @@ module Merb
       end
       
       def fields_for(obj, attrs=nil, &block)
-        old_obj, @_obj = @_obj, instance_variable_get("@#{obj}")
+        obj = obj_from_ivar_or_sym(obj)
+        old_obj, @_obj = @_obj, obj
         @_object_name = "#{@_obj.class}".snake_case
         old_block, @_block = @_block, block
         
