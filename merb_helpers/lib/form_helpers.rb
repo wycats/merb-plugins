@@ -1,21 +1,3 @@
-class Hash
-  
-  def to_html_attributes
-    map do |k,v|
-      "#{k.to_s.camelize.downcase}=\"#{v}\""
-    end.join(" ")
-  end
-  
-  def add_html_class!(html_class)
-    if self[:class]
-      self[:class] = "#{self[:class]} #{html_class}"
-    else
-      self[:class] = html_class
-    end
-  end
-  
-end
-
 module Merb
   module Helpers
     module Form
@@ -35,29 +17,26 @@ module Merb
         }
       end
       
-      def open_tag(name, attrs = nil)
-        "<#{name}#{' ' + attrs.to_html_attributes if attrs}>"
-      end
-      
-      def self_closing_tag(name, attrs = nil)
-        "<#{name}#{' ' + attrs.to_html_attributes if attrs}/>"
-      end
-      
       def form_tag(attrs = {}, &block)
+        attrs.merge!( :enctype => "multipart/form-data" ) if attrs.delete(:multipart)
+        fake_form_method = set_form_method(attrs)
         concat(open_tag("form", attrs), block.binding)
+        concat(generate_fake_form_method(fake_form_method), block.binding) if fake_form_method
         concat(capture(&block), block.binding)
         concat("</form>", block.binding)
       end
       
-      def form_for(obj, attrs=nil, &block)
+      def form_for(obj, attrs={}, &block)
+        fake_form_method = set_form_method(attrs, instance_variable_get("@#{obj}"))
         concat(open_tag("form", attrs), block.binding)
+        concat(generate_fake_form_method(fake_form_method), block.binding) if fake_form_method
         fields_for(obj, attrs, &block)
         concat("</form>", block.binding)
       end
       
       def fields_for(obj, attrs=nil, &block)
         old_obj, @_obj = @_obj, instance_variable_get("@#{obj}")
-        @_object_name = obj
+        @_object_name = "#{@_obj.class}".snake_case
         old_block, @_block = @_block, block
         
         concat(capture(&block), block.binding)
@@ -65,26 +44,26 @@ module Merb
         @_obj, @_block = old_obj, old_block        
       end
       
-      def name(col)
+      def control_name(col)
         "#{@_object_name}[#{col}]"
       end
       
-      def value(col)
+      def control_value(col)
         @_obj.send(col)
       end
       
-      def name_value(col, attrs)
-        {:name => name(col), :value => value(col)}.merge(attrs)
+      def control_name_value(col, attrs)
+        {:name => control_name(col), :value => control_value(col)}.merge(attrs)
       end
       
       def text_control(col, attrs = {})
         errorify_field(attrs, col)
-        text_field(name_value(col, attrs))
+        text_field(control_name_value(col, attrs))
       end
       
       def text_field(attrs = {})
         attrs.merge!(:type => "text")
-        self_closing_tag("input", attrs)
+        add_field_label(attrs){self_closing_tag("input", attrs)}
       end
       
       def checkbox_control(col, attrs = {})
@@ -92,21 +71,23 @@ module Merb
         val = @_obj.send(col)
         attrs.merge!(:value => val ? "1" : "0")
         attrs.merge!(:checked => "checked") if val
-        checkbox_field(name_value(col, attrs))
+        checkbox_field(control_name_value(col, attrs))
       end
       
       def checkbox_field(attrs = {})
         attrs.merge!(:type => :checkbox)
         attrs.add_html_class!("checkbox")
-        self_closing_tag("input", attrs)
+        add_field_label(attrs){self_closing_tag("input", attrs)}
       end
       
       def hidden_control(col, attrs = {})
+        attrs.delete(:label)
         errorify_field(attrs, col)
-        hidden_field(name_value(col, attrs))
+        hidden_field(control_name_value(col, attrs))
       end
       
       def hidden_field(attrs = {})
+        attrs.delete(:label)
         attrs.merge!(:type => :hidden)
         self_closing_tag("input", attrs)
       end
@@ -116,7 +97,7 @@ module Merb
         val = @_obj.send(col)
         ret = ""
         options.each do |opt|
-          hash = {:name => "#{@_object_name}[#{col}]", :value => opt}
+          hash = {:name => "#{@_object_name}[#{col}]", :value => opt, :label => opt}
           hash.merge!(:selected => "selected") if val.to_s == opt.to_s
           ret << radio_field(hash)
         end
@@ -126,18 +107,22 @@ module Merb
       def radio_field(attrs = {})
         attrs.merge!(:type => "radio")
         attrs.add_html_class!("radio")
-        self_closing_tag("input", attrs)
+        add_field_label(attrs){self_closing_tag("input", attrs)}
       end
       
       def text_area_control(col, attrs = {})
+        attrs ||= {}
         errorify_field(attrs, col)
-        text_area_field(value(col), attrs.merge(:name => name(col)))
+        text_area_field(control_value(col), attrs.merge(:name => control_name(col)))
       end
       
       def text_area_field(val, attrs = {})
-        open_tag("textarea", attrs) +
-        val +
-        "</textarea>"
+        val ||=""
+        add_field_label(attrs) do
+          open_tag("textarea", attrs) +
+          val +
+          "</textarea>"
+        end
       end
       
       def submit_button(contents, attrs = {})
@@ -146,7 +131,44 @@ module Merb
       end
 
       def errorify_field(attrs, col)
-        attrs.add_html_class!("error") if !@obj.valid? && @obj.errors.on(col)
+        attrs.add_html_class!("error") if !@_obj.valid? && @_obj.errors.on(col)
+      end
+      
+      def add_label(label, &block)
+        concat("<label>#{label}", block.binding)
+        yield
+        concat("</label>", block.binding )
+      end
+      
+      
+      def add_field_label( attrs, &block )
+        case attrs
+        when Hash
+          label_name = attrs.delete :label
+        when String, Symbol
+          label_name = attrs.to_s
+        end
+        ret = ""
+        ret << "<label>#{label_name}" if label_name
+        ret << yield
+        ret << "</label>" if label_name
+        ret
+      end
+      
+      private
+      # Fake out the browser to send back the method for RESTful stuff.
+      # Fall silently back to post if a method is given that is not supported here
+      def set_form_method(options = {}, obj = nil)
+        options[:method] ||= (!obj || obj.new_record? ? :post : :put)
+        if ![:get,:post].include?(options[:method])
+          fake_form_method = options[:method] if [:put, :delete].include?(options[:method])
+          options[:method] = :post
+        end
+        fake_form_method
+      end
+
+      def generate_fake_form_method(fake_form_method)
+        fake_form_method ? hidden_field(:name => "_method", :value => "#{fake_form_method}") : ""
       end
       
     end

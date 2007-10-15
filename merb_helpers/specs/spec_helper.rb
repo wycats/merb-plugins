@@ -2,7 +2,7 @@ $TESTING=true
 $:.push File.join(File.dirname(__FILE__), '..', 'lib')
 require 'rubygems'
 require 'merb'
-require 'merb/test/rspec'
+# require 'merb/test/rspec'
 
 class FakeModel
   def self.columns
@@ -21,6 +21,10 @@ class FakeModel
     false
   end
   
+  def new_record?
+    false
+  end
+  
   def errors
     FakeErrors.new(self)
   end
@@ -28,6 +32,7 @@ class FakeModel
   def foo
     "foowee"
   end
+  
   alias_method :foobad, :foo
   
   def bar
@@ -44,6 +49,10 @@ class FakeModel
     false
   end
   alias_method :batbad, :bat
+  
+  def nothing
+    nil
+  end
 end
 
 class FakeModel2 < FakeModel
@@ -52,6 +61,10 @@ class FakeModel2 < FakeModel
     "foowee2"
   end
   alias_method :foobad, :foo
+  
+  def new_record?
+    true
+  end
   
 end
 
