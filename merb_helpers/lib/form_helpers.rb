@@ -21,6 +21,10 @@ module Merb
         obj.is_a?(Symbol) ? instance_variable_get("@#{obj}") : obj
       end
       
+      def tag(tag_name, contents, attrs = {})
+        open_tag(tag_name, attrs) + contents + "</#{tag_name}>"
+      end
+      
       def form_tag(attrs = {}, &block)
         attrs.merge!( :enctype => "multipart/form-data" ) if attrs.delete(:multipart)
         fake_form_method = set_form_method(attrs)
@@ -69,7 +73,7 @@ module Merb
       
       def text_field(attrs = {})
         attrs.merge!(:type => "text")
-        add_field_label(attrs){self_closing_tag("input", attrs)}
+        optional_label(attrs) { self_closing_tag("input", attrs) }
       end
       
       def checkbox_control(col, attrs = {})
@@ -83,7 +87,7 @@ module Merb
       def checkbox_field(attrs = {})
         attrs.merge!(:type => :checkbox)
         attrs.add_html_class!("checkbox")
-        add_field_label(attrs){self_closing_tag("input", attrs)}
+        optional_label(attrs){self_closing_tag("input", attrs)}
       end
       
       def hidden_control(col, attrs = {})
@@ -113,7 +117,7 @@ module Merb
       def radio_field(attrs = {})
         attrs.merge!(:type => "radio")
         attrs.add_html_class!("radio")
-        add_field_label(attrs){self_closing_tag("input", attrs)}
+        optional_label(attrs){self_closing_tag("input", attrs)}
       end
       
       def text_area_control(col, attrs = {})
@@ -124,7 +128,7 @@ module Merb
       
       def text_area_field(val, attrs = {})
         val ||=""
-        add_field_label(attrs) do
+        optional_label(attrs) do
           open_tag("textarea", attrs) +
           val +
           "</textarea>"
@@ -133,32 +137,11 @@ module Merb
       
       def submit_button(contents, attrs = {})
         attrs.merge!(:type => "submit")
-        open_tag("button", attrs) + contents + "</button>"
+        tag("button", contents, attrs)
       end
 
-      def errorify_field(attrs, col)
-        attrs.add_html_class!("error") if !@_obj.valid? && @_obj.errors.on(col)
-      end
-      
-      def add_label(label, &block)
-        concat("<label>#{label}", block.binding)
-        yield
-        concat("</label>", block.binding )
-      end
-      
-      
-      def add_field_label( attrs, &block )
-        case attrs
-        when Hash
-          label_name = attrs.delete :label
-        when String, Symbol
-          label_name = attrs.to_s
-        end
-        ret = ""
-        ret << "<label>#{label_name}" if label_name
-        ret << yield
-        ret << "</label>" if label_name
-        ret
+      def label(name, contents = "", attrs = {})
+        tag("label", name.to_s + contents, attrs)
       end
       
       private
@@ -176,6 +159,20 @@ module Merb
       def generate_fake_form_method(fake_form_method)
         fake_form_method ? hidden_field(:name => "_method", :value => "#{fake_form_method}") : ""
       end
+      
+      def optional_label(attrs = {})
+        label = attrs.delete(:label) if attrs
+        if label
+          title = label.is_a?(Hash) ? label.delete(:title) : label
+          label(title, yield, label.is_a?(Hash) ? label : {})
+        else
+          yield
+        end
+      end   
+      
+      def errorify_field(attrs, col)
+        attrs.add_html_class!("error") if !@_obj.valid? && @_obj.errors.on(col)
+      end         
       
     end
   end

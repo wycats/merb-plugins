@@ -403,17 +403,10 @@ describe "label helpers" do
   it_should_behave_like "FakeBufferConsumer"
   
   it "should add a label to arbitrary markup in a template" do
-    result = add_label("Name:"){ _buffer << text_field(:name => "name_value") }
+    result = label("Name:", text_field(:name => "name_value"))
     result.should == "<label>Name:<input type=\"text\" name=\"name_value\"/></label>"
     
   end
-  
-  it "should add a label to a text returning helper" do
-    form_for(:obj) do
-      _buffer << add_field_label({:label => "LABEL"}){ text_control(:foo) }
-    end
-    _buffer.should match(/<label>LABEL<input .+\/><\/label>/)
-  end
-  
+    
 end
 
