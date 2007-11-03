@@ -1,6 +1,6 @@
 require 'merb/generators/merb_generator_helpers'
 
-class ArMigrationGenerator < Merb::GeneratorHelpers::MigrationGeneratorBase
+class MigrationGenerator < Merb::GeneratorHelpers::MigrationGeneratorBase
   
   def initialize( *args )
     super( *args )

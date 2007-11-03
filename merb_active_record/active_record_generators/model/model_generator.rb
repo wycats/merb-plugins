@@ -1,11 +1,11 @@
 require 'merb/generators/merb_generator_helpers'
 
-class ArModelGenerator < Merb::GeneratorHelpers::ModelGeneratorBase
+class ModelGenerator < Merb::GeneratorHelpers::ModelGeneratorBase
   
   def initialize( *args )
     super( *args )
     @model_template_name = "new_model.erb"
-    @migration_generator_name = "ar_migration"
+    @migration_generator_name = "migration"
     @model_test_generator_name = "merb_model_test"
   end
   

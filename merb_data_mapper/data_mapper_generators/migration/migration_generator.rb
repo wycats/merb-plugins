@@ -1,5 +1,5 @@
 require 'merb'
-class DmMigrationGenerator < RubiGen::Base
+class MigrationGenerator < RubiGen::Base
   
   default_options :author => nil
   
