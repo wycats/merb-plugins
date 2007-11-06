@@ -3,7 +3,7 @@ require 'rake/gempackagetask'
 
 PLUGIN = "merb_data_mapper"
 NAME = "merb_data_mapper"
-VERSION = "0.4.0"
+VERSION = "0.4.2"
 AUTHOR = "Jason Toy"
 EMAIL = "jtoy@rubynow.com"
 HOMEPAGE = "http://merb-plugins.rubyforge.org/merb_data_mapper/"
