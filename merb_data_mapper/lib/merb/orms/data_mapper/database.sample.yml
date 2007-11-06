@@ -3,7 +3,7 @@
 :development: &defaults
   :adapter: postgresql
   :database: sample_development
-  :username: teh_user
+  :username: the_user
   :password: secrets
   :host: localhost
 
