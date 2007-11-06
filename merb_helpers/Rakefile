@@ -3,11 +3,11 @@ require 'rake/gempackagetask'
 
 PLUGIN = "merb_helpers"
 NAME = "merb_helpers"
-VERSION = "0.0.1"
-AUTHOR = "Your Name"
-EMAIL = "Your Email"
-HOMEPAGE = "http://merb-plugins.rubyforge.org/merb_helpers/"
-SUMMARY = "Merb plugin that provides ..."
+VERSION = "0.4.0"
+AUTHOR = "Yehuda Katz"
+EMAIL = "wycats@gmail.com"
+HOMEPAGE = "http://merb.rubyforge.org/"
+SUMMARY = "Helper support for merb (similar to the Rails form helpers)"
 
 spec = Gem::Specification.new do |s|
   s.name = NAME
@@ -25,6 +25,8 @@ spec = Gem::Specification.new do |s|
   s.autorequire = PLUGIN
   s.files = %w(LICENSE README Rakefile TODO) + Dir.glob("{lib,specs}/**/*")
 end
+
+spec.add_dependency("merb", ">=0.4")
 
 Rake::GemPackageTask.new(spec) do |pkg|
   pkg.gem_spec = spec
