@@ -3,7 +3,7 @@ require 'rake/gempackagetask'
 
 PLUGIN = "merb_active_record"
 NAME = "merb_active_record"
-VERSION = "0.0.3"
+VERSION = "0.4.0"
 AUTHOR = "Duane Johnson"
 EMAIL = "canadaduane@gmail.com"
 HOMEPAGE = "http://merb-plugins.rubyforge.org/merb_active_record/"
@@ -20,7 +20,7 @@ spec = Gem::Specification.new do |s|
   s.author = AUTHOR
   s.email = EMAIL
   s.homepage = HOMEPAGE
-  s.requirements << 'merb'
+  s.add_dependency('merb', '>= 0.4.0')
   s.require_path = 'lib'
   s.autorequire = PLUGIN
   s.files = %w(LICENSE README Rakefile TODO) + Dir.glob("{lib,specs,active_record_generators}/**/*")
