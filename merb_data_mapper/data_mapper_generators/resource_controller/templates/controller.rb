@@ -8,19 +8,19 @@ class <%= class_name %> < Application
     render @<%= ivar %>s
   end
   
-  def show
-    @<%= ivar %> = <%= klass %>.find(params[:id])
+  def show(id)
+    @<%= ivar %> = <%= klass %>[id]
     render @<%= ivar %>
   end
   
-  def new
+  def new(<%= ivar %>)
     only_provides :html
-    @<%= ivar %> = <%= klass %>.new(params[:<%= ivar %>])
-    render
+    @<%= ivar %> = <%= klass %>.new(<%= ivar %>)
+    render @<%= ivar %>
   end
   
-  def create
-    @<%= ivar %> = <%= klass %>.new(params[:<%= ivar %>])
+  def create(<%= ivar %>)
+    @<%= ivar %> = <%= klass %>.new()
     if @<%= ivar %>.save
       redirect url(:<%= ivar %>, @<%= ivar %>)
     else
@@ -34,17 +34,17 @@ class <%= class_name %> < Application
     render
   end
   
-  def update
-    @<%= ivar %> = <%= klass %>.find(params[:id])
-    if @<%= ivar %>.update_attributes(params[:<%= ivar %>])
+  def update(id, <%= ivar %>)
+    @<%= ivar %> = <%= klass %>[id]
+    if @<%= ivar %>.update_attributes(<%= ivar %>)
       redirect url(:<%= ivar %>, @<%= ivar %>)
     else
       raise BadRequest
     end
   end
   
-  def destroy
-    @<%= ivar %> = <%= klass %>.find(params[:id])
+  def destroy(id)
+    @<%= ivar %> = <%= klass %>[id]
     if @<%= ivar %>.destroy!
       redirect url(:<%= ivar %>s)
     else
