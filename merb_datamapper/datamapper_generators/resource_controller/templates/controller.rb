@@ -1,6 +1,6 @@
 <% klass = class_name.singularize -%>
 <% ivar = class_name.snake_case.singularize -%>
-class <%= class_name.pluralize %> < Application
+class <%= class_name %> < Application
   provides :xml, :js, :yaml
   
   def index
