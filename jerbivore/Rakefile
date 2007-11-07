@@ -13,7 +13,6 @@ gemspec = Gem::Specification.new do |s|
   s.version = version
   s.platform = 'java'
   s.has_rdoc = true
-  s.extra_rdoc_files = ['README', 'LICENSE', 'TODO']
   s.summary = 'Merb + JRuby = Slightly less painful Java web apps'
   s.description = s.summary
   s.author = 'Dudley Flanders'
@@ -23,7 +22,7 @@ gemspec = Gem::Specification.new do |s|
   s.requirements << 'merb'
   s.require_path = 'lib'
   s.autorequire = 'jerbivore'
-  files = FileList.new(%w[LICENSE README Rakefile TODO])
+  files = FileList.new(%w[LICENSE Rakefile])
   files.include('{ext,jetty,lib,spec}/**/*')
   files.include(jar)
   files.exclude('spec/fixtures/fake-app/**/*')
