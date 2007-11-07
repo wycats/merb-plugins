@@ -1,0 +1,85 @@
+require 'rubygems'
+require 'rake/gempackagetask'
+require 'rake/clean'
+require 'spec/rake/spectask'
+
+jar = 'lib/java/jerbivore.jar'
+CLEAN.include(jar, 'pkg')
+
+version = '0.0.1'
+
+gemspec = Gem::Specification.new do |s|
+  s.name = 'jerbivore'
+  s.version = version
+  s.platform = 'java'
+  s.has_rdoc = true
+  s.extra_rdoc_files = ['README', 'LICENSE', 'TODO']
+  s.summary = 'Merb + JRuby = Slightly less painful Java web apps'
+  s.description = s.summary
+  s.author = 'Dudley Flanders'
+  s.email = 'dudley@misnomer.us'
+  s.homepage = ''
+  s.add_dependency 'Antwrap'
+  s.requirements << 'merb'
+  s.require_path = 'lib'
+  s.autorequire = 'jerbivore'
+  files = FileList.new(%w[LICENSE README Rakefile TODO])
+  files.include('{ext,jetty,lib,spec}/**/*')
+  files.include(jar)
+  files.exclude('spec/fixtures/fake-app/**/*')
+  s.files = files
+end
+
+Rake::GemPackageTask.new(gemspec) do |pkg|
+  pkg.gem_spec = gemspec
+end
+
+desc 'Run all specs'
+Spec::Rake::SpecTask.new('specs') do |t|
+  t.spec_opts = ['--format', 'specdoc', '--colour']
+  t.spec_files = Dir['spec/**/*_spec.rb'].sort
+end
+
+
+task :clean => ['java:clean'] 
+file jar => ['java:jar']
+task :gem => jar
+
+namespace :java do
+  desc "Run the merb-servlet's clean Ant task"
+  task :clean do
+    sh "ant -f ext/merb-servlet/build.xml clean"
+  end
+
+  desc "Run the merb-servlet's jar Ant task to create jerbivore.jar"
+  task :jar do
+    sh "ant -f ext/merb-servlet/build.xml jar"
+  end  
+end
+
+namespace :test do
+  namespace :app do
+    desc "Generate a Merb app for testing"
+    task :setup => :gem do
+      mkdir_p test
+      cd "spec/fixtures" do
+        rm_rf "fake-app"
+        system "jruby -S merb -g fake-app"
+        system "jruby -S gem install -i fake-app/gems ../../pkg/jerbivore-#{version}-java.gem"
+        File.open("fake-app/config/dependencies.rb", "a") {|f| f << "\ndependency 'jerbivore'\n"}
+        File.open("fake-app/config/merb.yml", "a") {|f| f << "\n:path_prefix: '/fake-app'\n"}
+      end
+      
+      cd "spec/fixtures/fake-app" do
+        system "jruby -S rake jerbivore:war"
+      end
+    end
+    
+    desc "Update the fake app's jerbivore installation"
+    task :update => :gem do
+      cd "spec/fixtures" do
+        system "jruby -S gem install -i fake-app/gems ../../pkg/jerbivore-#{version}-java.gem"
+      end
+    end
+  end
+end

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://java.sun.com/xml/ns/j2ee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"
+         version="2.4">
+         
+    <context-param>
+        <description>The files servlet should forward to the merb servlet if no file could be found</description>
+        <param-name>files.default</param-name>
+        <param-value>merb</param-value>
+    </context-param>
+
+    <servlet>
+        <servlet-name>merb</servlet-name>
+        <servlet-class>jerbivore.MerbServlet</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>files</servlet-name>
+        <servlet-class>jerbivore.FileServlet</servlet-class>
+    </servlet>
+
+    <!-- Allow all requests to go to the files servlet first -->
+    <servlet-mapping>
+        <servlet-name>files</servlet-name>
+        <url-pattern>/*</url-pattern>
+    </servlet-mapping>
+    
+</web-app>
