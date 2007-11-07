@@ -4,11 +4,12 @@ class ResourceControllerGenerator < Merb::GeneratorHelpers::ControllerGeneratorB
 
 
   def initialize(*args)
+    puts args.inspect
     runtime_options = args.last.is_a?(Hash) ? args.pop : {}
     name, *actions = args.flatten
     runtime_options[:actions] = %w[index show new edit]
     runtime_options[:test_stub_generator] = "merb_controller_test"
-    super( [name], runtime_options )
+    super( [name.pluralize], runtime_options )
   end
 
   def self.superclass
