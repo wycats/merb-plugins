@@ -4,8 +4,8 @@ class <%= class_name %> < Application
   provides :xml, :js, :yaml
   
   def index
-    @<%= ivar %>s = <%= klass %>.all
-    render @<%= ivar %>s
+    @<%= ivar.pluralize %> = <%= klass %>.all
+    render @<%= ivar.pluralize %>
   end
   
   def show
