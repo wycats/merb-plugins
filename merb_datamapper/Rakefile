@@ -3,7 +3,7 @@ require 'rake/gempackagetask'
 
 PLUGIN = "merb_datamapper"
 NAME = "merb_datamapper"
-VERSION = "0.4.2"
+VERSION = "0.4.3"
 AUTHOR = "Jason Toy"
 EMAIL = "jtoy@rubynow.com"
 HOMEPAGE = "http://merbivore.com"
@@ -21,7 +21,7 @@ spec = Gem::Specification.new do |s|
   s.email = EMAIL
   s.homepage = HOMEPAGE
   s.add_dependency('merb', '>= 0.4.0')
-  s.add_dependency('datamapper')
+  s.add_dependency('datamapper', '>= 0.2.3')
   s.require_path = 'lib'
   s.autorequire = PLUGIN
   s.files = %w(LICENSE README Rakefile TODO) + Dir.glob("{lib,specs,datamapper_generators}/**/*")
