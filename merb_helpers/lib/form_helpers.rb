@@ -102,13 +102,14 @@ module Merb
         self_closing_tag("input", attrs)
       end
       
-      def radio_group_control(col, options = {}, attrs = {})
+      def radio_group_control(col, options = [], attrs = {})
         errorify_field(attrs, col)
         val = @_obj.send(col)
         ret = ""
         options.each do |opt|
-          hash = {:name => "#{@_object_name}[#{col}]", :value => opt, :label => opt}
-          hash.merge!(:selected => "selected") if val.to_s == opt.to_s
+          value, label = opt.is_a?(Hash) ? [opt[:value], opt[:label]] : [opt, opt]
+          hash = {:name => "#{@_object_name}[#{col}]", :value => value, :label => label}
+          hash.merge!(:selected => "selected") if val.to_s == value.to_s
           ret << radio_field(hash)
         end
         ret
