@@ -10,7 +10,7 @@ class <%= class_name %> < Application
   
   def show(id)
     @<%= ivar %> = <%= klass %>[id]
-    raise BadRequest unless @<%= ivar %>
+    raise NotFound unless @<%= ivar %>
     render @<%= ivar %>
   end
   
@@ -32,13 +32,13 @@ class <%= class_name %> < Application
   def edit(id)
     only_provides :html
     @<%= ivar %> = <%= klass %>[id]
-    raise BadRequest unless @<%= ivar %>
+    raise NotFound unless @<%= ivar %>
     render
   end
   
   def update(id, <%= ivar %>)
     @<%= ivar %> = <%= klass %>[id]
-    raise BadRequest unless @<%= ivar %>
+    raise NotFound unless @<%= ivar %>
     if @<%= ivar %>.update_attributes(<%= ivar %>)
       redirect url(:<%= ivar %>, @<%= ivar %>)
     else
@@ -48,7 +48,7 @@ class <%= class_name %> < Application
   
   def destroy(id)
     @<%= ivar %> = <%= klass %>[id]
-    raise BadRequest unless @<%= ivar %>
+    raise NotFound unless @<%= ivar %>
     if @<%= ivar %>.destroy!
       redirect url(:<%= ivar.pluralize %>)
     else
