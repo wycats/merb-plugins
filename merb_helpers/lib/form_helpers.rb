@@ -76,18 +76,24 @@ module Merb
         optional_label(attrs) { self_closing_tag("input", attrs) }
       end
       
+      def cb_val_to_bool(val)
+        !(val == false || val.nil?) && val.to_i != 0
+      end
+      private :cb_val_to_bool
+
       def checkbox_control(col, attrs = {})
         errorify_field(attrs, col)
-        val = @_obj.send(col)
-        attrs.merge!(:value => val ? "1" : "0")
-        attrs.merge!(:checked => "checked") if val
+        attrs.merge!(:checked => "checked") if cb_val_to_bool(@_obj.send(col))
         checkbox_field(control_name_value(col, attrs))
       end
-      
+
       def checkbox_field(attrs = {})
+        on            = attrs.delete(:on)  || 1
+        off           = attrs.delete(:off) || 0
+        attrs[:value] = on if (!attrs.has_key?(:value) || attrs[:value].nil?)
         attrs.merge!(:type => :checkbox)
         attrs.add_html_class!("checkbox")
-        optional_label(attrs){self_closing_tag("input", attrs)}
+        hidden_field(:name => attrs[:name], :value => off) + optional_label(attrs){self_closing_tag("input", attrs)}
       end
       
       def hidden_control(col, attrs = {})

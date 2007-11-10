@@ -215,6 +215,13 @@ describe "checkbox_control (data bound)" do
     end
   end
   
+  it "should allow a user to set the :off value" do
+    form_for :obj do
+      checkbox_control(:baz, :off => "off", :on => "on").should match_tag(:input, :type =>"checkbox", :name => "fake_model[baz]", :class => "checkbox", :value => "on", :checked => "checked")
+      checkbox_control(:bat, :off => "off", :on => "on").should match_tag(:input, :type =>"checkbox", :name => "fake_model[bat]", :class => "checkbox", :value => "off")
+    end
+  end
+  
   it "should render controls with errors if their attribute contains an error" do
     form_for :obj do
       checkbox_control(:bazbad).should match_tag(:input, :type =>"checkbox", :name => "fake_model[bazbad]", 
