@@ -222,6 +222,16 @@ describe "checkbox_control (data bound)" do
     end
   end
   
+  it "should evaulate nil, false, 0 and '0' to false. All else to true" do
+    send(:col_val_to_bool, nil).should   == false
+    send(:col_val_to_bool, false).should == false
+    send(:col_val_to_bool, 0).should     == false
+    send(:col_val_to_bool, '0').should   == false
+    send(:col_val_to_bool, 1).should     == true
+    send(:col_val_to_bool, '1').should   == true
+    send(:col_val_to_bool, true).should  == true
+  end
+
   it "should render controls with errors if their attribute contains an error" do
     form_for :obj do
       checkbox_control(:bazbad).should match_tag(:input, :type =>"checkbox", :name => "fake_model[bazbad]", 
