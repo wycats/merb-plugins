@@ -192,6 +192,44 @@ describe "text_control (data bound)" do
   end
 end
 
+describe "password_field (basic)" do
+  it_should_behave_like "FakeBufferConsumer"
+  
+  it "should return a basic password field, but omit the value" do
+    password_field(:name => "foo", :value => "bar").should match_tag(:input, :type => "password", :name => "foo")
+  end
+  
+  it "should wrap the field in a label if the :label option is passed to the text_field" do
+    result = password_field(:label => "LABEL" )
+    result.should match(/<label>LABEL<input type="password"\s*\/><\/label>/)
+  end
+end
+
+describe "password_control (data bound)" do
+  it_should_behave_like "FakeBufferConsumer"
+  
+  it "should take a string object and return a useful password control, but omit the value" do
+    f = form_for :obj do
+      password_control(:foo).should match_tag(:input, :type => "password", :name => "fake_model[foo]")
+    end
+  end
+
+  it "should take additional attributes and use them" do
+    form_for :obj do
+      password_control(:foo, :bar => "7").should match_tag(:input, :type => "password", :name => "fake_model[foo]", :bar => "7")
+    end
+  end
+  
+  it "should wrap the text_control in a label if the :label option is passed in" do
+    form_for :obj do
+      _buffer << password_control(:foo, :label => "LABEL")
+    end
+    _buffer.should match(/<label>LABEL<input/)
+    res = _buffer.scan(/<[^>]*>/)
+    res[2].should_not match_tag(:input, :label => "LABEL")
+  end
+end
+
 describe "checkbox_field (basic)" do
   it "should return a basic checkbox based on the values passed in" do
     checkbox_field(:name => "foo", :checked => "checked").should match_tag(:input, :class => "checkbox", :name => "foo", :checked => "checked")

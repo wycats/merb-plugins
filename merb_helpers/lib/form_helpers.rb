@@ -76,6 +76,18 @@ module Merb
         optional_label(attrs) { self_closing_tag("input", attrs) }
       end
       
+      def password_control(col, attrs = {})
+        attrs.merge!(:name => control_name(col))
+        errorify_field(attrs, col)
+        password_field(control_name_value(col, attrs))
+      end
+      
+      def password_field(attrs = {})
+        attrs.delete(:value)
+        attrs.merge!(:type => 'password')
+        optional_label(attrs) { self_closing_tag("input", attrs) }
+      end
+      
       # translate column values from the db to boolean
       # nil, false, 0 and '0' are false. All others are true
       def col_val_to_bool(val)
