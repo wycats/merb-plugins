@@ -5,15 +5,15 @@ module Merb
     def setup_session
       MERB_LOGGER.info("Setting up session")
       before = cookies[_session_id_key]
-      @_session, cookies[_session_id_key] = Merb::ActiveRecordSession.persist(cookies[_session_id_key])
-      @_fingerprint = Marshal.dump(@_session.data).hash
+      request.session, cookies[_session_id_key] = Merb::ActiveRecordSession.persist(cookies[_session_id_key])
+      @_fingerprint = Marshal.dump(request.session.data).hash
       @_new_cookie = cookies[_session_id_key] != before
     end
 
     def finalize_session
       MERB_LOGGER.info("Finalize session")
-      @_session.save if @_fingerprint != Marshal.dump(@_session.data).hash
-      set_cookie(_session_id_key, @_session.session_id, _session_expiry) if (@_new_cookie || @_session.needs_new_cookie)
+      request.session.save if @_fingerprint != Marshal.dump(request.session.data).hash
+      set_cookie(_session_id_key, request.session.session_id, _session_expiry) if (@_new_cookie || request.session.needs_new_cookie)
     end
   end # ActiveRecordMixin
 
