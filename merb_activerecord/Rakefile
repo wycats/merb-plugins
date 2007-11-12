@@ -34,3 +34,7 @@ task :install do
   sh %{rake package}
   sh %{sudo gem install pkg/#{NAME}-#{VERSION}}
 end
+
+task :release => :package do
+  sh %{rubyforge add_release merb #{PLUGIN} #{VERSION} pkg/#{NAME}-#{VERSION}.gem}
+end
