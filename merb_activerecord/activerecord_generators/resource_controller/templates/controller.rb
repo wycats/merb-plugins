@@ -5,7 +5,7 @@ class <%= class_name %> < Application
   
   def index
     @<%= ivar.pluralize %> = <%= klass %>.find(:all)
-    render @<%= ivar.pluralize %>s
+    render @<%= ivar.pluralize %>
   end
   
   def show
