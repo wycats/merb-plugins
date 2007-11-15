@@ -465,3 +465,41 @@ describe "label helpers" do
     
 end
 
+describe "file_field (basic)" do
+  it_should_behave_like "FakeBufferConsumer"
+  
+  it "should return a basic file field based on the values passed in" do
+    file_field(:name => "foo", :value => "bar").should match_tag( :input, :type => "file", :name => "foo", :value => "bar")
+  end
+  
+  it "should wrap the field in a label if the :label option is passed to the file_field" do
+    result = file_field(:label => "LABEL" )
+    result.should match(/<label>LABEL<input type="file"\s*\/><\/label>/)
+  end
+end
+
+describe "file_control (data bound)" do
+  it_should_behave_like "FakeBufferConsumer"
+  
+  it "should take a string object and return a useful file control" do
+    f = form_for :obj do
+      file_control(:foo).should match_tag(:input, :type => "file", :name => "fake_model[foo]", :value => "foowee")
+    end
+  end
+
+  it "should take additional attributes and use them" do
+    form_for :obj do
+      file_control(:foo, :bar => "7").should match_tag(:input, :type => "file", :name => "fake_model[foo]", :value => "foowee", :bar => "7")
+    end
+  end
+  
+  it "should wrap the file_control in a label if the :label option is passed in" do
+    form_for :obj do
+      _buffer << text_control(:foo, :label => "LABEL")
+    end
+    _buffer.should match(/<label>LABEL<input/)
+    res = _buffer.scan(/<[^>]*>/)
+    res[2].should_not match_tag(:input, :label => "LABEL")
+  end
+end
+

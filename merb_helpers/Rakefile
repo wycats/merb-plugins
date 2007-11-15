@@ -20,13 +20,12 @@ spec = Gem::Specification.new do |s|
   s.author = AUTHOR
   s.email = EMAIL
   s.homepage = HOMEPAGE
-  s.requirements << 'merb'
+  s.add_dependency("merb", ">=0.4")
   s.require_path = 'lib'
   s.autorequire = PLUGIN
   s.files = %w(LICENSE README Rakefile TODO) + Dir.glob("{lib,specs}/**/*")
 end
 
-spec.add_dependency("merb", ">=0.4")
 
 Rake::GemPackageTask.new(spec) do |pkg|
   pkg.gem_spec = spec

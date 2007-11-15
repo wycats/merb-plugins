@@ -165,6 +165,17 @@ module Merb
         tag("label", name.to_s + contents, attrs)
       end
       
+      ## file input control
+      def file_control(col, attrs = {})
+        errorify_field(attrs, col)
+        file_field(control_name_value(col, attrs))
+      end
+      
+      def file_field(attrs = {})
+        attrs.merge!(:type => "file")
+        optional_label(attrs) { self_closing_tag("input", attrs) }
+      end
+      
       private
       # Fake out the browser to send back the method for RESTful stuff.
       # Fall silently back to post if a method is given that is not supported here
