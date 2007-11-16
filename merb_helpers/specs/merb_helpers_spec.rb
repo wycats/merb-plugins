@@ -511,11 +511,12 @@ describe "fieldset generation (basic)" do
   it_should_behave_like "FakeBufferConsumer"
 
   it "should provide legend option" do
-    form_tag do
+    fieldset :legend => 'TEST' do
       _buffer << "CONTENT"
     end
-    _buffer.should match_tag(:form, :method => "post")
     _buffer.should include("CONTENT")
+    _buffer.should match_tag(:fieldset, {})
+    _buffer.should match_tag(:legend, :content => 'TEST')
   end
 end
 

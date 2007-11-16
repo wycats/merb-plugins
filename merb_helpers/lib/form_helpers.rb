@@ -34,7 +34,7 @@ module Merb #:nodoc:
     # The HTML generated for this would be:
     #
     #     <form action="/foo/bar/1" method="post">
-    #       <input id="first_name" name="first_name" size="30" type="text" />
+    #       <label for="first_name">First Name</label><input id="first_name" name="first_name" size="30" type="text" />
     #       <input name="commit" type="submit" value="Create" />
     #     </form>
     module Form
@@ -80,7 +80,7 @@ module Merb #:nodoc:
       # The HTML generated for this would be:
       #
       #     <form action="/foo/bar/1" method="post">
-      #       <input id="first_name" name="first_name" size="30" type="text" />
+      #       <label for="first_name">First Name</label><input id="first_name" name="first_name" size="30" type="text" />
       #       <input name="commit" type="submit" value="Create" />
       #     </form>
       def form_tag(attrs = {}, &block)
@@ -102,8 +102,8 @@ module Merb #:nodoc:
       # The HTML generated for this would be:
       #
       #     <form action="/people/create" method="post">
-      #       <input id="person_first_name" name="person[first_name]" size="30" type="text" />
-      #       <input id="person_last_name" name="person[last_name]" size="30" type="text" />
+      #       <label for="person[first_name]">First Name</label><input id="person_first_name" name="person[first_name]" size="30" type="text" />
+      #       <label for="person[last_name]">Last Name</label><input id="person_last_name" name="person[last_name]" size="30" type="text" />
       #       <input name="commit" type="submit" value="Create" />
       #     </form>
       def form_for(obj, attrs={}, &block)
@@ -391,11 +391,14 @@ module Merb #:nodoc:
       #
       # ==== Options
       # +legend+:: The name of this fieldset which will be provided in a HTML legend tag.
-      def fieldset(attrs = {}, &block)
+      def fieldset(attrs={}, &block)
         legend = attrs.delete(:legend)
-        open_tag( 'fieldset', attrs ) + ( tag('legend', legend) if legend ) + yield + "</fieldset>"
+        concat( open_tag('fieldset', attrs), block.binding )
+        concat( tag('legend', legend), block.binding ) if legend
+        concat(capture(&block), block.binding)
+        concat( "</fieldset>", block.binding)
       end
-
+      
       ## file input control
       def file_control(col, attrs = {})
         errorify_field(attrs, col)
