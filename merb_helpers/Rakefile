@@ -3,7 +3,7 @@ require 'rake/gempackagetask'
 
 PLUGIN = "merb_helpers"
 NAME = "merb_helpers"
-VERSION = "0.4.0"
+VERSION = "0.4.1"
 AUTHOR = "Yehuda Katz"
 EMAIL = "wycats@gmail.com"
 HOMEPAGE = "http://merb.rubyforge.org/"
