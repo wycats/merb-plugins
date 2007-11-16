@@ -161,9 +161,9 @@ describe "text_field (basic)" do
     text_field(:name => "foo", :value => "bar").should match_tag( :input, :type => "text", :name => "foo", :value => "bar")
   end
   
-  it "should wrap the field in a label if the :label option is passed to the text_field" do
+  it "should provide an additional label tag if the :label option is passed in" do
     result = text_field(:label => "LABEL" )
-    result.should match(/<label>LABEL<input type="text"\s*\/><\/label>/)
+    result.should match(/<label>LABEL<\/label><input type="text"\s*\/>/)
   end
 end
 
@@ -182,11 +182,11 @@ describe "text_control (data bound)" do
     end
   end
   
-  it "should wrap the text_control in a label if the :label option is passed in" do
+  it "should provide an additional label tag if the :label option is passed in" do
     form_for :obj do
       _buffer << text_control(:foo, :label => "LABEL")
     end
-    _buffer.should match(/<label>LABEL<input/)
+    _buffer.should match(/<label.*>LABEL<\/label><input/)
     res = _buffer.scan(/<[^>]*>/)
     res[2].should_not match_tag(:input, :label => "LABEL")
   end
@@ -199,9 +199,9 @@ describe "password_field (basic)" do
     password_field(:name => "foo", :value => "bar").should match_tag(:input, :type => "password", :name => "foo")
   end
   
-  it "should wrap the field in a label if the :label option is passed to the text_field" do
+  it "should provide an additional label tag if the :label option is passed in" do
     result = password_field(:label => "LABEL" )
-    result.should match(/<label>LABEL<input type="password"\s*\/><\/label>/)
+    result.should match(/<label.*>LABEL<\/label><input type="password"\s*\/>/)
   end
 end
 
@@ -220,11 +220,11 @@ describe "password_control (data bound)" do
     end
   end
   
-  it "should wrap the text_control in a label if the :label option is passed in" do
+  it "should provide an additional label tag if the :label option is passed in" do
     form_for :obj do
       _buffer << password_control(:foo, :label => "LABEL")
     end
-    _buffer.should match(/<label>LABEL<input/)
+    _buffer.should match(/<label.*>LABEL<\/label><input/)
     res = _buffer.scan(/<[^>]*>/)
     res[2].should_not match_tag(:input, :label => "LABEL")
   end
@@ -235,9 +235,9 @@ describe "checkbox_field (basic)" do
     checkbox_field(:name => "foo", :checked => "checked").should match_tag(:input, :class => "checkbox", :name => "foo", :checked => "checked")
   end
   
-  it "should wrap the checkbox_field in a label if the :label option is passed in" do
+  it "should provide an additional label tag if the :label option is passed in" do
     result = checkbox_field(:label => "LABEL" )
-    result.should match(/<label>LABEL<input/)
+    result.should match(/<label>LABEL<\/label><input/)
     res = result.scan(/<[^>]*>/)
     res[2].should_not match_tag(:input, :label => "LABEL")
   end
@@ -279,11 +279,11 @@ describe "checkbox_control (data bound)" do
     end
   end  
   
-  it "should wrap the checkbox_control in a label if the label option is passed in" do
+  it "should provide an additional label tag if the :label option is passed in" do
     form_for :obj do
       _buffer << checkbox_control(:foo, :label => "LABEL")
     end
-    _buffer.should match( /<label>LABEL<input/ )
+    _buffer.should match( /<label.*>LABEL<\/label><input/ )
     res = _buffer.scan(/<[^>]*>/)
     res[2].should_not match_tag(:input, :label => "LABEL")
     end
@@ -332,9 +332,9 @@ describe "radio button (basic)" do
     radio_field(:name => "foo", :value => "bar").should match_tag(:input, :type => "radio", :name => "foo", :value => "bar")
   end
   
-  it "should render a label when the label is passed in" do
+  it "should provide an additional label tag if the :label option is passed in" do
     result = radio_field(:name => "foo", :value => "bar", :label => "LABEL")
-    result.should match(/<label>LABEL<input/)
+    result.should match(/<label.*>LABEL<\/label><input/)
     res = result.scan(/<[^>]*>/)
     res[2].should_not match_tag(:input, :label => "LABEL")
   end
@@ -347,16 +347,16 @@ describe "radio button groups (data bound)" do
   it "should return a group of radio buttons" do
     form_for :obj do
       radio = radio_group_control(:foo, [:foowee, :baree]).scan(/<[^>]*>/)
-      radio[1].should match_tag(:input, :type => "radio", :name => "fake_model[foo]", :value => "foowee", :selected => "selected")
-      radio[4].should match_tag(:input, :type => "radio", :name => "fake_model[foo]", :value => "baree")
-      radio[2].should not_match_tag(:selected => "selected")
+      radio[2].should match_tag(:input, :type => "radio", :name => "fake_model[foo]", :value => "foowee", :selected => "selected")
+      radio[5].should match_tag(:input, :type => "radio", :name => "fake_model[foo]", :value => "baree")
+      radio[3].should not_match_tag(:selected => "selected")
     end
   end
   
-  it "should wrap the each radio button in the group in a label corresponding to the options" do
+  it "should provide an additional label tag if the :label option is passed in" do
     form_for :obj do
       radio = radio_group_control(:foo, [:foowee, :baree])
-      radio.scan( /<label>(foowee|baree)<input/ ).size.should == 2
+      radio.scan( /<label.*?>(foowee|baree)<\/label><input/ ).size.should == 2
       radio = radio.scan(/<[^>]*>/)
       radio[1].should_not match_tag(:input, :label => "LABEL")
       radio[4].should_not match_tag(:input, :label => "LABEL")
@@ -379,90 +379,144 @@ describe "text area (basic)" do
   
   it "should render a label when the label is passed in" do
     result = text_area_field( "CONTENT", :name => "foo", :value => "bar", :label => "LABEL")
-    result.should match(/<label>LABEL<textarea/)
+    result.should match(/<label.*>LABEL<\/label><textarea/)
     res = result.scan(/<[^>]*>/)
     res[1].should_not match_tag(:textarea, :label => "LABEL")
   end
 end
 
-describe "text area (data bound)" do
+describe "select (data bound)" do
+  
   it_should_behave_like "FakeBufferConsumer"
-  
-  it "should return a bound text area" do
-    form_for :obj do
-      ta = text_area_control(:foo)
-      tab = text_area_control(:foobad)
-      ta.should match_tag(:textarea, :name => "fake_model[foo]")
-      tab.should match_tag(:textarea, :name => "fake_model[foobad]", :class => "error")
-      ta.should include("foowee")
-    end
-  end
-  
-  it "should handle a nil content value" do
-    @obj.nothing.should be_nil
-    form_for :obj do
-      text_area_control(:nothing).should match_tag(:textarea, :name => "fake_model[nothing]")
-    end
-  end
-  
-  it "should handle a nil attribute hash" do
-    form_for :obj do
-      text_area_control(:nothing, nil).should match_tag(:textarea, :name => "fake_model[nothing]")
-    end
-  end
 
-  it "should render a label when the label is passed in" do
+  it "should render the select tag with the correct id and name" do
     form_for :obj do
-      result = text_area_control( :foo, :label => "LABEL")
-      result.should match(/<label>LABEL<textarea/)
-      res = result.scan(/<[^>]*>/)
-      res[1].should_not match_tag(:textarea, :label => "LABEL")
+      content = select_control( :foo )
+      content.should match_tag( :select, :id => "fake_model_foo", :name => "fake_model[foo]" )
     end
   end
-
+  
+  it "should include a blank option" do
+    form_for :obj do
+      content = select_control( :foo, :include_blank => true )
+      content.should match_tag( :option, :value => '')
+    end
+  end
+  
+  it "should render a prompt option without a value" do
+    form_for :obj do
+      content = select_control( :foo, :prompt => "Choose" )
+    end
+  end
+  
+  it "should render a select tag with options" do
+    form_for :obj do
+      content = select_control( :foo, :class => 'class1 class2', :title => 'This is the title' )
+      content.should match_tag( :select, :class => "class1 class2", :title=> "This is the title" ) 
+    end
+  end
+  
+  it "should render a select tag with options and a blank option" do
+    form_for :obj do
+      content = select_control( :foo, :title => "TITLE", :include_blank => true )
+      content.should match_tag( :select, :title => "TITLE" ) 
+      content.should match_tag( :option, :value => '' )
+    end
+  end
+  
+  it "should render the text as the value if no text_method is specified" do
+    form_for :obj do
+      content = select_control( :foo, :collection => [FakeModel] )
+      content.should match_tag( :option, :value => "FakeModel" )
+    end
+  end
+      
 end
 
-describe "form helper supporting methods for controls" do
+describe "option tag generation (data bound)" do
   it_should_behave_like "FakeBufferConsumer"
   
-  it "should give class_name[colname] for control_name" do
+  it "should use text_method and value_method for tag generation" do
+    content = options_from_collection_for_select( [FakeModel.new, FakeModel2.new], :text_method => 'foo', :value_method => 'bar' )
+    content.should match_tag( :option, :content => "foowee", :value => "7" )
+    content.should match_tag( :option, :content => "foowee2", :value => "barbar" )
+  end
+  
+  it "should render a hash of arrays as a grouped select box" do
+    @model1 = FakeModel.new ; @model1.make = "Ford"   ; @model1.model = "Mustang"   ; @model1.vin = '1' 
+    @model2 = FakeModel.new ; @model2.make = "Ford"   ; @model2.model = "Falcon"    ; @model2.vin = '2'
+    @model3 = FakeModel.new ; @model3.make = "Holden" ; @model3.model = "Commodore" ; @model3.vin = '3'
+  
+    collection = [@model1, @model2, @model3].group_by( &:make )
+    content = options_from_collection_for_select(collection, :text_method => 'model', :value_method => 'vin', :selected => '1')
+    
+    content.should match_tag( :optgroup, :label => "Ford" )
+    content.should match_tag( :option, :selected => "selected", :value => "1", :content => "Mustang" )
+    content.should match_tag( :option, :value => "2", :content => "Falcon" )
+    content.should match_tag( :optgroup, :label => "Holden" )
+    content.should match_tag( :option, :value => "3", :content => "Commodore" )
+  end
+    
+  it "should humanize and titlize keys in the label for the option group" do
+    collection = { :some_snake_case_key => [FakeModel] }
     form_for :obj do
-      text_control( :foo ).should match_tag( :input, :type => "text", :name => "fake_model[foo]")
+      content = select_control( :foo, :collection => collection )
+      content.should match_tag( :optgroup, :label => "Some Snake Case Key" )
     end
   end
+
   
-  it "should provide value=method_value for the control_value method" do
-    form_for :obj do
-      text_control( :foo ).should match_tag( :input, :type => "text", :value => "foowee")
+end
+
+describe "option tags generation (basic)" do
+  it_should_behave_like "FakeBufferConsumer"
+  
+  before do
+    @collection = [['rabbit','Rabbit'],['horse','Horse'],['bird','Bird']]
+  end
+  
+  it "should provide an option tag for each item in the collection" do
+    result = options_for_select( @collection )
+    doc = Hpricot( result )
+    (doc/"option").size.should == 3
+  end
+  
+  it "should provide a blank option" do
+    content = options_for_select(@collection, :include_blank => true )
+    content.should match_tag( :option, :value => '' )
+  end
+  
+  it "should provide a prompt option" do
+    content = options_for_select( [], :prompt => 'Choose' )
+    content.should match_tag( :option, :value => '', :content => 'Choose' )
+  end
+  
+  it "should provide selected options by value" do
+    content = options_for_select( [['rabbit','Rabbit'],['chicken','Chicken']], :selected => 'rabbit' )
+    content.should match_tag( :option, :value => 'rabbit', :selected => 'selected', :content => 'Rabbit' )
+    content.should_not match_tag( :option, :value => 'chicken', :selected => nil, :content => 'Chicken' )
+  end
+  
+  it "should render a hash of options as optgroup" do
+    collection = { :fruit => [['orange','Orange'],['banana','Banana']], :vegatables => [['corn','Corn']]}
+    content = options_for_select(collection, :selected => 'banana')
+    content.should match_tag( :optgroup, :label => 'Fruit' )
+    content.should match_tag( :optgroup, :label => 'Vegatables' )
+    content.should match_tag( :option, :value => 'banana', :selected => 'selected', :content => 'Banana' )
+  end
+  
+end
+
+describe "fieldset generation (basic)" do
+  it_should_behave_like "FakeBufferConsumer"
+
+  it "should provide legend option" do
+    form_tag do
+      _buffer << "CONTENT"
     end
+    _buffer.should match_tag(:form, :method => "post")
+    _buffer.should include("CONTENT")
   end
-  
-  it "should give name and value for a call to control_name_value" do
-    form_for :obj do
-      control_name_value(:foo, :attribute => "ATTRIBUTE" ).should == {  :name => "fake_model[foo]",
-                                                                        :value => "foowee",
-                                                                        :attribute => "ATTRIBUTE"}
-    end    
-  end
-end
-
-describe "submit_button" do
-  it_should_behave_like "FakeBufferConsumer"
-    
-  it "should produce a simple submit button" do
-    submit_button("Foo").should == "<button type=\"submit\">Foo</button>"
-  end
-end
-
-describe "label helpers" do
-  it_should_behave_like "FakeBufferConsumer"
-  
-  it "should add a label to arbitrary markup in a template" do
-    result = label("Name:", text_field(:name => "name_value"))
-    result.should == "<label>Name:<input type=\"text\" name=\"name_value\"/></label>"
-    
-  end
-    
 end
 
 describe "file_field (basic)" do
@@ -474,7 +528,7 @@ describe "file_field (basic)" do
   
   it "should wrap the field in a label if the :label option is passed to the file_field" do
     result = file_field(:label => "LABEL" )
-    result.should match(/<label>LABEL<input type="file"\s*\/><\/label>/)
+    result.should match(/<label>LABEL<\/label><input type="file"\s*\/>/)
   end
 end
 
@@ -497,7 +551,7 @@ describe "file_control (data bound)" do
     form_for :obj do
       _buffer << text_control(:foo, :label => "LABEL")
     end
-    _buffer.should match(/<label>LABEL<input/)
+    _buffer.should match(/<label.*>LABEL<\/label><input/)
     res = _buffer.scan(/<[^>]*>/)
     res[2].should_not match_tag(:input, :label => "LABEL")
   end

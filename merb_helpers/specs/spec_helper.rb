@@ -5,9 +5,13 @@ require 'merb'
 # require 'merb/test/rspec'
 
 class FakeModel
+  
+  attr_accessor :vin, :make, :model
+  
   def self.columns
     [FakeColumn.new(:foo, :string), 
-     FakeColumn.new(:foobad, :string),       
+     FakeColumn.new(:foobad, :string),
+     FakeColumn.new(:desc, :string),
      FakeColumn.new(:bar, :integer), 
      FakeColumn.new(:barbad, :integer),      
      FakeColumn.new(:baz, :boolean),
@@ -32,7 +36,6 @@ class FakeModel
   def foo
     "foowee"
   end
-  
   alias_method :foobad, :foo
   
   def bar
@@ -56,11 +59,15 @@ class FakeModel
 end
 
 class FakeModel2 < FakeModel
-
+  
   def foo
     "foowee2"
   end
   alias_method :foobad, :foo
+  
+  def bar
+    "barbar"
+  end
   
   def new_record?
     true
@@ -82,16 +89,14 @@ end
 
 class FakeColumn
   attr_accessor :name, :type
+  
   def initialize(name, type)
     @name, @type = name, type
   end
+  
 end
 
-
-  
-
 describe "FakeBufferConsumer", :shared => true do
-  
   before :each do
     @obj = FakeModel.new
     def _buffer(buf = "") @buffer ||= "" end    

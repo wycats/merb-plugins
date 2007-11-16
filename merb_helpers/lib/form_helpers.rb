@@ -1,7 +1,51 @@
-module Merb
+module Merb #:nodoc:
+  
+  # Merb helpers include several helpers used for simplifying view creation.
+  # The available helpers currently include form tag helpers for both resource based and generic HTML form tag creation
   module Helpers
+    # Provides a number of methods for creating form tags which may be used either with or without the presence of ORM specific models.
+    # There are two types of form helpers: those that specifically work with model attributes and those that don't.
+	  # This helper deals with both model attributes and generic form tags. Model attributes generally end in "_control" such as +text_control+,
+	  # and generic tags end with "_field", such as +text_field+
+    #
+	  # The core method of this helper, +form_for+, gives you the ability to create a form for a resource.
+    # For example, let's say that you have a model <tt>Person</tt> and want to create a new instance of it:
+    #
+    #     <% form_for :person, :action => url(:people) do %>
+    #       <%= text_control :first_name, :label => 'First Name' %>
+    #       <%= text_control :last_name,  :label => 'Last Name' %>
+    #       <%= submit_button 'Create' %>
+    #     <% end %>
+    #
+    # The HTML generated for this would be:
+    #
+    #     <form action="/people/create" method="post">
+    #       <input id="person_first_name" name="person[first_name]" size="30" type="text" />
+    #       <input id="person_last_name" name="person[last_name]" size="30" type="text" />
+    #       <input name="commit" type="submit" value="Create" />
+    #     </form>
+    #
+	  # You may also create a normal form using form_tag
+    #     <% form_tag({url(:controller => "foo", :action => "bar", :id => 1)} do %>
+    #       <%= text_field :name => 'first_name', :label => 'First Name' %>
+    #       <%= submit_button 'Create' %>
+    #     <% end %>
+    #
+    # The HTML generated for this would be:
+    #
+    #     <form action="/foo/bar/1" method="post">
+    #       <input id="first_name" name="first_name" size="30" type="text" />
+    #       <input name="commit" type="submit" value="Create" />
+    #     </form>
     module Form
     
+      # Provides a HTML formatted display of resource errors in an unordered list with a h2 form submission error
+      # ==== Options
+      # +html_class+:: Set for custom error div class default is <tt>submittal_failed<tt>
+      #
+      # ==== Example
+      #
+      #   <%= error_messages_for :person %>      
       def error_messages_for(obj, error_li = nil, html_class='submittal_failed')
         return "" if obj.errors.empty?
         header_message = block_given? ? yield(obj.errors) : "<h2>Form submittal failed because of #{obj.errors.size} #{obj.errors.size == 1 ? 'problem' : 'problems'}</h2>"
@@ -17,14 +61,28 @@ module Merb
         }
       end
       
-      def obj_from_ivar_or_sym(obj)
+      def obj_from_ivar_or_sym(obj) #:nodoc:
         obj.is_a?(Symbol) ? instance_variable_get("@#{obj}") : obj
       end
-      
-      def tag(tag_name, contents, attrs = {})
-        open_tag(tag_name, attrs) + contents + "</#{tag_name}>"
+
+      # Creates a generic HTML tag 
+      def tag(tag_name, contents, attrs = {}) #:nodoc:
+        open_tag(tag_name, attrs) + contents.to_s + "</#{tag_name}>"
       end
-      
+
+      # Generates a form tag, which accepts a block that is not directly based on resource attributes
+      # 
+      #     <% form_tag({url(:controller => "foo", :action => "bar", :id => 1)} do %>
+      #       <%= text_field :name => 'first_name', :label => 'First Name' %>
+      #       <%= submit_button 'Create' %>
+      #     <% end %>
+      #
+      # The HTML generated for this would be:
+      #
+      #     <form action="/foo/bar/1" method="post">
+      #       <input id="first_name" name="first_name" size="30" type="text" />
+      #       <input name="commit" type="submit" value="Create" />
+      #     </form>
       def form_tag(attrs = {}, &block)
         attrs.merge!( :enctype => "multipart/form-data" ) if attrs.delete(:multipart)
         fake_form_method = set_form_method(attrs)
@@ -34,6 +92,20 @@ module Merb
         concat("</form>", block.binding)
       end
       
+      # Generates a resource specific form tag which accepts a block, this also provides automatic resource routing.
+      #     <% form_for :person, :action => url(:people) do %>
+      #       <%= text_control :first_name, :label => 'First Name' %>
+      #       <%= text_control :last_name,  :label => 'Last Name' %>
+      #       <%= submit_button 'Create' %>
+      #     <% end %>
+      #
+      # The HTML generated for this would be:
+      #
+      #     <form action="/people/create" method="post">
+      #       <input id="person_first_name" name="person[first_name]" size="30" type="text" />
+      #       <input id="person_last_name" name="person[last_name]" size="30" type="text" />
+      #       <input name="commit" type="submit" value="Create" />
+      #     </form>
       def form_for(obj, attrs={}, &block)
         obj = obj_from_ivar_or_sym(obj)
         fake_form_method = set_form_method(attrs, obj)
@@ -43,6 +115,19 @@ module Merb
         concat("</form>", block.binding)
       end
       
+      # Creates a scope around a specific resource object like form_for, but doesnt create the form tags themselves.
+      # This makes fields_for suitable for specifying additional resource objects in the same form. 
+      #
+      # ==== Examples
+      #
+      #     <% form_for :person, :action => url(:people) do %>
+      #       <%= text_control :first_name, :label => 'First Name' %>
+      #       <%= text_control :last_name,  :label => 'Last Name' %>
+      #       <% fields_for :permission do %>
+      #         <%= checkbox_control :is_admin, :label => 'Administrator' %>
+      #       <% end %>
+      #       <%= submit_button 'Create' %>
+      #     <% end %>
       def fields_for(obj, attrs=nil, &block)
         obj = obj_from_ivar_or_sym(obj)
         old_obj, @_obj = @_obj, obj
@@ -54,28 +139,48 @@ module Merb
         @_obj, @_block = old_obj, old_block        
       end
       
-      def control_name(col)
+      def control_name(col) #:nodoc:
         "#{@_object_name}[#{col}]"
       end
       
-      def control_value(col)
+      def control_id(col) #:nodoc:
+        "#{@_object_name}_#{col}"
+      end
+      
+      def control_value(col) #:nodoc:
         @_obj.send(col)
       end
       
-      def control_name_value(col, attrs)
+      def control_name_value(col, attrs) #:nodoc:
         {:name => control_name(col), :value => control_value(col)}.merge(attrs)
       end
       
+      # Provides a HTML text input tag based on a resource attribute.
+      #
+      # ==== Example
+      #     <% form_for :person, :action => url(:people) do %>
+      #       <%= text_control :first_name, :label => 'First Name' %>
+      #     <% end %>
       def text_control(col, attrs = {})
         errorify_field(attrs, col)
         text_field(control_name_value(col, attrs))
       end
       
+      # Provides a generic HTML text input tag
+      # Provides a HTML text input tag based on a resource attribute.
+      #
+      # ==== Example
+      #   <%= text_field :fav_color, :label => 'Your Favorite Color' %>
+      #   => <label for="fav_color">Your Favorite Color</label><input type="text" name="fav_color" id="fav_color"/>
       def text_field(attrs = {})
         attrs.merge!(:type => "text")
         optional_label(attrs) { self_closing_tag("input", attrs) }
       end
       
+      # Provides a HTML password input based on a resource attribute.
+      # This is generally used within a resource block such as +form_for+
+      # ==== Example
+      #    <%= password_control :password, :label => 'New Password' %>
       def password_control(col, attrs = {})
         attrs.merge!(:name => control_name(col))
         errorify_field(attrs, col)
@@ -90,7 +195,7 @@ module Merb
       
       # translate column values from the db to boolean
       # nil, false, 0 and '0' are false. All others are true
-      def col_val_to_bool(val)
+      def col_val_to_bool(val) #:nodoc:
         !(val == "0" || val == 0 || !val)
       end
       private :col_val_to_bool
@@ -110,6 +215,16 @@ module Merb
         hidden_field(:name => attrs[:name], :value => off) + optional_label(attrs){self_closing_tag("input", attrs)}
       end
       
+      # Returns a hidden input tag tailored for accessing a specified attribute (identified by +col+) on an object
+      # resource within a +form_for+ resource block. Additional options on the input tag can be passed as a
+      # hash with +attrs+. These options will be tagged onto the HTML as an HTML element attribute as in the example
+      # shown.
+      #
+      # ==== Examples
+      #
+      #   <%= hidden_control :identifier %>
+      #   # => <input id="person_identifier" name="person[identifier]" type="hidden" value="#{@person.identifier}" />
+      #
       def hidden_control(col, attrs = {})
         attrs.delete(:label)
         errorify_field(attrs, col)
@@ -164,7 +279,123 @@ module Merb
       def label(name, contents = "", attrs = {})
         tag("label", name.to_s + contents, attrs)
       end
+
+      def select_field(attrs = {})
+        collection = attrs.delete(:collection)
+        option_attrs = {
+          :prompt => attrs.delete(:prompt),
+          :selected => attrs.delete(:selected),
+          :include_blank => attrs.delete(:include_blank),
+          :text_method => attrs.delete(:text_method),
+          :value_method => attrs.delete(:value_method)
+        }
+        optional_label(attrs) { open_tag('select', attrs) + options_for_select(collection, option_attrs) + "</select>"}
+      end
       
+      def select_control(col, attrs = {})
+        attrs.merge!(:name => attrs[:name] || control_name(col))
+        attrs.merge!(:id   => attrs[:id]   || control_id(col))
+        errorify_field(attrs, col)
+        optional_label(attrs) { select_field(attrs) }
+      end
+      
+      # Accepts a collection (hash, array, enumerable, your type) and returns a string of option tags. 
+      # Given a collection where the elements respond to first and last (such as a two-element array), 
+      # the "lasts" serve as option values and the "firsts" as option text. Hashes are turned into
+      # this form automatically, so the keys become "firsts" and values become lasts. If selected is
+      # specified, the matching "last" or element will get the selected option-tag. Selected may also
+      # be an array of values to be selected when using a multiple select.
+      #
+      # ==== Examples
+      #   <%= options_for_select( [['apple','Apple Pie'],['orange','Orange Juice']], :selected => 'orange' )
+      #   => <option value="apple">Apple Pie</option><option value="orange" selected="selected">Orange Juice</option>
+      #
+      #   <%= options_for_select( [['apple','Apple Pie'],['orange','Orange Juice']], :selected => ['orange','apple'], :prompt => 'Select One' )
+      #   => <option value="">Select One</option><option value="apple" selected="selected">Apple Pie</option><option value="orange" selected="selected">Orange Juice</option>
+      #
+      # ==== Options
+      # +selected+:: The value of a selected object, may be either a string or an array.
+      # +prompt+:: Adds an addtional option tag with the provided string with no value.
+      # +include_blank+:: Adds an additional blank option tag with no value.
+      def options_for_select(collection, attrs = {})
+        prompt     = attrs.delete(:prompt)
+        blank      = attrs.delete(:include_blank)
+        selected   = attrs.delete(:selected)
+        returning '' do |ret|
+          ret << tag('option', prompt, :value => '') if prompt
+          ret << tag("option", '', :value => '') if blank
+          unless collection.blank?
+            if collection.is_a?(Hash)
+              collection.each do |label,group|
+                ret << open_tag("optgroup", :label => label.to_s.titleize) + options_for_select(group, :selected => selected) + "</optgroup>"
+              end
+            else
+              collection.each do |value,text|
+                options = selected.to_a.include?(value) ? {:selected => 'selected'} : {}
+                ret << tag( 'option', text, {:value => value}.merge(options) )
+              end
+            end
+          end
+        end
+      end
+
+      # Returns a string of option tags that have been compiled by iterating over the collection and
+      # assigning the the result of a call to the value_method as the option value and the text_method
+      # as the option text. If selected_value is specified, the element returning a match on
+      # the value_method option will get the selected option tag.
+      #
+      # This method also also supports the automatic generation of optgroup tags by using a hash.
+      # ==== Examples
+      # If we had a collection of people within a @project object, and want to use 'id' as the value, and 'name'
+      # as the option content we could do something similar to this;
+      #
+      #   <%= options_from_collection_for_select(@project.people, :text_method => "id", :value_method => "name") %>
+      #   The iteration of the collection would create options in this manner;
+      #   =>  <option value="#{person.id}">#{person.name}</option>
+      #
+      #   <% @people = Person.find(:all).group_by( &:state )
+      #   <%= options_for_select(@people, :text_method => 'full_name', :value_method => 'id', :selected => 3) %>
+      #   => <optgroup label="Washington"><option value="1">Josh Martin</option><option value="2">John Doe</option></optgroup>
+      #   => <optgroup label="Idaho"><option value="3" selected="selected">Jane Doe</option>
+      #
+      # ==== Options
+      # +text_method+:: Defines the method which will be used to provide the text of the option tags (required)
+      # +value_method+:: Defines the method which will be used to provide the value of the option tags (required)
+      # +selected+:: The value of a selected object, may be either a string or an array.
+      def options_from_collection_for_select(collection, attrs = {})
+          if collection.is_a?(Hash)
+            returning '' do |ret|
+              collection.each do |label, group|
+                ret << open_tag("optgroup", :label => label.to_s) + options_from_collection_for_select(group, attrs) + "</optgroup>"
+              end
+            end
+          else
+            text_method    = attrs[:text_method]
+            value_method   = attrs[:value_method]
+            selected_value = attrs[:selected]
+            options_for_select(
+               collection.inject([]) { |options, object| options << [ object.send(value_method), object.send(text_method) ] },
+                     :selected => selected_value 
+            )
+          end
+      end
+      
+      # Provides the ability to create quick fieldsets as blocks for your forms.
+      #
+      # ==== Example
+      #   <% fieldset :legend => 'Customer Options' do -%>
+      #   ...your form elements
+      #   <% end -%>
+      #
+      #   => <fieldset><legend>Customer Options</legend>...your form elements</fieldset>
+      #
+      # ==== Options
+      # +legend+:: The name of this fieldset which will be provided in a HTML legend tag.
+      def fieldset(attrs = {}, &block)
+        legend = attrs.delete(:legend)
+        open_tag( 'fieldset', attrs ) + ( tag('legend', legend) if legend ) + yield + "</fieldset>"
+      end
+
       ## file input control
       def file_control(col, attrs = {})
         errorify_field(attrs, col)
@@ -196,11 +427,12 @@ module Merb
         label = attrs.delete(:label) if attrs
         if label
           title = label.is_a?(Hash) ? label.delete(:title) : label
-          label(title, yield, label.is_a?(Hash) ? label : {})
+          named = attrs[:name].blank? ? {} : {:for => attrs[:name]}
+          label(title, '', label.is_a?(Hash) ? label : named) + yield
         else
           yield
         end
-      end   
+      end
       
       def errorify_field(attrs, col)
         attrs.add_html_class!("error") if !@_obj.valid? && @_obj.errors.on(col)
@@ -210,6 +442,6 @@ module Merb
   end
 end
 
-class Merb::ViewContext
+class Merb::ViewContext #:nodoc:
   include Merb::Helpers::Form
 end
