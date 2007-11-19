@@ -1,5 +1,7 @@
 require 'rubygems'
 require 'rake/gempackagetask'
+require 'spec'
+require 'spec/rake/spectask'
 
 PLUGIN = "merb_helpers"
 NAME = "merb_helpers"
@@ -33,4 +35,10 @@ end
 
 task :install => [:package] do
   sh %{sudo gem install pkg/#{NAME}-#{GEM_VERSION}}
+end
+
+Spec::Rake::SpecTask.new do |t|
+   t.warning = true
+   t.spec_opts = ["--format", "specdoc", "--colour"]
+   t.spec_files = Dir['specs/**/*_spec.rb'].sort   
 end

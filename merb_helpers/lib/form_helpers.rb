@@ -20,9 +20,11 @@ module Merb #:nodoc:
     # The HTML generated for this would be:
     #
     #     <form action="/people/create" method="post">
+    #       <label for="person_first_name">First Name</label>
     #       <input id="person_first_name" name="person[first_name]" size="30" type="text" />
+    #       <label for="person_last_name">Last Name</label>
     #       <input id="person_last_name" name="person[last_name]" size="30" type="text" />
-    #       <input name="commit" type="submit" value="Create" />
+    #       <button type="submit">Create</button>
     #     </form>
     #
 	  # You may also create a normal form using form_tag
@@ -35,7 +37,7 @@ module Merb #:nodoc:
     #
     #     <form action="/foo/bar/1" method="post">
     #       <label for="first_name">First Name</label><input id="first_name" name="first_name" size="30" type="text" />
-    #       <input name="commit" type="submit" value="Create" />
+    #       <button type="submit">Create</button>
     #     </form>
     module Form
     
@@ -44,7 +46,6 @@ module Merb #:nodoc:
       # +html_class+:: Set for custom error div class default is <tt>submittal_failed<tt>
       #
       # ==== Example
-      #
       #   <%= error_messages_for :person %>      
       def error_messages_for(obj, error_li = nil, html_class='submittal_failed')
         return "" if obj.errors.empty?
@@ -119,7 +120,6 @@ module Merb #:nodoc:
       # This makes fields_for suitable for specifying additional resource objects in the same form. 
       #
       # ==== Examples
-      #
       #     <% form_for :person, :action => url(:people) do %>
       #       <%= text_control :first_name, :label => 'First Name' %>
       #       <%= text_control :last_name,  :label => 'Last Name' %>
@@ -129,6 +129,8 @@ module Merb #:nodoc:
       #       <%= submit_button 'Create' %>
       #     <% end %>
       def fields_for(obj, attrs=nil, &block)
+        @_obj ||= nil
+        @_block ||= nil
         obj = obj_from_ivar_or_sym(obj)
         old_obj, @_obj = @_obj, obj
         @_object_name = "#{@_obj.class}".snake_case
@@ -166,27 +168,33 @@ module Merb #:nodoc:
         text_field(control_name_value(col, attrs))
       end
       
-      # Provides a generic HTML text input tag
+      # Provides a generic HTML text input tag.
       # Provides a HTML text input tag based on a resource attribute.
       #
       # ==== Example
-      #   <%= text_field :fav_color, :label => 'Your Favorite Color' %>
-      #   => <label for="fav_color">Your Favorite Color</label><input type="text" name="fav_color" id="fav_color"/>
+      #     <%= text_field :fav_color, :label => 'Your Favorite Color' %>
+      #     # => <label for="fav_color">Your Favorite Color</label><input type="text" name="fav_color" id="fav_color"/>
       def text_field(attrs = {})
         attrs.merge!(:type => "text")
         optional_label(attrs) { self_closing_tag("input", attrs) }
       end
       
       # Provides a HTML password input based on a resource attribute.
-      # This is generally used within a resource block such as +form_for+
+      # This is generally used within a resource block such as +form_for+.
+      #
       # ==== Example
-      #    <%= password_control :password, :label => 'New Password' %>
+      #     <%= password_control :password, :label => 'New Password' %>
       def password_control(col, attrs = {})
         attrs.merge!(:name => control_name(col))
         errorify_field(attrs, col)
         password_field(control_name_value(col, attrs))
       end
       
+      # Provides a generic HTML password input tag.
+      #
+      # ==== Example
+      #     <%= password_field :password, :label => "Password" %>
+      #     # => <label for="password">Password</label><input type="password" name="password" id="password"/>
       def password_field(attrs = {})
         attrs.delete(:value)
         attrs.merge!(:type => 'password')
@@ -200,12 +208,21 @@ module Merb #:nodoc:
       end
       private :col_val_to_bool
 
+      # Provides a HTML checkbox input based on a resource attribute.
+      # This is generally used within a resource block such as +form_for+.
+      #
+      # ==== Example
+      #     <%= checkbox_control :is_activated, :label => "Activated?" %>
       def checkbox_control(col, attrs = {})
         errorify_field(attrs, col)
         attrs.merge!(:checked => "checked") if col_val_to_bool(@_obj.send(col))
         checkbox_field(control_name_value(col, attrs))
       end
 
+      # Provides a generic HTML checkbox input tag.
+      #
+      # ==== Example
+      #     <% checkbox_field :name => "is_activated", :value => "1" %>
       def checkbox_field(attrs = {})
         on            = attrs.delete(:on)  || 1
         off           = attrs.delete(:off) || 0
@@ -220,23 +237,34 @@ module Merb #:nodoc:
       # hash with +attrs+. These options will be tagged onto the HTML as an HTML element attribute as in the example
       # shown.
       #
-      # ==== Examples
-      #
-      #   <%= hidden_control :identifier %>
-      #   # => <input id="person_identifier" name="person[identifier]" type="hidden" value="#{@person.identifier}" />
-      #
+      # ==== Example
+      #     <%= hidden_control :identifier %>
+      #     # => <input id="person_identifier" name="person[identifier]" type="hidden" value="#{@person.identifier}" />
       def hidden_control(col, attrs = {})
         attrs.delete(:label)
         errorify_field(attrs, col)
         hidden_field(control_name_value(col, attrs))
       end
       
+      # Provides a generic HTML hidden input field.
+      #
+      # ==== Example
+      #     <%= hidden_field :name => "secret", :value => "some secret value" %>
       def hidden_field(attrs = {})
         attrs.delete(:label)
         attrs.merge!(:type => :hidden)
         self_closing_tag("input", attrs)
       end
       
+      # Provides a radio group based on a resource attribute.
+      # This is generally used within a resource block such as +form_for+.
+      #
+      # ==== Examples
+      #     <!-- the labels are the options -->
+      #     <%= radio_group_control :my_choice, [5,6,7] %>
+      # 
+      #     <!-- custom labels -->
+      #     <%= radio_group_control :my_choice, [{:value => 5, :label => "five"}] %>
       def radio_group_control(col, options = [], attrs = {})
         errorify_field(attrs, col)
         val = @_obj.send(col)
@@ -250,18 +278,33 @@ module Merb #:nodoc:
         ret
       end
       
+      # Provides a generic HTML radio input tag.
+      # Normally, you would use multipe +radio_field+.
+      #
+      # ==== Example
+      #     <%= radio_field :name => "radio_options", :value => "1", :label => "One" %>
+      #     <%= radio_field :name => "radio_options", :value => "2", :label => "Two" %>
       def radio_field(attrs = {})
         attrs.merge!(:type => "radio")
         attrs.add_html_class!("radio")
         optional_label(attrs){self_closing_tag("input", attrs)}
       end
       
+      # Provides a HTML textarea based on a resource attribute
+      # This is generally used within a resource block such as +form_for+
+      #
+      # ==== Example
+      #     <% text_area_control :comments, :label => "Comments"
       def text_area_control(col, attrs = {})
         attrs ||= {}
         errorify_field(attrs, col)
         text_area_field(control_value(col), attrs.merge(:name => control_name(col)))
       end
       
+      # Provides a generic HTML textarea tag.
+      #
+      # ==== Example
+      #     <% text_area_field "my comments", :name => "comments", :label => "Comments" %>
       def text_area_field(val, attrs = {})
         val ||=""
         optional_label(attrs) do
@@ -271,15 +314,34 @@ module Merb #:nodoc:
         end
       end
       
+      # Provides a generic HTML submit button.
+      #
+      # ==== Example
+      #     <% submit_button "Process" %>
       def submit_button(contents, attrs = {})
+        contents ||= "Submit"
         attrs.merge!(:type => "submit")
         tag("button", contents, attrs)
       end
 
+      # Provides a generic HTML label.
+      #
+      # ==== Example
+      #     <% label "Name", "", :for => "name" %> 
+      #     # => <label for="name">Name</label>
       def label(name, contents = "", attrs = {})
         tag("label", name.to_s + contents, attrs)
       end
 
+      # Provides a generic HTML select.
+      #
+      # ==== Options
+      # +prompt+:: Adds an additional option tag with the provided string with no value.
+      # +selected+:: The value of a selected object, which may be either a string or an array.
+      # +include_blank+:: Adds an additional blank option tag with no value.
+      # +collection+:: The collection for the select options
+      # +text_method+:: Method to determine text of an option (as a symbol).
+      # +value_method+:: Method to determine value of an option (as a symbol).
       def select_field(attrs = {})
         collection = attrs.delete(:collection)
         option_attrs = {
@@ -292,6 +354,11 @@ module Merb #:nodoc:
         optional_label(attrs) { open_tag('select', attrs) + options_for_select(collection, option_attrs) + "</select>"}
       end
       
+      # Provides a HTML select based on a resource attribute.
+      # This is generally used within a resource block such as +form_for+.
+      #
+      # ==== Example
+      #     <% select_control :name, :collection => %w(one two three four) %>
       def select_control(col, attrs = {})
         attrs.merge!(:name => attrs[:name] || control_name(col))
         attrs.merge!(:id   => attrs[:id]   || control_id(col))
@@ -314,7 +381,7 @@ module Merb #:nodoc:
       #   => <option value="">Select One</option><option value="apple" selected="selected">Apple Pie</option><option value="orange" selected="selected">Orange Juice</option>
       #
       # ==== Options
-      # +selected+:: The value of a selected object, may be either a string or an array.
+      # +selected+:: The value of a selected object, which may be either a string or an array.
       # +prompt+:: Adds an addtional option tag with the provided string with no value.
       # +include_blank+:: Adds an additional blank option tag with no value.
       def options_for_select(collection, attrs = {})
@@ -383,11 +450,11 @@ module Merb #:nodoc:
       # Provides the ability to create quick fieldsets as blocks for your forms.
       #
       # ==== Example
-      #   <% fieldset :legend => 'Customer Options' do -%>
-      #   ...your form elements
-      #   <% end -%>
+      #     <% fieldset :legend => 'Customer Options' do -%>
+      #     ...your form elements
+      #     <% end -%>
       #
-      #   => <fieldset><legend>Customer Options</legend>...your form elements</fieldset>
+      #     => <fieldset><legend>Customer Options</legend>...your form elements</fieldset>
       #
       # ==== Options
       # +legend+:: The name of this fieldset which will be provided in a HTML legend tag.
@@ -399,12 +466,20 @@ module Merb #:nodoc:
         concat( "</fieldset>", block.binding)
       end
       
-      ## file input control
+      # Provides a HTML file input for a resource attribute.
+      # This is generally used within a resource block such as +form_for+.
+      #
+      # ==== Example
+      #     <% file_control :file, :label => "File" %>
       def file_control(col, attrs = {})
         errorify_field(attrs, col)
         file_field(control_name_value(col, attrs))
       end
       
+      # Provides a HTML file input
+      #
+      # ==== Example
+      #     <% file_field :name => "file", :label => "File" %>
       def file_field(attrs = {})
         attrs.merge!(:type => "file")
         optional_label(attrs) { self_closing_tag("input", attrs) }
