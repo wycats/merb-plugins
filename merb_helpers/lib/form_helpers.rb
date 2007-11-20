@@ -165,6 +165,7 @@ module Merb #:nodoc:
       #     <% end %>
       def text_control(col, attrs = {})
         errorify_field(attrs, col)
+        attrs.merge!(:id => control_id(col))
         text_field(control_name_value(col, attrs))
       end
       
@@ -213,23 +214,24 @@ module Merb #:nodoc:
       #
       # ==== Example
       #     <%= checkbox_control :is_activated, :label => "Activated?" %>
-      def checkbox_control(col, attrs = {})
+      def checkbox_control(col, attrs = {}, hidden_attrs={})
         errorify_field(attrs, col)
         attrs.merge!(:checked => "checked") if col_val_to_bool(@_obj.send(col))
-        checkbox_field(control_name_value(col, attrs))
+        attrs.merge!(:id => control_id(col))
+        checkbox_field(control_name_value(col, attrs), hidden_attrs)
       end
 
       # Provides a generic HTML checkbox input tag.
       #
       # ==== Example
       #     <% checkbox_field :name => "is_activated", :value => "1" %>
-      def checkbox_field(attrs = {})
+      def checkbox_field(attrs = {}, hidden_attrs={})
         on            = attrs.delete(:on)  || 1
         off           = attrs.delete(:off) || 0
         attrs[:value] = on if ( (v = attrs[:value]).nil? || v != "" )
         attrs.merge!(:type => :checkbox)
         attrs.add_html_class!("checkbox")
-        hidden_field(:name => attrs[:name], :value => off) + optional_label(attrs){self_closing_tag("input", attrs)}
+        hidden_field({:name => attrs[:name], :value => off}.merge(hidden_attrs)) + optional_label(attrs){self_closing_tag("input", attrs)}
       end
       
       # Returns a hidden input tag tailored for accessing a specified attribute (identified by +col+) on an object
@@ -243,6 +245,7 @@ module Merb #:nodoc:
       def hidden_control(col, attrs = {})
         attrs.delete(:label)
         errorify_field(attrs, col)
+        attrs[:class] ||= "hidden"
         hidden_field(control_name_value(col, attrs))
       end
       
@@ -485,6 +488,12 @@ module Merb #:nodoc:
         optional_label(attrs) { self_closing_tag("input", attrs) }
       end
       
+      def submit_field(attrs = {})
+        attrs.merge!(:type => :submit)
+        attrs[:name] ||= "submit"
+        self_closing_tag("input", attrs)
+      end
+      
       private
       # Fake out the browser to send back the method for RESTful stuff.
       # Fall silently back to post if a method is given that is not supported here
@@ -505,8 +514,8 @@ module Merb #:nodoc:
         label = attrs.delete(:label) if attrs
         if label
           title = label.is_a?(Hash) ? label.delete(:title) : label
-          named = attrs[:name].blank? ? {} : {:for => attrs[:name]}
-          label(title, '', label.is_a?(Hash) ? label : named) + yield
+          named = attrs[:id].blank? ? {} : {:for => attrs[:id]}
+          label(title, '', label.is_a?(Hash) ? label.merge(named) : named) + yield
         else
           yield
         end

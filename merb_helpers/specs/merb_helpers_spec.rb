@@ -248,7 +248,7 @@ describe "checkbox_control (data bound)" do
     
   it "should take a string and return a useful checkbox control" do
     form_for :obj do
-      checkbox_control(:baz).should match_tag(:input, :type =>"checkbox", :name => "fake_model[baz]", :class => "checkbox", :value => "1", :checked => "checked")
+      checkbox_control(:baz).should match_tag(:input, :type =>"checkbox", :name => "fake_model[baz]", :class => "checkbox", :value => "1", :checked => "checked", :id => "fake_model_baz")
       checkbox_control(:bat).should match_tag(:input, :type =>"checkbox", :name => "fake_model[bat]", :class => "checkbox", :value => "0")
     end
   end
@@ -558,3 +558,16 @@ describe "file_control (data bound)" do
   end
 end
 
+describe "submit_field (basic)" do
+  it "should return a basic submit input based on the values passed in" do
+    submit_field(:name => "foo", :value => "bar").should match_tag(:input, :type => "submit", :name => "foo", :value => "bar")
+  end
+  
+  it "should provide an additional label tag if the :label option is passed in" do
+    result = submit_field(:value => "foo", :label => "LABEL")
+    result.should match(/<input.*type="submit"/)
+    result.should match(/<input.*name="submit"/)
+    result.should match(/<input.*value="foo"/)
+    result.should match(/<input.*label="LABEL"/)
+  end
+end
