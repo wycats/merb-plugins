@@ -354,7 +354,7 @@ module Merb #:nodoc:
           :text_method => attrs.delete(:text_method),
           :value_method => attrs.delete(:value_method)
         }
-        optional_label(attrs) { open_tag('select', attrs) + options_for_select(collection, option_attrs) + "</select>"}
+        optional_label(attrs) { open_tag('select', attrs) + options_from_collection_for_select(collection, option_attrs) + "</select>"}
       end
       
       # Provides a HTML select based on a resource attribute.
@@ -433,21 +433,25 @@ module Merb #:nodoc:
       # +value_method+:: Defines the method which will be used to provide the value of the option tags (required)
       # +selected+:: The value of a selected object, may be either a string or an array.
       def options_from_collection_for_select(collection, attrs = {})
-          if collection.is_a?(Hash)
-            returning '' do |ret|
-              collection.each do |label, group|
-                ret << open_tag("optgroup", :label => label.to_s) + options_from_collection_for_select(group, attrs) + "</optgroup>"
-              end
+        prompt     = attrs.delete(:prompt)
+        blank      = attrs.delete(:include_blank)
+        if collection.is_a?(Hash)
+          returning '' do |ret|
+	          ret << tag("option", prompt, :value => '') if prompt
+	          ret << tag("option", '',     :value => '') if blank
+            collection.each do |label, group|
+              ret << open_tag("optgroup", :label => label.to_s) + options_from_collection_for_select(group, attrs) + "</optgroup>"
             end
-          else
-            text_method    = attrs[:text_method]
-            value_method   = attrs[:value_method]
-            selected_value = attrs[:selected]
-            options_for_select(
-               collection.inject([]) { |options, object| options << [ object.send(value_method), object.send(text_method) ] },
-                     :selected => selected_value 
-            )
           end
+        else
+          text_method    = attrs[:text_method]
+          value_method   = attrs[:value_method]
+          selected_value = attrs[:selected]
+          options_for_select(
+            collection.inject([]) { |options, object| options << [ object.send(value_method), object.send(text_method) ] },
+            :selected => selected_value, :include_blank => blank, :prompt => prompt
+          )
+        end
       end
       
       # Provides the ability to create quick fieldsets as blocks for your forms.
