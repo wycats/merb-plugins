@@ -1,3 +1,5 @@
+require 'base64'
+
 module Merb
   module SessionMixin
     def setup_session
@@ -22,6 +24,7 @@ module Merb
       primary_key :id
       varchar :session_id
       varchar :data
+      timestamp :created_at
     end
   
     attr_accessor :needs_new_cookie
@@ -29,7 +32,8 @@ module Merb
     class << self
       # Generates a new session ID and creates a row for the new session in the database.
       def generate
-        create(:session_id => Merb::SessionMixin::rand_uuid, :data => marshal({}))
+        create(:session_id => Merb::SessionMixin::rand_uuid,
+                       :data => marshal({}), :created_at => Time.now)
       end
     
       # Gets the existing session based on the <tt>session_id</tt> available in cookies.

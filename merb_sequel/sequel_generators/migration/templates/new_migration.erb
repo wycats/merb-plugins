@@ -1,6 +1,11 @@
 class <%= class_name.snake_case.camel_case %> < Sequel::Migration
   def up
+    # For details on migrations in sequel see 
+    # http://sequel.rubyforge.org/
+    # http://code.google.com/p/ruby-sequel/wiki/Migrations
+    
     <%= "create_table :#{table_name} do" if table_name %>
+      primary_key :id
 <% for attribute in table_attributes -%>
       <%= attribute.type %> :<%= attribute.name %>
 <% end -%>

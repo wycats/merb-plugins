@@ -1,2 +1,2 @@
-class <%= class_name %> < Sequel::Model
+class <%= class_name %> < Sequel::Model(:<%= class_name.snake_case.pluralize %>)
 end
