@@ -186,7 +186,7 @@ module Merb #:nodoc:
       # ==== Example
       #     <%= password_control :password, :label => 'New Password' %>
       def password_control(col, attrs = {})
-        attrs.merge!(:name => control_name(col))
+        attrs.merge!(:name => control_name(col), :id => control_id(col))
         errorify_field(attrs, col)
         password_field(control_name_value(col, attrs))
       end
