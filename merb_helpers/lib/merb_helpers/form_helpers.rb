@@ -440,15 +440,19 @@ module Merb #:nodoc:
 	          ret << tag("option", prompt, :value => '') if prompt
 	          ret << tag("option", '',     :value => '') if blank
             collection.each do |label, group|
-              ret << open_tag("optgroup", :label => label.to_s) + options_from_collection_for_select(group, attrs) + "</optgroup>"
+              ret << open_tag("optgroup", :label => label.to_s.humanize.titleize) + options_from_collection_for_select(group, attrs) + "</optgroup>"
             end
           end
         else
           text_method    = attrs[:text_method]
           value_method   = attrs[:value_method]
           selected_value = attrs[:selected]
-          options_for_select(
-            collection.inject([]) { |options, object| options << [ object.send(value_method), object.send(text_method) ] },
+          
+          text_method ||= :to_s
+          value_method ||= text_method
+          
+          options_for_select(collection.inject([]) { |options, object| 
+              options << [ object.send(value_method), object.send(text_method) ] },
             :selected => selected_value, :include_blank => blank, :prompt => prompt
           )
         end
