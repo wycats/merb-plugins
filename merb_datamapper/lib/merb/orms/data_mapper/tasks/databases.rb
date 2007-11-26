@@ -18,7 +18,7 @@ namespace :dm do
     
     desc "Clears sessions"
     task :clear => :merb_env do
-      table_name = (Merb::Plugins.config[:data_mapper][:session_table_name] || "sessions")
+      table_name = (Merb::Plugins.config[:datamapper][:session_table_name] || "sessions")
       #Merb::Orms::DataMapper.connect.execute("DELETE FROM #{table_name}")
     end
   end

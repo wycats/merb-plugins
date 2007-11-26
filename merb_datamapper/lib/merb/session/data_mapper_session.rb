@@ -17,7 +17,7 @@ module Merb
     end
   end
 
-  table_name = (Merb::Plugins.config[:merb_data_mapper][:session_table_name] || "sessions")
+  table_name = (Merb::Plugins.config[:merb_datamapper][:session_table_name] || "sessions")
   
   class DataMapperSession < DataMapper::Base
     
@@ -78,7 +78,10 @@ module Merb
     def data
       @unmarshalled_data || @unmarshalled_data = self.class.unmarshal(@data)
     end
-
+    
+    def data=(data)
+      @data, @unmarshalled_data = data, data
+    end
   
   private
     

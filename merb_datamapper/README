@@ -1,8 +1,10 @@
-merb_data_mapper
+merb_datamapper
 =================
 
 A plugin for the Merb framework that provides DataMapper access
 
 To use sessions:
-set the session store to data_mapper in merb.yml
-add the dependency in dependencies.rb: dependency "merb_data_mapper"
+1. set the session store to datamapper in merb.yml:
+    :session_store: datamapper
+2. add the dependency in dependencies.rb:
+    use_orm :datamapper
