@@ -115,49 +115,49 @@ namespace :db do
   end
 
   namespace :schema do
-    desc "Create a schema/schema.rb file that can be portably used against any DB supported by AR"
-    task :dump => :environment do
+    desc 'Create a schema/schema.rb file that can be portably used against any DB supported by AR'
+    task :dump do
       require 'active_record/schema_dumper'
       File.open(ENV['SCHEMA'] || "schema/schema.rb", "w") do |file|
         ActiveRecord::SchemaDumper.dump(ActiveRecord::Base.connection, file)
       end
     end
-
+    
     desc "Load a schema.rb file into the database"
-    task :load => :environment do
+    task :load do
       file = ENV['SCHEMA'] || "schema/schema.rb"
       load(file)
     end
   end
 
-  namespace :structure do
+ namespace :structure do
     desc "Dump the database structure to a SQL file"
-    task :dump => :environment do
-      abcs = ActiveRecord::Base.configurations
-      case abcs[MERB_ENV][:adapter]
-      when "mysql", "oci", "oracle"
-        ActiveRecord::Base.establish_connection(abcs[MERB_ENV])
-        File.open("schema/#{MERB_ENV}_structure.sql", "w+") { |f| f << ActiveRecord::Base.connection.structure_dump }
-      when "postgresql"
-        ENV['PGHOST']     = abcs[MERB_ENV]["host"] if abcs[MERB_ENV]["host"]
-        ENV['PGPORT']     = abcs[MERB_ENV]["port"].to_s if abcs[MERB_ENV]["port"]
-        ENV['PGPASSWORD'] = abcs[MERB_ENV]["password"].to_s if abcs[MERB_ENV]["password"]
-        search_path = abcs[MERB_ENV]["schema_search_path"]
-        search_path = "--schema=#{search_path}" if search_path
-        `pg_dump -i -U "#{abcs[MERB_ENV]["username"]}" -s -x -O -f schema/#{MERB_ENV}_structure.sql #{search_path} #{abcs[MERB_ENV]["database"]}`
-        raise "Error dumping database" if $?.exitstatus == 1
-      when "sqlite", "sqlite3"
-        dbfile = abcs[MERB_ENV]["database"] || abcs[MERB_ENV]["dbfile"]
-        `#{abcs[MERB_ENV]["adapter"]} #{dbfile} .schema > schema/#{MERB_ENV}_structure.sql`
-      when "sqlserver"
-        `scptxfr /s #{abcs[MERB_ENV]["host"]} /d #{abcs[MERB_ENV]["database"]} /I /f db\\#{MERB_ENV}_structure.sql /q /A /r`
-        `scptxfr /s #{abcs[MERB_ENV]["host"]} /d #{abcs[MERB_ENV]["database"]} /I /F db\ /q /A /r`
-      when "firebird"
-        set_firebird_env(abcs[MERB_ENV])
-        db_string = firebird_db_string(abcs[MERB_ENV])
-        sh "isql -a #{db_string} > schema/#{MERB_ENV}_structure.sql"
-      else
-        raise "Task not supported by '#{abcs[MERB_ENV][:adapter]}'"
+    task :dump do
+      config = ActiveRecord::Base.configurations[MERB_ENV.to_sym]
+      case config[:adapter]
+        when "mysql", "oci", "oracle"
+          ActiveRecord::Base.establish_connection(config[MERB_ENV])
+          File.open("schema/#{MERB_ENV}_structure.sql", "w+") { |f| f << ActiveRecord::Base.connection.structure_dump }
+        when "postgresql"
+          ENV['PGHOST']     = config[:host] if config[:host]
+          ENV['PGPORT']     = config[:port].to_s if config[:port]
+          ENV['PGPASSWORD'] = config[:password].to_s if config[:password]
+          search_path = config[:schema_search_path]
+          search_path = "--schema=#{search_path}" if search_path
+          `pg_dump -i -U "#{config[:username]}" -s -x -O -f schema/#{MERB_ENV}_structure.sql #{search_path} #{config[:database]}`
+          raise "Error dumping database" if $?.exitstatus == 1
+        when "sqlite", "sqlite3"
+          dbfile = config[:database] || config[:dbfile]
+          `#{config[:adapter]} #{dbfile} .schema > schema/#{MERB_ENV}_structure.sql`
+        when "sqlserver"
+          `scptxfr /s #{config[:host]} /d #{config[:database]} /I /f schema\\#{MERB_ENV}_structure.sql /q /A /r`
+          `scptxfr /s #{config[:host]} /d #{config[:database]} /I /F schema\ /q /A /r`
+        when "firebird"
+          set_firebird_env(config[MERB_ENV])
+          db_string = firebird_db_string(config[MERB_ENV])
+          sh "isql -a #{db_string} > schema/#{MERB_ENV}_structure.sql"
+        else
+          raise "Task not supported by '#{config[:adapter]}'"
       end
 
       if ActiveRecord::Base.connection.supports_migrations?
@@ -169,84 +169,78 @@ namespace :db do
   namespace :test do
     desc "Recreate the test database from the current environment's database schema"
     task :clone => %w(db:schema:dump db:test:purge) do
-      ActiveRecord::Base.establish_connection(ActiveRecord::Base.configurations['test'])
+      ActiveRecord::Base.establish_connection(ActiveRecord::Base.configurations[:test])
       ActiveRecord::Schema.verbose = false
       Rake::Task["db:schema:load"].invoke
     end
 
-
     desc "Recreate the test databases from the development structure"
     task :clone_structure => [ "db:structure:dump", "db:test:purge" ] do
-      abcs = ActiveRecord::Base.configurations
-      case abcs["test"]["adapter"]
-      when "mysql"
-        ActiveRecord::Base.establish_connection(:test)
-        ActiveRecord::Base.connection.execute('SET foreign_key_checks = 0')
-        IO.readlines("schema/#{MERB_ENV}_structure.sql").join.split("\n\n").each do |table|
-          ActiveRecord::Base.connection.execute(table)
-        end
-      when "postgresql"
-        ENV['PGHOST']     = abcs["test"]["host"] if abcs["test"]["host"]
-        ENV['PGPORT']     = abcs["test"]["port"].to_s if abcs["test"]["port"]
-        ENV['PGPASSWORD'] = abcs["test"]["password"].to_s if abcs["test"]["password"]
-        `psql -U "#{abcs["test"]["username"]}" -f schema/#{MERB_ENV}_structure.sql #{abcs["test"]["database"]}`
-      when "sqlite", "sqlite3"
-        dbfile = abcs["test"]["database"] || abcs["test"]["dbfile"]
-        `#{abcs["test"]["adapter"]} #{dbfile} < schema/#{MERB_ENV}_structure.sql`
-      when "sqlserver"
-        `osql -E -S #{abcs["test"]["host"]} -d #{abcs["test"]["database"]} -i db\\#{MERB_ENV}_structure.sql`
-      when "oci", "oracle"
-        ActiveRecord::Base.establish_connection(:test)
-        IO.readlines("schema/#{MERB_ENV}_structure.sql").join.split(";\n\n").each do |ddl|
-          ActiveRecord::Base.connection.execute(ddl)
-        end
-      when "firebird"
-        set_firebird_env(abcs["test"])
-        db_string = firebird_db_string(abcs["test"])
-        sh "isql -i schema/#{MERB_ENV}_structure.sql #{db_string}"
-      else
-        raise "Task not supported by '#{abcs["test"]["adapter"]}'"
+      config = ActiveRecord::Base.configurations[:test]
+      case config[:adapter]
+        when "mysql"
+          ActiveRecord::Base.establish_connection(:test)
+          ActiveRecord::Base.connection.execute('SET foreign_key_checks = 0')
+          IO.readlines("schema/#{MERB_ENV}_structure.sql").join.split("\n\n").each do |table|
+            ActiveRecord::Base.connection.execute(table)
+          end
+        when "postgresql"
+          ENV['PGHOST']     = config[:host] if config[:host]
+          ENV['PGPORT']     = config[:port].to_s if config[:port]
+          ENV['PGPASSWORD'] = config[:password].to_s if config[:password]
+          `psql -U "#{config[:username]}" -f schema/#{MERB_ENV}_structure.sql #{config[:database]}`
+        when "sqlite", "sqlite3"
+          dbfile = config[:database] ||config[:dbfile]
+          `#{config[:adapter]} #{dbfile} < schema/#{MERB_ENV}_structure.sql`
+        when "sqlserver"
+          `osql -E -S #{config[:host]} -d #{config[:database]} -i schema\\#{MERB_ENV}_structure.sql`
+        when "oci", "oracle"
+          ActiveRecord::Base.establish_connection(:test)
+          IO.readlines("schema/#{MERB_ENV}_structure.sql").join.split(";\n\n").each do |ddl|
+            ActiveRecord::Base.connection.execute(ddl)
+          end
+        when "firebird"
+          set_firebird_env(config)
+          db_string = firebird_db_string(config)
+          sh "isql -i schema/#{MERB_ENV}_structure.sql #{db_string}"
+        else
+          raise "Task not supported by '#{config[:adapter]}'"
       end
     end
-
+    
     desc "Empty the test database"
-    task :purge => :environment do
-      abcs = ActiveRecord::Base.configurations
-      case abcs["test"]["adapter"]
-      when "mysql"
-        ActiveRecord::Base.establish_connection(:test)
-        ActiveRecord::Base.connection.recreate_database(abcs["test"]["database"])
-      when "postgresql"
-        ENV['PGHOST']     = abcs["test"]["host"] if abcs["test"]["host"]
-        ENV['PGPORT']     = abcs["test"]["port"].to_s if abcs["test"]["port"]
-        ENV['PGPASSWORD'] = abcs["test"]["password"].to_s if abcs["test"]["password"]
-        enc_option = "-E #{abcs["test"]["encoding"]}" if abcs["test"]["encoding"]
-
-        ActiveRecord::Base.clear_active_connections!
-        `dropdb -U "#{abcs["test"]["username"]}" #{abcs["test"]["database"]}`
-        `createdb #{enc_option} -U "#{abcs["test"]["username"]}" #{abcs["test"]["database"]}`
-      when "sqlite","sqlite3"
-        dbfile = abcs["test"]["database"] || abcs["test"]["dbfile"]
-        File.delete(dbfile) if File.exist?(dbfile)
-      when "sqlserver"
-        dropfkscript = "#{abcs["test"]["host"]}.#{abcs["test"]["database"]}.DP1".gsub(/\\/,'-')
-        `osql -E -S #{abcs["test"]["host"]} -d #{abcs["test"]["database"]} -i db\\#{dropfkscript}`
-        `osql -E -S #{abcs["test"]["host"]} -d #{abcs["test"]["database"]} -i db\\#{MERB_ENV}_structure.sql`
-      when "oci", "oracle"
-        ActiveRecord::Base.establish_connection(:test)
-        ActiveRecord::Base.connection.structure_drop.split(";\n\n").each do |ddl|
-          ActiveRecord::Base.connection.execute(ddl)
-        end
-      when "firebird"
-        ActiveRecord::Base.establish_connection(:test)
-        ActiveRecord::Base.connection.recreate_database!
-      else
-        raise "Task not supported by '#{abcs["test"]["adapter"]}'"
+    task :purge do
+      config = ActiveRecord::Base.configurations[:test]
+      case config[:adapter]
+        when "mysql"
+          ActiveRecord::Base.establish_connection(:test)
+          ActiveRecord::Base.connection.recreate_database(config[:database])
+        when "postgresql"
+          ENV['PGHOST']     = config[:host] if config[:host]
+          ENV['PGPORT']     = configs[:port].to_s if config[:port]
+          ENV['PGPASSWORD'] = configs[:password].to_s if config[:password]
+          enc_option = "-E #{config[:encoding]}" if config[:encoding]
+          ActiveRecord::Base.clear_active_connections!
+          `dropdb -U "#{config[:username]}" #{config[:database]}`
+          `createdb #{enc_option} -U "#{config[:username]}" #{config[:database]}`
+        when "sqlite","sqlite3"
+          dbfile = config[:database] || config[:dbfile]
+          File.delete(dbfile) if File.exist?(dbfile)
+        when "sqlserver"
+        config  ActiveRecord::Base.establish_connection(:test)
+          ActiveRecord::Base.connection.structure_drop.split(";\n\n").each do |ddl|
+            ActiveRecord::Base.connection.execute(ddl)
+          end
+        when "firebird"
+          ActiveRecord::Base.establish_connection(:test)
+          ActiveRecord::Base.connection.recreate_database!
+        else
+          raise "Task not supported by '#{config[:adapter]}'"
       end
     end
 
-    desc 'Prepare the test database and load the schema'
-    task :prepare => :environment do
+    desc "Prepare the test database and load the schema"
+    task :prepare => ["db:test:clone_structure", "db:test:clone"] do
       if defined?(ActiveRecord::Base) && !ActiveRecord::Base.configurations.blank?
         Rake::Task[{ :sql  => "db:test:clone_structure", :ruby => "db:test:clone" }[ActiveRecord::Base.schema_format]].invoke
       end
