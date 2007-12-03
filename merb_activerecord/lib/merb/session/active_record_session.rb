@@ -92,6 +92,14 @@ module Merb
       data[key]
     end
   
+    def empty?
+      data.empty?
+    end
+  
+    def each(&b)
+      data.each(&b)
+    end
+  
     def []=(key, val)
       data[key] = val
     end

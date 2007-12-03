@@ -91,6 +91,14 @@ module Merb
       data[key] = val
     end
   
+    def empty?
+      data.empty?
+    end
+  
+    def each(&b)
+      data.each(&b)
+    end
+  
     # Lazy-unmarshal session state.
     def data
       @data ||= self.class.unmarshal(@values[:data]) || {}

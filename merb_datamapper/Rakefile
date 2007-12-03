@@ -3,7 +3,7 @@ require 'rake/gempackagetask'
 
 PLUGIN = "merb_datamapper"
 NAME = "merb_datamapper"
-VERSION = "0.4.4"
+VERSION = "0.4.5"
 AUTHOR = "Jason Toy"
 EMAIL = "jtoy@rubynow.com"
 HOMEPAGE = "http://merbivore.com"
