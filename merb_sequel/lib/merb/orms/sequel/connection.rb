@@ -1,4 +1,4 @@
-require 'fileutils'
+require "fileutils"
 
 module Merb
   module Orms
@@ -25,48 +25,36 @@ module Merb
       
         # Database connects as soon as the gem is loaded
         def connect
+
+          require "sequel"
+
           if File.exists?(config_file)
             puts "Connecting to database..."
-            # Load the correct Sequel adapter and set it up according to the yaml file
-            case config[:adapter]
-            when 'mysql'
-              require "sequel/mysql"
-              host = config[:host] || 'localhost'
-              user = config[:user] || config[:username] || 'root'
-              password = config[:password]
-              # Use Sequel::Model.db to access this object
-              ::Sequel.mysql(config[:database], :host => host, :user => user, :password => password, :logger => MERB_LOGGER)
-            when 'postgresql'
-              require "sequel/postgres"
-              host = config[:host] || 'localhost'
-              user = config[:user] || config[:username] || 'root'
-              password = config[:password]
-              encoding = config[:encoding] || config[:charset] || nil
-              
-              if encoding
-                ::Sequel.postgres(config[:database], :host => host, :user => user, :password => password, :encoding => encoding, :logger => MERB_LOGGER)
-              else
-                ::Sequel.postgres(config[:database], :host => host, :user => user, :password => password, :logger => MERB_LOGGER)
-              end
-            when 'sqlite'
-              require "sequel/sqlite"
-              if config[:database]
-                ::Sequel.sqlite(config[:database], :logger => MERB_LOGGER)
-              else
-                ::Sequel.sqlite(:logger => MERB_LOGGER)
-              end
-            else
-              require "sequel/sqlite"
-              p full_config
-              puts "No adapter specified in config/database.yml... trying a memory-only sqlite database"
-              ::Sequel.sqlite
-            end
+            options = {}
+            options[:adapter]  = (config[:adaptor]  || "sqlite")
+            options[:host]     = (config[:host]     || "localhost")
+            options[:user]     = (config[:username] || config[:user] || "root")
+            options[:encoding] = (config[:encoding] || config[:charset]) if (config[:encoding] || config[:charset])
+            options[:database] = config[:database] if config[:database]
+            options[:logger]   = MERB_LOGGER
+            
+            uri = "#{options[:adapter]}://"
+            uri << options[:username]         if options[:username]
+            uri << (':' + options[:password]) if options[:password]
+            uri << '@' if (options[:user] || options[:password])
+            uri << options[:host]
+            uri << ('/' + options[:database]) if options[:database]
+
+            connection = ::Sequel.connect(uri, options)
+
+            MERB_LOGGER.error("Connection Error: #{e}") unless connection
           else
             copy_sample_config
             puts "No database.yml file found in #{MERB_ROOT}/config."
-            puts "A sample file was created called database.sample.yml for you to copy and edit."
+            puts "A sample file was created called config/database.sample.yml for you to copy and edit."
             exit(1)
           end
+
         end
         
         # Registering this ORM lets the user choose sequel as a session store
@@ -76,7 +64,9 @@ module Merb
             "merb/session/sequel_session",
             "Using Sequel database sessions")
         end
+
       end
     end
   end
+
 end

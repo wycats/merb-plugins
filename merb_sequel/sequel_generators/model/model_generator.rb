@@ -1,4 +1,4 @@
-require 'merb/generators/merb_generator_helpers'
+require "merb/generators/merb_generator_helpers"
 
 class ModelGenerator < Merb::GeneratorHelpers::ModelGeneratorBase
   

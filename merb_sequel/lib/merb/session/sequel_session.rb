@@ -2,6 +2,7 @@ require 'base64'
 
 module Merb
   module SessionMixin
+    
     def setup_session
       MERB_LOGGER.info("Setting up session")
       before = cookies[_session_id_key]
@@ -15,6 +16,7 @@ module Merb
       request.session.save if @_fingerprint != Marshal.dump(request.session.data).hash
       set_cookie(_session_id_key, request.session.values[:session_id], _session_expiry) if (@_new_cookie || request.session.needs_new_cookie)
     end
+    
   end
 
   table_name = (Merb::Plugins.config[:sequel][:session_table_name] || "sessions")
@@ -57,7 +59,10 @@ module Merb
         255
       end
     
-      def marshal(data)   Base64.encode64(Marshal.dump(data)) if data end
+      def marshal(data)
+        Base64.encode64(Marshal.dump(data)) if data
+      end
+      
       def unmarshal(data)
         Marshal.load(Base64.decode64(data)) if data
       end
@@ -110,6 +115,7 @@ module Merb
     end
   
   private
+  
     attr_writer :data
   
     before_save do # marshal_data!
@@ -138,4 +144,5 @@ module Merb
 
     puts "Created sessions table."
   end
+  
 end

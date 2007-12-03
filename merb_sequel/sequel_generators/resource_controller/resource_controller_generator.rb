@@ -1,4 +1,4 @@
-require 'merb/generators/merb_generator_helpers'
+require "merb/generators/merb_generator_helpers"
 
 class ResourceControllerGenerator < Merb::GeneratorHelpers::ControllerGeneratorBase
 
@@ -7,7 +7,7 @@ class ResourceControllerGenerator < Merb::GeneratorHelpers::ControllerGeneratorB
     name, *actions = args.flatten
     runtime_options[:actions] = %w[index show new edit]
     runtime_options[:test_stub_generator] = "merb_controller_test"
-    super( [name], runtime_options )
+    super([name], runtime_options)
   end
 
   def self.superclass
@@ -15,8 +15,9 @@ class ResourceControllerGenerator < Merb::GeneratorHelpers::ControllerGeneratorB
   end
   
   protected
+
   def banner
-        <<-EOS
+    <<-EOS
   Creates a Merb controller, views and specs using Sequel Models
 
   USAGE: #{$0} #{spec.name} resource_name"
