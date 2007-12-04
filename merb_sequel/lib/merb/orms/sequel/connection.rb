@@ -25,28 +25,11 @@ module Merb
       
         # Database connects as soon as the gem is loaded
         def connect
-
           require "sequel"
 
           if File.exists?(config_file)
-            puts "Connecting to database..."
-            options = {}
-            options[:adapter]  = (config[:adaptor]  || "sqlite")
-            options[:host]     = (config[:host]     || "localhost")
-            options[:user]     = (config[:username] || config[:user] || "root")
-            options[:encoding] = (config[:encoding] || config[:charset]) if (config[:encoding] || config[:charset])
-            options[:database] = config[:database] if config[:database]
-            options[:logger]   = MERB_LOGGER
-            
-            uri = "#{options[:adapter]}://"
-            uri << options[:username]         if options[:username]
-            uri << (':' + options[:password]) if options[:password]
-            uri << '@' if (options[:user] || options[:password])
-            uri << options[:host]
-            uri << ('/' + options[:database]) if options[:database]
-
-            connection = ::Sequel.connect(uri, options)
-
+            puts "Connecting to database..."            
+            connection = ::Sequel.connect(config_options(config))
             MERB_LOGGER.error("Connection Error: #{e}") unless connection
           else
             copy_sample_config
@@ -54,7 +37,19 @@ module Merb
             puts "A sample file was created called config/database.sample.yml for you to copy and edit."
             exit(1)
           end
-
+        end
+        
+        def config_options(config = {})
+          options = {}
+          options[:adapter]  = (config[:adaptor]  || "sqlite")
+          options[:host]     = (config[:host]     || "localhost")
+          options[:user]     = (config[:username] || config[:user] || "root")
+          if (config[:encoding] || config[:charset])
+            options[:encoding] = (config[:encoding] || config[:charset])
+          end
+          options[:database] = config[:database]  if config[:database]
+          options[:logger]   = MERB_LOGGER
+          options
         end
         
         # Registering this ORM lets the user choose sequel as a session store
