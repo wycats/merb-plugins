@@ -41,9 +41,10 @@ module Merb
         
         def config_options(config = {})
           options = {}
-          options[:adapter]  = (config[:adaptor]  || "sqlite")
+          options[:adapter]  = (config[:adapter]  || "sqlite")
           options[:host]     = (config[:host]     || "localhost")
           options[:user]     = (config[:username] || config[:user] || "root")
+          options[:password] = config[:password] if config[:password]
           if (config[:encoding] || config[:charset])
             options[:encoding] = (config[:encoding] || config[:charset])
           end
