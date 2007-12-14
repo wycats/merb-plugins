@@ -31,8 +31,7 @@ describe "error_messages_for" do
   it "should accept a custom error list item block" do
     errs = error_messages_for(@obj, proc {|err| "<li>#{err[0]} column: #{err[1]}</li>"})
     errs.should include("<li>foo column: bar</li>")
-  end
-  
+  end  
 end
 
 describe "form_tag" do
@@ -164,7 +163,7 @@ describe "text_field (basic)" do
   it "should provide an additional label tag if the :label option is passed in" do
     result = text_field(:label => "LABEL" )
     result.should match(/<label>LABEL<\/label><input type="text"\s*\/>/)
-  end
+  end 
 end
 
 describe "text_control (data bound)" do
@@ -189,6 +188,27 @@ describe "text_control (data bound)" do
     _buffer.should match(/<label.*>LABEL<\/label><input/)
     res = _buffer.scan(/<[^>]*>/)
     res[2].should_not match_tag(:input, :label => "LABEL")
+  end
+  
+  it "should not errorify the field for a new object" do
+    f = form_for :obj do
+      text_control(:foo, :bar =>"7").should_not match_tag(:input, :type => "text", :name => "fake_model[foo]", :class => "error")    
+    end
+  end
+  
+  it "should errorify a field for a model with errors" do
+    model = mock("model")
+    model.stub!(:new_record?).and_return(true)
+    model.stub!(:class).and_return("MyClass")
+    model.stub!(:foo).and_return("FOO")
+    errors = mock("errors")
+    errors.should_receive(:on).with(:foo).and_return(true)
+    
+    model.stub!(:errors).and_return(errors)
+    
+    f = form_for model do
+      text_control(:foo).should match_tag(:input, :class => "error")
+    end
   end
 end
 
@@ -228,6 +248,28 @@ describe "password_control (data bound)" do
     res = _buffer.scan(/<[^>]*>/)
     res[2].should_not match_tag(:input, :label => "LABEL")
   end
+  
+  it "should not errorify the field for a new object" do
+    f = form_for :obj do
+      password_control(:foo, :bar =>"7").should_not match_tag(:input, :class => "error")    
+    end
+  end
+  
+  it "should errorify a field for a model with errors" do
+    model = mock("model")
+    model.stub!(:new_record?).and_return(true)
+    model.stub!(:class).and_return("MyClass")
+    model.stub!(:foo).and_return("FOO")
+    errors = mock("errors")
+    errors.should_receive(:on).with(:foo).and_return(true)
+    
+    model.stub!(:errors).and_return(errors)
+    
+    f = form_for model do
+      password_control(:foo).should match_tag(:input, :class => "error")
+    end
+  end
+  
 end
 
 describe "checkbox_field (basic)" do
@@ -287,6 +329,27 @@ describe "checkbox_control (data bound)" do
     res = _buffer.scan(/<[^>]*>/)
     res[2].should_not match_tag(:input, :label => "LABEL")
     end
+    
+    it "should not errorify the field for a new object" do
+      f = form_for :obj do
+        checkbox_control(:foo, :bar =>"7").should_not match_tag(:input, :type => "checkbox", :class => "error checkbox")
+      end
+    end
+
+    it "should errorify a field for a model with errors" do
+      model = mock("model")
+      model.stub!(:new_record?).and_return(true)
+      model.stub!(:class).and_return("MyClass")
+      model.stub!(:foo).and_return("FOO")
+      errors = mock("errors")
+      errors.should_receive(:on).with(:foo).and_return(true)
+    
+      model.stub!(:errors).and_return(errors)
+    
+      f = form_for model do
+        checkbox_control(:foo, :bar =>"7").should match_tag(:input, :type => "checkbox", :class => "error checkbox")
+      end
+    end
 end
 
 describe "hidden_field (basic)" do
@@ -322,6 +385,27 @@ describe "hidden_control (data bound)" do
       res = hidden_control(:foo, :label => "LABEL")
       res.should_not match(/<label>LABEL/)
       res.should_not match_tag(:input, :label=> "LABEL")  
+    end
+  end
+  
+  it "should not errorify the field for a new object" do
+    f = form_for :obj do
+      hidden_control(:foo, :bar =>"7").should_not match_tag(:input, :type => "hidden", :class => "error")
+    end
+  end
+
+  it "should not errorify a field for a model with errors" do
+    model = mock("model")
+    model.stub!(:new_record?).and_return(true)
+    model.stub!(:class).and_return("MyClass")
+    model.stub!(:foo).and_return("FOO")
+    errors = mock("errors")
+    errors.should_receive(:on).with(:foo).and_return(true)
+  
+    model.stub!(:errors).and_return(errors)
+  
+    f = form_for model do
+      hidden_control(:foo, :bar =>"7").should match_tag(:input, :type => "hidden", :name => "my_class[foo]", :class => "error")
     end
   end
     

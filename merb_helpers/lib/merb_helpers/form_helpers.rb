@@ -530,7 +530,7 @@ module Merb #:nodoc:
       end
       
       def errorify_field(attrs, col)
-        attrs.add_html_class!("error") if !@_obj.valid? && @_obj.errors.on(col)
+        attrs.add_html_class!("error") if @_obj.errors.on(col)
       end         
       
     end
