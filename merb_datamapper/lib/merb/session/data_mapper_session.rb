@@ -37,7 +37,7 @@ module Merb
       # If none is found, generates a new session.
       def persist(session_id)
         if session_id
-          session = self[:session_id => session_id]
+          session = first :session_id => session_id
         end
         unless session
           session = generate
