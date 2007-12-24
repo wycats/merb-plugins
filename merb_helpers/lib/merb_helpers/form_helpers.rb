@@ -343,7 +343,7 @@ module Merb #:nodoc:
       # +selected+:: The value of a selected object, which may be either a string or an array.
       # +include_blank+:: Adds an additional blank option tag with no value.
       # +collection+:: The collection for the select options
-      # +text_method+:: Method to determine text of an option (as a symbol).
+      # +text_method+:: Method to determine text of an option (as a symbol). Ex: :text_method => :name  will call .name on your record object for what text to display.
       # +value_method+:: Method to determine value of an option (as a symbol).
       def select_field(attrs = {})
         collection = attrs.delete(:collection)
