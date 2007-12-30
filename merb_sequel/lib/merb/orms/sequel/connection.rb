@@ -26,6 +26,7 @@ module Merb
         # Database connects as soon as the gem is loaded
         def connect
           require "sequel"
+          require "sequel_model"
 
           if File.exists?(config_file)
             puts "#{Time.now.httpdate}: Connecting to the '#{config[:adapter]}' database '#{config[:hosts]}' ..."
