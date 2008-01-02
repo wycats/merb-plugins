@@ -8,7 +8,6 @@ require 'merb/test/helper'
 Spec::Runner.configure do |config|
   config.include(Merb::Test::Helper)
   config.include(Merb::Test::RspecMatchers)
-  config.include(Merb::Test::MerbRspecControllerRedirect)  
 end
 
 class FakeModel

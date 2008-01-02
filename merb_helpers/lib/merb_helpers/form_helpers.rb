@@ -501,8 +501,34 @@ module Merb #:nodoc:
         attrs[:name] ||= "submit"
         self_closing_tag("input", attrs)
       end
-      
+
+      # Generates a delete button inside of a form. 
+      # 
+      #     <%= delete_button :news_post, @news_post, 'Remove' %>
+      # 
+      # The HTML generated for this would be:
+      # 
+      #     <form method="post" action="/news_posts/4">
+      #       <input type="hidden" value="delete" name="_method"/>
+      #       <button type="submit">Remove</button>
+      #     </form>
+      def delete_button(symbol, obj, contents = 'Delete', form_attrs = {}, button_attrs = {})
+        button_attrs.merge!(:type => 'submit')
+        form_attrs.merge!(:action => url(symbol, obj), :method => :delete)
+
+        obj = obj_from_ivar_or_sym(symbol)
+        fake_form_method = set_form_method(form_attrs, obj)
+
+        output = ""
+        output << open_tag("form", form_attrs)
+        output << generate_fake_form_method(fake_form_method)
+        output << tag("button", contents, button_attrs)
+        output << "</form>"
+        output
+      end
+         
       private
+
       # Fake out the browser to send back the method for RESTful stuff.
       # Fall silently back to post if a method is given that is not supported here
       def set_form_method(options = {}, obj = nil)

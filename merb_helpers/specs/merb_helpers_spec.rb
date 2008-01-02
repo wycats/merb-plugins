@@ -655,3 +655,26 @@ describe "submit_field (basic)" do
     result.should match(/<input.*label="LABEL"/)
   end
 end
+
+
+describe "delete_button" do
+  before(:each) do
+    @obj = mock("a model")
+    Merb::Router.prepare do |r|
+      r.resources :objs
+    end
+  end
+
+  it "should return a button inside of a form for the object" do
+    result = delete_button(:obj, @obj)
+    result.should match_tag(:form, :action => "/objs/#{@obj.id}", :method => "post")
+    result.should match_tag(:input, :type => "hidden", :value => "delete", :name => "_method")
+    result.should match_tag(:button, :type => "submit")
+    result.should match(/<button.*>Delete<\/button>/)
+  end
+
+  it "should allow you to modify it's contents" do
+    result = delete_button(:obj, @obj, "Remove")
+    result.should match(/<button.*>Remove<\/button>/)
+  end
+end
