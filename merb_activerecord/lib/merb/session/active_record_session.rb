@@ -84,8 +84,8 @@ module Merb
     end 
   
     # Lazy-delete of session data 
-    def delete
-      self.data = {}
+    def delete(key = nil)
+      key ? self.data.delete(key) : self.data.clear
     end
   
     def [](key)
