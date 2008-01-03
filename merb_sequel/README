@@ -1,7 +1,10 @@
-merb_sequel
-=================
+= merb_sequel
 
 A plugin for the Merb framework that provides Sequel access
 
 After you install the plugin, you have access to the sequel_migration generator in your merb projects
 example: /merb/root/script/generate sequel_migration new_migration
+
+= Contributors
+
+originally written by Duane Johnson (canadaduane@gmail.com).

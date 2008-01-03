@@ -1,35 +1,36 @@
-require 'rubygems'
-require 'rake/gempackagetask'
+require "rubygems"
+require "rake/gempackagetask"
 
-PLUGIN = "merb_sequel"
-NAME = "merb_sequel"
-VERSION = "0.4.2"
-AUTHOR = "Duane Johnson"
-EMAIL = "canadaduane@gmail.com"
+PLUGIN   = "merb_sequel"
+NAME     = "merb_sequel"
+VERSION  = "0.4.2"
+AUTHOR   = "Wayne E. Seguin"
+EMAIL    = "wayneeseguin@gmail.com"
 HOMEPAGE = "http://merb-plugins.rubyforge.org/merb_sequel/"
-SUMMARY = "Merb plugin that provides support for the Sequel database object"
+SUMMARY  = "Merb plugin that provides support for Sequel and Sequel::Model"
 
-spec = Gem::Specification.new do |s|
-  s.name = NAME
-  s.version = VERSION
-  s.platform = Gem::Platform::RUBY
-  s.has_rdoc = true
-  s.extra_rdoc_files = ["README", "LICENSE", 'TODO']
-  s.summary = SUMMARY
-  s.description = s.summary
-  s.author = AUTHOR
-  s.email = EMAIL
-  s.homepage = HOMEPAGE
-  s.add_dependency('merb',         '>= 0.4.0')
-  s.add_dependency('sequel',       '>= 0.5.0')
-  s.add_dependency('sequel_model', '>= 0.1')
-  s.require_path = 'lib'
-  s.autorequire = PLUGIN
-  s.files = %w(LICENSE README Rakefile TODO) + Dir.glob("{lib,specs,sequel_generators}/**/*")
+specification = Gem::Specification.new do |spec|
+  spec.name         = NAME
+  spec.email        = EMAIL
+  spec.author       = AUTHOR
+  spec.version      = VERSION
+  spec.summary      = SUMMARY
+  spec.platform     = Gem::Platform::RUBY
+  spec.has_rdoc     = true
+  spec.homepage     = HOMEPAGE
+  spec.description  = SUMMARY
+  spec.autorequire  = PLUGIN
+  spec.require_path = "lib"
+  spec.extra_rdoc_files = ["README", "LICENSE", 'TODO']
+  # Dependencies
+  spec.add_dependency("merb",         ">= 0.4.0")
+  spec.add_dependency("sequel",       ">= 1.0.0")
+  spec.add_dependency("sequel_model", ">= 0.2")
+  spec.files = %w(LICENSE README Rakefile TODO) + Dir.glob("{lib,specs,sequel_generators}/**/*")
 end
 
-Rake::GemPackageTask.new(spec) do |pkg|
-  pkg.gem_spec = spec
+Rake::GemPackageTask.new(specification) do |package|
+  package.gem_spec = specification
 end
 
 task :install do
