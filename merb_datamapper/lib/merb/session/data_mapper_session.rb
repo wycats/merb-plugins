@@ -22,7 +22,7 @@ module Merb
   class DataMapperSession < DataMapper::Base
     
     set_table_name "sessions"
-    property :session_id, :text, :lazy => false
+    property :session_id, :text, :lazy => false, :key => true
     property :data,       :text, :lazy => false
   
     attr_accessor :needs_new_cookie
@@ -37,7 +37,7 @@ module Merb
       # If none is found, generates a new session.
       def persist(session_id)
         if session_id
-          session = first :session_id => session_id
+          session = self[session_id]
         end
         unless session
           session = generate
