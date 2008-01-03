@@ -1,7 +1,7 @@
 module Merb
   
   module Helpers
-    HELPERS_DIR   = File.join(File.dirname(__FILE__), 'merb_helpers')
+    HELPERS_DIR   = File.dirname(__FILE__) / 'merb_helpers'
     HELPERS_FILES = Dir["#{HELPERS_DIR}/*_helpers.rb"].collect {|h| h.match(/\/(\w+)\.rb/)[1]}
       
     def self.load_helpers(helpers = HELPERS_FILES)

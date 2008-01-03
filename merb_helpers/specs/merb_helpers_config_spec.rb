@@ -36,12 +36,6 @@ describe "loading configuration" do
     defined?(Merb::Helpers).should_not be_nil    
   end
   
-  it "should look in the merb_helpers directory for all *_helpers.rb files" do
-    reload_merb_helpers
-    Dir.should_receive(:[]).with("#{Merb::Helpers::HELPERS_DIR}/*_helpers.rb")
-    reload_merb_helpers
-  end
-  
   it "should load all helpers by default" do
     reload_merb_helpers
     defined?(Merb::Helpers).should_not be_nil

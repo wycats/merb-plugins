@@ -263,10 +263,10 @@ module Merb #:nodoc:
       # This is generally used within a resource block such as +form_for+.
       #
       # ==== Examples
-      #     <!-- the labels are the options -->
+      #     <%# the labels are the options %>
       #     <%= radio_group_control :my_choice, [5,6,7] %>
       # 
-      #     <!-- custom labels -->
+      #     <%# custom labels %>
       #     <%= radio_group_control :my_choice, [{:value => 5, :label => "five"}] %>
       def radio_group_control(col, options = [], attrs = {})
         errorify_field(attrs, col)
@@ -451,7 +451,7 @@ module Merb #:nodoc:
           text_method ||= :to_s
           value_method ||= text_method
           
-          options_for_select(collection.inject([]) { |options, object| 
+          options_for_select((collection || []).inject([]) { |options, object| 
               options << [ object.send(value_method), object.send(text_method) ] },
             :selected => selected_value, :include_blank => blank, :prompt => prompt
           )
