@@ -34,7 +34,7 @@ end
 
 desc "Run :package and install resulting .gem"
 task :install => [:package] do
-  sh %{sudo gem install pkg/#{NAME}-#{GEM_VERSION}}
+  sh %{sudo gem install pkg/#{NAME}-#{GEM_VERSION} --no-rdoc --no-ri}
 end
 
 Spec::Rake::SpecTask.new do |t|

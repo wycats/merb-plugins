@@ -42,6 +42,7 @@ describe "form_tag" do
       _buffer << "CONTENT"
     end
     _buffer.should match_tag(:form, :method => "post")
+    _buffer.should_not match_tag(:input, :type => "hidden", :name => "_method")
     _buffer.should include("CONTENT")
   end
   

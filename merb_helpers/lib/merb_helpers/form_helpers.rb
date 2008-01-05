@@ -551,7 +551,7 @@ module Merb #:nodoc:
       # Fake out the browser to send back the method for RESTful stuff.
       # Fall silently back to post if a method is given that is not supported here
       def set_form_method(options = {}, obj = nil)
-        options[:method] ||= (!obj || (obj.respond_to?(:new_record?) && !obj.new_record?) ? :put : :post)
+        options[:method] ||= ((obj && obj.respond_to?(:new_record?) && !obj.new_record?) ? :put : :post)
         if ![:get,:post].include?(options[:method])
           fake_form_method = options[:method] if [:put, :delete].include?(options[:method])
           options[:method] = :post
