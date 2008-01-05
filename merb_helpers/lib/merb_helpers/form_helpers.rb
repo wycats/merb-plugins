@@ -85,7 +85,7 @@ module Merb #:nodoc:
       #       <input name="commit" type="submit" value="Create" />
       #     </form>
       def form_tag(attrs = {}, &block)
-        attrs.merge!( :enctype => "multipart/form-data" ) if attrs.delete(:multipart)
+        set_multipart_attribute!(attrs)
         fake_form_method = set_form_method(attrs)
         concat(open_tag("form", attrs), block.binding)
         concat(generate_fake_form_method(fake_form_method), block.binding) if fake_form_method
@@ -108,6 +108,7 @@ module Merb #:nodoc:
       #       <input name="commit" type="submit" value="Create" />
       #     </form>
       def form_for(obj, attrs={}, &block)
+        set_multipart_attribute!(attrs)
         obj = obj_from_ivar_or_sym(obj)
         fake_form_method = set_form_method(attrs, obj)
         concat(open_tag("form", attrs), block.binding)
@@ -557,7 +558,11 @@ module Merb #:nodoc:
       
       def errorify_field(attrs, col)
         attrs.add_html_class!("error") if @_obj.errors.on(col)
-      end         
+      end   
+      
+      def set_multipart_attribute!(attrs = {})
+        attrs.merge!( :enctype => "multipart/form-data" ) if attrs.delete(:multipart)      
+      end
       
     end
   end

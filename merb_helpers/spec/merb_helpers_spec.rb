@@ -120,6 +120,12 @@ describe "form_for" do
     _buffer.should match_tag(:input, :type => "hidden", :value => "put", :name => "_method")    
   end
   
+  it "should set a form to be mutlipart" do
+    form_for(:obj, :multipart => true) do
+    end
+    _buffer.should match_tag( :form, :method => "post", :enctype => "multipart/form-data")
+  end
+  
 end
 
 describe "fields_for" do
@@ -660,6 +666,7 @@ end
 describe "delete_button" do
   before(:each) do
     @obj = mock("a model")
+    @obj.stub!(:id).and_return(5)
     Merb::Router.prepare do |r|
       r.resources :objs
     end
