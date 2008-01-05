@@ -223,18 +223,36 @@ module Merb #:nodoc:
       end
 
       # Provides a generic HTML checkbox input tag.
+      # There are two ways this tag can be generated, based on the
+      # option :boolean. If not set to true, a "magic" input is generated.
+      # Otherwise, an input is created that can be easily used for passing
+      # an array of values to the application.
       #
       # ==== Example
       #     <% checkbox_field :name => "is_activated", :value => "1" %>
+      #
+      #     <% checkbox_field :name => "choices[]", :boolean => false, :value => "dog" %>
+      #     <% checkbox_field :name => "choices[]", :boolean => false, :value => "cat" %>
+      #     <% checkbox_field :name => "choices[]", :boolean => false, :value => "weasle" %>
       def checkbox_field(attrs = {}, hidden_attrs={})
-        on            = attrs.delete(:on)  || 1
-        off           = attrs.delete(:off) || 0
-        attrs[:value] = on if ( (v = attrs[:value]).nil? || v != "" )
+        boolbox = true
+        boolbox = false if ( attrs.has_key?(:boolean) and !attrs[:boolean] )
+        attrs.delete(:boolean)
+
+        if( boolbox )
+                on            = attrs.delete(:on)  || 1
+                off           = attrs.delete(:off) || 0
+                attrs[:value] = on if ( (v = attrs[:value]).nil? || v != "" )
+        else
+                # HTML-escape the value attribute
+                attrs[:value] = escape_xml( attrs[:value] )
+        end
+
         attrs.merge!(:type => :checkbox)
         attrs.add_html_class!("checkbox")
-        hidden_field({:name => attrs[:name], :value => off}.merge(hidden_attrs)) + optional_label(attrs){self_closing_tag("input", attrs)}
+        (boolbox ? hidden_field({:name => attrs[:name], :value => off}.merge(hidden_attrs)) : '') + optional_label(attrs){self_closing_tag("input", attrs)}
       end
-      
+
       # Returns a hidden input tag tailored for accessing a specified attribute (identified by +col+) on an object
       # resource within a +form_for+ resource block. Additional options on the input tag can be passed as a
       # hash with +attrs+. These options will be tagged onto the HTML as an HTML element attribute as in the example

@@ -282,6 +282,14 @@ describe "checkbox_field (basic)" do
   it "should return a basic checkbox based on the values passed in" do
     checkbox_field(:name => "foo", :checked => "checked").should match_tag(:input, :class => "checkbox", :name => "foo", :checked => "checked")
   end
+
+  it "should return a basic checkbox with :boolean => true" do
+    checkbox_field(:name => "foo", :checked => "checked", :boolean => true).should match_tag(:input, :class => "checkbox", :name => "foo", :checked => "checked")
+  end
+
+  it "should return a basic checkbox with a value other than 1/0" do
+    checkbox_field(:name => "choices[]", :boolean => false, :value => "dog").should match_tag(:input, :class => "checkbox", :name => "choices[]", :value => "dog")
+  end
   
   it "should provide an additional label tag if the :label option is passed in" do
     result = checkbox_field(:label => "LABEL" )
