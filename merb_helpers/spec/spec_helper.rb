@@ -81,6 +81,11 @@ class FakeModel2 < FakeModel
   
 end
 
+class FakeModel3
+  attr_accessor :foo, :bar
+end
+
+
 class FakeErrors
   
   def initialize(model)

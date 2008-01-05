@@ -113,6 +113,14 @@ describe "form_for" do
     _buffer.should_not match_tag(:input, :type => "hidden", :name => "_method")
   end
   
+  it "should set the method to post if the object does not respond to new_record?" do
+    @obj3 = FakeModel3.new
+    form_for(:obj3) do
+    end
+    _buffer.should match_tag(:form, :method => "post")
+    _buffer.should_not match_tag(:input, :type => "hidden", :name => "_method")
+  end
+  
   it "should support PUT if the object passed in is not a new_record? via a hidden field" do
     form_for(:obj) do
     end
