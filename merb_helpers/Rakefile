@@ -1,5 +1,6 @@
 require 'rubygems'
 require 'rake/gempackagetask'
+require 'rake/rdoctask'
 require 'spec/rake/spectask'
 
 PLUGIN = "merb_helpers"
@@ -9,6 +10,10 @@ AUTHOR = "Yehuda Katz"
 EMAIL = "wycats@gmail.com"
 HOMEPAGE = "http://merb.rubyforge.org/"
 SUMMARY = "Helper support for merb (similar to the Rails form helpers)"
+
+windows = (PLATFORM =~ /win32|cygwin/)
+
+SUDO = windows ? "" : "sudo"
 
 spec = Gem::Specification.new do |s|
   s.name = NAME
@@ -34,11 +39,33 @@ end
 
 desc "Run :package and install resulting .gem"
 task :install => [:package] do
-  sh %{sudo gem install pkg/#{NAME}-#{GEM_VERSION} --no-rdoc --no-ri}
+  sh %{#{SUDO} gem install pkg/#{NAME}-#{GEM_VERSION} --no-rdoc --no-ri}
 end
+
+Rake::RDocTask.new do |rdoc|
+      files = ['README', 'LICENSE',
+               'lib/**/*.rb']
+      rdoc.rdoc_files.add(files)
+      rdoc.main = 'README'
+      rdoc.title = 'Merb Helper Docs'
+      rdoc.rdoc_dir = 'doc/rdoc'
+      rdoc.options << '--line-numbers' << '--inline-source'
+end
+
 
 Spec::Rake::SpecTask.new do |t|
    t.warning = true
    t.spec_opts = ["--format", "specdoc", "--colour"]
    t.spec_files = Dir['spec/**/*_spec.rb'].sort   
 end
+
+desc "Run all specs and generate an rcov report"
+Spec::Rake::SpecTask.new('rcov') do |t|
+  t.spec_files = FileList['spec/**/*_spec.rb']
+  t.spec_opts = ["--format", "specdoc", "--colour"]
+  t.rcov = true
+  t.rcov_dir = 'coverage'
+  t.rcov_opts = ['--exclude', 'gems', '--exclude', 'spec']
+end
+
+
