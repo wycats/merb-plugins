@@ -4,7 +4,7 @@ namespace :dm do
   namespace :db do
     desc "Perform automigration"
     task :automigrate => :merb_env do
-      DataMapper::Base.auto_migrate!
+      DataMapper::Persistence.auto_migrate!
     end
   end
   
