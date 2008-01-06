@@ -42,7 +42,6 @@ describe "form_tag" do
       _buffer << "CONTENT"
     end
     _buffer.should match_tag(:form, :method => "post")
-    _buffer.should_not match_tag(:input, :type => "hidden", :name => "_method")
     _buffer.should include("CONTENT")
   end
   
@@ -114,25 +113,11 @@ describe "form_for" do
     _buffer.should_not match_tag(:input, :type => "hidden", :name => "_method")
   end
   
-  it "should set the method to post if the object does not respond to new_record?" do
-    @obj3 = FakeModel3.new
-    form_for(:obj3) do
-    end
-    _buffer.should match_tag(:form, :method => "post")
-    _buffer.should_not match_tag(:input, :type => "hidden", :name => "_method")
-  end
-  
   it "should support PUT if the object passed in is not a new_record? via a hidden field" do
     form_for(:obj) do
     end
     _buffer.should match_tag(:form, :method => "post")
     _buffer.should match_tag(:input, :type => "hidden", :value => "put", :name => "_method")    
-  end
-  
-  it "should set a form to be mutlipart" do
-    form_for(:obj, :multipart => true) do
-    end
-    _buffer.should match_tag( :form, :method => "post", :enctype => "multipart/form-data")
   end
   
 end
@@ -177,7 +162,7 @@ describe "text_field (basic)" do
   
   it "should provide an additional label tag if the :label option is passed in" do
     result = text_field(:label => "LABEL" )
-    result.should match(/<label>LABEL<\/label><input type="text"\s*\/>/)
+    result.should match(/<label>LABEL<\/label><input type="text" class="text"\s*\/>/)
   end 
 end
 
@@ -222,7 +207,7 @@ describe "text_control (data bound)" do
     model.stub!(:errors).and_return(errors)
     
     f = form_for model do
-      text_control(:foo).should match_tag(:input, :class => "error")
+      text_control(:foo).should match_tag(:input, :class => "error text")
     end
   end
 end
@@ -236,7 +221,7 @@ describe "password_field (basic)" do
   
   it "should provide an additional label tag if the :label option is passed in" do
     result = password_field(:label => "LABEL" )
-    result.should match(/<label.*>LABEL<\/label><input type="password"\s*\/>/)
+    result.should match(/<label.*>LABEL<\/label><input type="password" class="password"\s*\/>/)
   end
 end
 
@@ -281,7 +266,7 @@ describe "password_control (data bound)" do
     model.stub!(:errors).and_return(errors)
     
     f = form_for model do
-      password_control(:foo).should match_tag(:input, :class => "error")
+      password_control(:foo).should match_tag(:input, :class => "error password")
     end
   end
   
@@ -290,14 +275,6 @@ end
 describe "checkbox_field (basic)" do
   it "should return a basic checkbox based on the values passed in" do
     checkbox_field(:name => "foo", :checked => "checked").should match_tag(:input, :class => "checkbox", :name => "foo", :checked => "checked")
-  end
-
-  it "should return a basic checkbox with :boolean => true" do
-    checkbox_field(:name => "foo", :checked => "checked", :boolean => true).should match_tag(:input, :class => "checkbox", :name => "foo", :checked => "checked")
-  end
-
-  it "should return a basic checkbox with a value other than 1/0" do
-    checkbox_field(:name => "choices[]", :boolean => false, :value => "dog").should match_tag(:input, :class => "checkbox", :name => "choices[]", :value => "dog")
   end
   
   it "should provide an additional label tag if the :label option is passed in" do
@@ -399,7 +376,7 @@ describe "hidden_control (data bound)" do
   
   it "should render controls with errors if their attribute contains an error" do
     form_for :obj do
-      hidden_control(:foobad).should match_tag(:input, :type =>"hidden", :name => "fake_model[foobad]", :value => "foowee", :class => "error")
+      hidden_control(:foobad).should match_tag(:input, :type =>"hidden", :name => "fake_model[foobad]", :value => "foowee", :class => "error hidden")
     end
   end
   
@@ -428,7 +405,7 @@ describe "hidden_control (data bound)" do
     model.stub!(:errors).and_return(errors)
   
     f = form_for model do
-      hidden_control(:foo, :bar =>"7").should match_tag(:input, :type => "hidden", :name => "my_class[foo]", :class => "error")
+      hidden_control(:foo, :bar =>"7").should match_tag(:input, :type => "hidden", :name => "my_class[foo]", :class => "error hidden")
     end
   end
     
@@ -636,7 +613,7 @@ describe "file_field (basic)" do
   
   it "should wrap the field in a label if the :label option is passed to the file_field" do
     result = file_field(:label => "LABEL" )
-    result.should match(/<label>LABEL<\/label><input type="file"\s*\/>/)
+    result.should match(/<label>LABEL<\/label><input type="file" class="file"\s*\/>/)
   end
 end
 
@@ -683,7 +660,6 @@ end
 describe "delete_button" do
   before(:each) do
     @obj = mock("a model")
-    @obj.stub!(:id).and_return(5)
     Merb::Router.prepare do |r|
       r.resources :objs
     end

@@ -178,6 +178,7 @@ module Merb #:nodoc:
       #     # => <label for="fav_color">Your Favorite Color</label><input type="text" name="fav_color" id="fav_color"/>
       def text_field(attrs = {})
         attrs.merge!(:type => "text")
+        attrs.add_html_class!("text")
         optional_label(attrs) { self_closing_tag("input", attrs) }
       end
       
@@ -200,6 +201,7 @@ module Merb #:nodoc:
       def password_field(attrs = {})
         attrs.delete(:value)
         attrs.merge!(:type => 'password')
+        attrs.add_html_class!("password")
         optional_label(attrs) { self_closing_tag("input", attrs) }
       end
       
@@ -275,6 +277,7 @@ module Merb #:nodoc:
       def hidden_field(attrs = {})
         attrs.delete(:label)
         attrs.merge!(:type => :hidden)
+        attrs.add_html_class!("hidden")
         self_closing_tag("input", attrs)
       end
       
@@ -512,6 +515,7 @@ module Merb #:nodoc:
       #     <% file_field :name => "file", :label => "File" %>
       def file_field(attrs = {})
         attrs.merge!(:type => "file")
+        attrs.add_html_class!("file")
         optional_label(attrs) { self_closing_tag("input", attrs) }
       end
       
