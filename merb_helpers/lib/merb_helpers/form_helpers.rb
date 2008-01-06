@@ -535,7 +535,7 @@ module Merb #:nodoc:
       #       <input type="hidden" value="delete" name="_method"/>
       #       <button type="submit">Remove</button>
       #     </form>
-      def delete_button(symbol, obj, contents = 'Delete', form_attrs = {}, button_attrs = {})
+      def delete_button(symbol, obj = instance_variable_get(symbol), contents = 'Delete', form_attrs = {}, button_attrs = {})
         button_attrs.merge!(:type => 'submit')
         form_attrs.merge!(:action => url(symbol, obj), :method => :delete)
 
