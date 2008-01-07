@@ -18,7 +18,9 @@ module Merb
               # Convert string keys to symbols
               full_config = Erubis.load_yaml_file(config_file)
               config = (Merb::Plugins.config[:merb_sequel] = {})
-              (full_config[MERB_ENV.to_sym] || full_config[MERB_ENV]).each { |k, v| config[k.to_sym] = v }
+              (full_config[MERB_ENV.to_sym] || full_config[MERB_ENV]).each do |key, value|
+                config[key.to_sym] = value
+              end
               config
             end
         end
