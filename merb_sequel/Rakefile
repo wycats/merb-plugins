@@ -3,7 +3,7 @@ require "rake/gempackagetask"
 
 PLUGIN   = "merb_sequel"
 NAME     = "merb_sequel"
-VERSION  = "0.4.2"
+VERSION  = "0.4.3"
 AUTHOR   = "Wayne E. Seguin"
 EMAIL    = "wayneeseguin@gmail.com"
 HOMEPAGE = "http://merb-plugins.rubyforge.org/merb_sequel/"
@@ -23,7 +23,7 @@ specification = Gem::Specification.new do |spec|
   spec.require_path = "lib"
   spec.extra_rdoc_files = ["README", "LICENSE", 'TODO']
   # Dependencies
-  spec.add_dependency("merb",         ">= 0.4.0")
+  spec.add_dependency("merb",         ">= 0.4.2")
   spec.add_dependency("sequel",       ">= 1.0.0")
   spec.add_dependency("sequel_model", ">= 0.2")
   spec.files = %w(LICENSE README Rakefile TODO) + Dir.glob("{lib,specs,sequel_generators}/**/*")
