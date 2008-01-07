@@ -5,10 +5,10 @@ module Merb #:nodoc:
   module Helpers
     # Provides a number of methods for creating form tags which may be used either with or without the presence of ORM specific models.
     # There are two types of form helpers: those that specifically work with model attributes and those that don't.
-	  # This helper deals with both model attributes and generic form tags. Model attributes generally end in "_control" such as +text_control+,
-	  # and generic tags end with "_field", such as +text_field+
+    # This helper deals with both model attributes and generic form tags. Model attributes generally end in "_control" such as +text_control+,
+    # and generic tags end with "_field", such as +text_field+
     #
-	  # The core method of this helper, +form_for+, gives you the ability to create a form for a resource.
+    # The core method of this helper, +form_for+, gives you the ability to create a form for a resource.
     # For example, let's say that you have a model <tt>Person</tt> and want to create a new instance of it:
     #
     #     <% form_for :person, :action => url(:people) do %>
@@ -27,7 +27,7 @@ module Merb #:nodoc:
     #       <button type="submit">Create</button>
     #     </form>
     #
-	  # You may also create a normal form using form_tag
+    # You may also create a normal form using form_tag
     #     <% form_tag({url(:controller => "foo", :action => "bar", :id => 1)} do %>
     #       <%= text_field :name => 'first_name', :label => 'First Name' %>
     #       <%= submit_button 'Create' %>
@@ -535,23 +535,23 @@ module Merb #:nodoc:
       #       <input type="hidden" value="delete" name="_method"/>
       #       <button type="submit">Remove</button>
       #     </form>
-      def delete_button(symbol, obj = instance_variable_get(symbol), contents = 'Delete', form_attrs = {}, button_attrs = {})
-        button_attrs.merge!(:type => 'submit')
-        form_attrs.merge!(:action => url(symbol, obj), :method => :delete)
-
-        obj = obj_from_ivar_or_sym(symbol)
+      def delete_button(symbol, obj = instance_variable_get("@#{symbol}"), contents = 'Delete', form_attrs = {}, button_attrs = {})
+        button_attrs[:type] = :submit
+        
+        form_attrs.merge! :action => url(symbol, obj), :method => :delete
+        
         fake_form_method = set_form_method(form_attrs, obj)
-
-        output = ""
-        output << open_tag("form", form_attrs)
-        output << generate_fake_form_method(fake_form_method)
-        output << tag("button", contents, button_attrs)
-        output << "</form>"
-        output
+        
+        button = ''
+        button << open_tag(:form, form_attrs)
+        button << generate_fake_form_method(fake_form_method)
+        button << tag(:button, contents, button_attrs)
+        button << '</form>'
+        button
       end
-         
-      private
-
+      
+    private
+      
       # Fake out the browser to send back the method for RESTful stuff.
       # Fall silently back to post if a method is given that is not supported here
       def set_form_method(options = {}, obj = nil)
@@ -562,7 +562,7 @@ module Merb #:nodoc:
         end
         fake_form_method
       end
-
+      
       def generate_fake_form_method(fake_form_method)
         fake_form_method ? hidden_field(:name => "_method", :value => "#{fake_form_method}") : ""
       end
