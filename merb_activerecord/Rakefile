@@ -3,7 +3,7 @@ require 'rake/gempackagetask'
 
 PLUGIN = "merb_activerecord"
 NAME = "merb_activerecord"
-VERSION = "0.4.4"
+VERSION = "0.5"
 AUTHOR = "Duane Johnson"
 EMAIL = "canadaduane@gmail.com"
 HOMEPAGE = "http://merbivore.com"

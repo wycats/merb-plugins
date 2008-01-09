@@ -5,7 +5,7 @@ require 'spec/rake/spectask'
 
 PLUGIN = "merb_helpers"
 NAME = "merb_helpers"
-GEM_VERSION = "0.4.1"
+GEM_VERSION = "0.5"
 AUTHOR = "Yehuda Katz"
 EMAIL = "wycats@gmail.com"
 HOMEPAGE = "http://merb.rubyforge.org/"
