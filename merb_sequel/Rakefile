@@ -23,7 +23,7 @@ specification = Gem::Specification.new do |spec|
   spec.require_path = "lib"
   spec.extra_rdoc_files = ["README", "LICENSE", 'TODO']
   # Dependencies
-  spec.add_dependency("merb",         ">= 0.4.2")
+  spec.add_dependency("merb",         ">= 0.5")
   spec.add_dependency("sequel",       ">= 1.0.0")
   spec.add_dependency("sequel_model", ">= 0.2")
   spec.files = %w(LICENSE README Rakefile TODO) + Dir.glob("{lib,specs,sequel_generators}/**/*")
