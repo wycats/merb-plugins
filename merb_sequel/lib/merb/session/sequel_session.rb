@@ -19,7 +19,7 @@ module Merb
     
   end
 
-  table_name = (Merb::Plugins.config[:sequel][:session_table_name] || "sessions")
+  table_name = (Merb::Plugins.config[:merb_sequel][:session_table_name] || "sessions")
 
   class SequelSession < Sequel::Model(table_name.to_sym)
     set_schema do
