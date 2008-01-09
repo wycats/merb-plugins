@@ -132,14 +132,15 @@ module Merb #:nodoc:
       def fields_for(obj, attrs=nil, &block)
         @_obj ||= nil
         @_block ||= nil
+        @_object_name ||= nil
         obj = obj_from_ivar_or_sym(obj)
         old_obj, @_obj = @_obj, obj
-        @_object_name = "#{@_obj.class}".snake_case
         old_block, @_block = @_block, block
+        old_object_name, @_object_name = @_object_name, "#{@_obj.class}".snake_case
         
         concat(capture(&block), block.binding)
 
-        @_obj, @_block = old_obj, old_block        
+        @_obj, @_block, @_object_name = old_obj, old_block, old_object_name
       end
       
       def control_name(col) #:nodoc:

@@ -151,6 +151,18 @@ describe "fields_for" do
     _buffer.should match_tag(:input, :name => "fake_model[foo]", :value => "foowee", :type => "text")
   end
   
+  it "should pass context back to the old object after exiting block" do
+    @obj2 = FakeModel2.new
+    fields_for(:obj) do
+      text_control(:foo).should match_tag(:input, :id => "fake_model_foo", :name => "fake_model[foo]", :type => "text")
+      
+      fields_for(:obj2) do
+        text_control(:foo).should match_tag(:input, :id => "fake_model2_foo", :name => "fake_model2[foo]", :type => "text")
+      end
+      
+      text_control(:bar).should match_tag(:input, :id => "fake_model_bar", :name => "fake_model[bar]", :type => "text")
+    end
+  end
 end
 
 describe "text_field (basic)" do
