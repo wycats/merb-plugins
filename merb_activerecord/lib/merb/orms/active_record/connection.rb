@@ -5,8 +5,8 @@ module Merb
   module Orms
     module ActiveRecord
       class << self
-        def config_file() MERB_ROOT / "config" / "database.yml" end
-        def sample_dest() MERB_ROOT / "config" / "database.sample.yml" end
+        def config_file() Merb.root / "config" / "database.yml" end
+        def sample_dest() Merb.root / "config" / "database.sample.yml" end
         def sample_source() File.dirname(__FILE__) / "database.sample.yml" end
       
         def copy_sample_config
@@ -37,7 +37,7 @@ module Merb
             ::ActiveRecord::Base.establish_connection config
           else
             copy_sample_config
-            puts "No database.yml file found in #{MERB_ROOT}/config."
+            puts "No database.yml file found in #{Merb.root}/config."
             puts "A sample file was created called database.sample.yml for you to copy and edit."
             exit(1)
           end

@@ -16,7 +16,7 @@ namespace :sequel do
     desc "Creates session migration"
     task :create => :merb_env do
       # TODO: this should not use '001' always...
-      dest = File.join(MERB_ROOT, "schema", "migrations","001_add_sessions_table.rb")
+      dest = File.join(Merb.root, "schema", "migrations","001_add_sessions_table.rb")
       source = File.join(File.dirname(__FILE__), "merb", "session","001_add_sessions_table.rb")
       
       FileUtils.cp source, dest unless File.exists?(dest)

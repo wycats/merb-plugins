@@ -42,7 +42,7 @@
     <Ref id="RequestLog">
       <Set name="requestLog">
         <New id="RequestLogImpl" class="org.mortbay.jetty.NCSARequestLog">
-          <Arg><%= MERB_ROOT / "log" / "jetty.request.log" %></Arg>
+          <Arg><%= Merb.root / "log" / "jetty.request.log" %></Arg>
           <Set name="append">true</Set>
           <Set name="extended">false</Set>
           <Set name="LogTimeZone">GMT</Set>
@@ -54,7 +54,7 @@
       <Arg>
         <New class="org.mortbay.jetty.deployer.WebAppDeployer">
           <Set name="contexts"><Ref id="Contexts"/></Set>
-          <Set name="webAppDir"><%= MERB_ROOT / "war" %></Set>
+          <Set name="webAppDir"><%= Merb.root / "war" %></Set>
           <Set name="parentLoaderPriority">false</Set>
           <Set name="extract">true</Set>
           <Set name="allowDuplicates">false</Set>

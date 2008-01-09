@@ -21,7 +21,7 @@ namespace :jerbivore do
     
     #desc "Install the required gems into your app's gems directory"
     task :gems do
-      gem_dir = MERB_ROOT / 'gems'
+      gem_dir = Merb.root / 'gems'
       mkdir_p gem_dir / 'gems'
       mkdir_p gem_dir / 'specifications'
 
@@ -36,7 +36,7 @@ namespace :jerbivore do
     end
     
     task :merb do
-      unless File.exist?(MERB_ROOT / 'framework')
+      unless File.exist?(Merb.root / 'framework')
         Rake::Task['merb:freeze_from_svn'].invoke
       end
     end
@@ -45,14 +45,14 @@ namespace :jerbivore do
   desc "Package your application into a .war file"
   task :war => ['jerbivore:freeze:merb'] do
     require 'antwrap'
-    war_file = "#{File.basename(MERB_ROOT)}.war"
-    build_dir = MERB_ROOT / 'war'
+    war_file = "#{File.basename(Merb.root)}.war"
+    build_dir = Merb.root / 'war'
     mkdir_p build_dir 
     ant = AntProject.new(:ant_home => ENV['ANT_HOME'])
     ant.war(:webxml => JERBIVORE_ROOT / 'lib' / 'java' / 'web.xml', 
             :destfile => build_dir / war_file) do |ant|
       ant.fileset :dir => 'public'
-      ant.webinf :dir => MERB_ROOT, 
+      ant.webinf :dir => Merb.root, 
                  :excludes => '**/*.war, log/**/*, public/**/*, war/**/*'
       ant.lib :file => JERBIVORE_ROOT / 'lib' / 'java' / '*.jar'
     end
@@ -61,7 +61,7 @@ namespace :jerbivore do
     end
   end
   
-  jetty_config = MERB_ROOT / 'config' / 'jetty.xml'
+  jetty_config = Merb.root / 'config' / 'jetty.xml'
   file jetty_config do
     erb = Erubis::Eruby.new(File.read(JERBIVORE_ROOT / 'jetty' / 'jetty.xml.erb'))
     File.open(jetty_config, "w") {|f| f << erb.result(binding)}

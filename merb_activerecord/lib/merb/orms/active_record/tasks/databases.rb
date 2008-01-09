@@ -59,7 +59,7 @@ namespace :db do
     when 'mysql'
       ActiveRecord::Base.connection.drop_database config[:database]
     when /^sqlite/
-      FileUtils.rm_f File.join(MERB_ROOT, config[:database])
+      FileUtils.rm_f File.join(Merb.root, config[:database])
     when 'postgresql'
       `dropdb "#{config[:database]}"`
     end
@@ -108,7 +108,7 @@ namespace :db do
     task :load => :environment do
       require 'active_record/fixtures'
       ActiveRecord::Base.establish_connection(MERB_ENV.to_sym)
-      (ENV['FIXTURES'] ? ENV['FIXTURES'].split(/,/) : Dir.glob(File.join(MERB_ROOT, 'test', 'fixtures', '*.{yml,csv}'))).each do |fixture_file|
+      (ENV['FIXTURES'] ? ENV['FIXTURES'].split(/,/) : Dir.glob(File.join(Merb.root, 'test', 'fixtures', '*.{yml,csv}'))).each do |fixture_file|
         Fixtures.create_fixtures('test/fixtures', File.basename(fixture_file, '.*'))
       end
     end
