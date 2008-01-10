@@ -46,7 +46,7 @@ module Merb
         # Registering this ORM lets the user choose active_record as a session
         # in merb.yml's session_store: option.
         def register_session_type
-          Merb::Server.register_session_type("activerecord",
+          Merb::BootLoader.register_session_type("activerecord",
             "merb/session/active_record_session",
             "Using ActiveRecord database sessions")
         end

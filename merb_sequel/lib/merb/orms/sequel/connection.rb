@@ -67,7 +67,7 @@ module Merb
         # Registering this ORM lets the user choose sequel as a session store
         # in merb.yml's session_store: option.
         def register_session_type
-          Merb::Server.register_session_type("sequel",
+          Merb::BootLoader.register_session_type("sequel",
             "merb/session/sequel_session",
             "Using Sequel database sessions")
         end
