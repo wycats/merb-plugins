@@ -42,13 +42,7 @@ if defined?(Merb::Plugins)
           base.send(:before, :initialize_params_filter)
         end
 
-        module ClassMethods
-          #before Proc.new {|c|
-            #args.keys.each {|obj|
-              #c.request.restrict_params(obj, args[obj])
-            #}
-          #}
-          
+        module ClassMethods          
           # Ensures these parameters are sent for the object
           # 
           #   params_accessible :post => [:title, :body]
@@ -103,12 +97,15 @@ if defined?(Merb::Plugins)
                 self.request.restrict_params(obj, accessible_params_args[obj])
               end
             end
+            
+            if protected_params_args.is_a?(Hash)
+              protected_params_args.keys.each do |obj|
+                self.request.remove_params_from_object(obj, protected_params_args[obj])
+              end
+            end
           end
         end
         
-        #args.keys.each do |obj|
-          #request.remove_params_from_object(obj, args[obj])
-        #end
       end
 
       module RequestMixin
@@ -119,9 +116,11 @@ if defined?(Merb::Plugins)
         #   params_filter_from_object(:post, [:status, :author_id])
         # 
         def remove_params_from_object(obj, attrs = [])
-          filtered = params
-          attrs.each {|a| filtered[obj].delete(a)}
-          @params = filtered
+          unless params[obj].nil?
+            filtered = params
+            attrs.each {|a| filtered[obj].delete(a)}
+            @params = filtered
+          end
         end
 
         # Restricts parameters of an object
