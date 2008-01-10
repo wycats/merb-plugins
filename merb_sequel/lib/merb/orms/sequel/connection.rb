@@ -3,7 +3,9 @@ require "fileutils"
 module Merb
   module Orms
     module Sequel
+
       class << self
+
         def config_file() Merb.root / "config" / "database.yml" end
         def sample_dest() Merb.root / "config" / "database.sample.yml" end
         def sample_source() File.dirname(__FILE__) / "database.sample.yml" end
@@ -13,27 +15,30 @@ module Merb
         end
       
         def config
+
           @config ||=
-            begin
-              # Convert string keys to symbols
-              full_config = Erubis.load_yaml_file(config_file)
-              config = (Merb::Plugins.config[:merb_sequel] = {})
-              (full_config[MERB_ENV.to_sym] || full_config[MERB_ENV]).each do |key, value|
-                config[key.to_sym] = value
-              end
-              config
+          begin
+            # Convert string keys to symbols
+            full_config = Erubis.load_yaml_file(config_file)
+            config = (Merb::Plugins.config[:merb_sequel] = {})
+            (full_config[Merb.environment.to_sym] || full_config[Merb.environment]).each do |key, value|
+              config[key.to_sym] = value
             end
+            config
+          end
+
         end
       
         # Database connects as soon as the gem is loaded
         def connect
+          
           require "sequel"
           require "sequel_model"
 
           if File.exists?(config_file)
             puts "#{Time.now.httpdate}: Connecting to the '#{config[:database]}' database on '#{config[:host]}' using '#{config[:adapter]}' ..."
             connection = ::Sequel.connect(config_options(config))
-            MERB_LOGGER.error("Connection Error: #{e}") unless connection
+            Merb.logger.error("Connection Error: #{e}") unless connection
             connection
           else
             copy_sample_config
@@ -41,9 +46,11 @@ module Merb
             puts "A sample file was created called config/database.sample.yml for you to copy and edit."
             exit(1)
           end
+          
         end
         
         def config_options(config = {})
+          
           options = {}
           options[:adapter]  = (config[:adapter]  || "sqlite")
           options[:host]     = (config[:host]     || "localhost")
@@ -53,7 +60,7 @@ module Merb
             options[:encoding] = (config[:encoding] || config[:charset])
           end
           options[:database] = config[:database]  if config[:database]
-          options[:logger]   = MERB_LOGGER
+          options[:logger]   = Merb.logger
           options
         end
         
@@ -66,7 +73,9 @@ module Merb
         end
 
       end
+      
     end
+    
   end
 
 end
