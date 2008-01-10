@@ -1,5 +1,5 @@
 task :environment do
- Merb.environment_ENV = ( ENV['Merb.environment_ENV'] || Merb.environment_ENV ).to_sym
+ Merb.environment = ( ENV['Merb.environment'] || Merb.environment ).to_sym
 end
 
 namespace :db do
@@ -12,9 +12,9 @@ namespace :db do
     end
   end
 
-  desc 'Create the local database defined in config/database.yml for the current Merb.environment_ENV'
+  desc 'Create the local database defined in config/database.yml for the current Merb.environment'
   task :create => :environment do
-    create_local_database(ActiveRecord::Base.configurations[Merb.environment_ENV])
+    create_local_database(ActiveRecord::Base.configurations[Merb.environment])
   end
 
   def create_local_database(config)
@@ -53,7 +53,7 @@ namespace :db do
 
   desc 'Drops the database for the current environment'
   task :drop => :environment do
-    config = ActiveRecord::Base.configurations[Merb.environment_ENV || :development]
+    config = ActiveRecord::Base.configurations[Merb.environment || :development]
     p config
     case config[:adapter]
     when 'mysql'
@@ -76,7 +76,7 @@ namespace :db do
 
   # desc "Retrieves the charset for the current environment's database"
   # task :charset => :environment do
-  #   config = ActiveRecord::Base.configurations[Merb.environment_ENV || :development]
+  #   config = ActiveRecord::Base.configurations[Merb.environment || :development]
   #   case config[:adapter]
   #   when 'mysql'
   #     ActiveRecord::Base.establish_connection(config)
@@ -88,7 +88,7 @@ namespace :db do
 
   # desc "Retrieves the collation for the current environment's database"
   # task :collation => :environment do
-  #   config = ActiveRecord::Base.configurations[Merb.environment_ENV || :development]
+  #   config = ActiveRecord::Base.configurations[Merb.environment || :development]
   #   case config[:adapter]
   #   when 'mysql'
   #     ActiveRecord::Base.establish_connection(config)
@@ -107,7 +107,7 @@ namespace :db do
     desc "Load fixtures into the current environment's database.  Load specific fixtures using FIXTURES=x,y"
     task :load => :environment do
       require 'active_record/fixtures'
-      ActiveRecord::Base.establish_connection(Merb.environment_ENV.to_sym)
+      ActiveRecord::Base.establish_connection(Merb.environment.to_sym)
       (ENV['FIXTURES'] ? ENV['FIXTURES'].split(/,/) : Dir.glob(File.join(Merb.root, 'test', 'fixtures', '*.{yml,csv}'))).each do |fixture_file|
         Fixtures.create_fixtures('test/fixtures', File.basename(fixture_file, '.*'))
       end
@@ -133,35 +133,35 @@ namespace :db do
  namespace :structure do
     desc "Dump the database structure to a SQL file"
     task :dump do
-      config = ActiveRecord::Base.configurations[Merb.environment_ENV.to_sym]
+      config = ActiveRecord::Base.configurations[Merb.environment.to_sym]
       case config[:adapter]
         when "mysql", "oci", "oracle"
-          ActiveRecord::Base.establish_connection(config[Merb.environment_ENV])
-          File.open("schema/#{Merb.environment_ENV}_structure.sql", "w+") { |f| f << ActiveRecord::Base.connection.structure_dump }
+          ActiveRecord::Base.establish_connection(config[Merb.environment])
+          File.open("schema/#{Merb.environment}_structure.sql", "w+") { |f| f << ActiveRecord::Base.connection.structure_dump }
         when "postgresql"
           ENV['PGHOST']     = config[:host] if config[:host]
           ENV['PGPORT']     = config[:port].to_s if config[:port]
           ENV['PGPASSWORD'] = config[:password].to_s if config[:password]
           search_path = config[:schema_search_path]
           search_path = "--schema=#{search_path}" if search_path
-          `pg_dump -i -U "#{config[:username]}" -s -x -O -f schema/#{Merb.environment_ENV}_structure.sql #{search_path} #{config[:database]}`
+          `pg_dump -i -U "#{config[:username]}" -s -x -O -f schema/#{Merb.environment}_structure.sql #{search_path} #{config[:database]}`
           raise "Error dumping database" if $?.exitstatus == 1
         when "sqlite", "sqlite3"
           dbfile = config[:database] || config[:dbfile]
-          `#{config[:adapter]} #{dbfile} .schema > schema/#{Merb.environment_ENV}_structure.sql`
+          `#{config[:adapter]} #{dbfile} .schema > schema/#{Merb.environment}_structure.sql`
         when "sqlserver"
-          `scptxfr /s #{config[:host]} /d #{config[:database]} /I /f schema\\#{Merb.environment_ENV}_structure.sql /q /A /r`
+          `scptxfr /s #{config[:host]} /d #{config[:database]} /I /f schema\\#{Merb.environment}_structure.sql /q /A /r`
           `scptxfr /s #{config[:host]} /d #{config[:database]} /I /F schema\ /q /A /r`
         when "firebird"
-          set_firebird_env(config[Merb.environment_ENV])
-          db_string = firebird_db_string(config[Merb.environment_ENV])
-          sh "isql -a #{db_string} > schema/#{Merb.environment_ENV}_structure.sql"
+          set_firebird_env(config[Merb.environment])
+          db_string = firebird_db_string(config[Merb.environment])
+          sh "isql -a #{db_string} > schema/#{Merb.environment}_structure.sql"
         else
           raise "Task not supported by '#{config[:adapter]}'"
       end
 
       if ActiveRecord::Base.connection.supports_migrations?
-        File.open("schema/#{Merb.environment_ENV}_structure.sql", "a") { |f| f << ActiveRecord::Base.connection.dump_schema_information }
+        File.open("schema/#{Merb.environment}_structure.sql", "a") { |f| f << ActiveRecord::Base.connection.dump_schema_information }
       end
     end
   end
@@ -181,28 +181,28 @@ namespace :db do
         when "mysql"
           ActiveRecord::Base.establish_connection(:test)
           ActiveRecord::Base.connection.execute('SET foreign_key_checks = 0')
-          IO.readlines("schema/#{Merb.environment_ENV}_structure.sql").join.split("\n\n").each do |table|
+          IO.readlines("schema/#{Merb.environment}_structure.sql").join.split("\n\n").each do |table|
             ActiveRecord::Base.connection.execute(table)
           end
         when "postgresql"
           ENV['PGHOST']     = config[:host] if config[:host]
           ENV['PGPORT']     = config[:port].to_s if config[:port]
           ENV['PGPASSWORD'] = config[:password].to_s if config[:password]
-          `psql -U "#{config[:username]}" -f schema/#{Merb.environment_ENV}_structure.sql #{config[:database]}`
+          `psql -U "#{config[:username]}" -f schema/#{Merb.environment}_structure.sql #{config[:database]}`
         when "sqlite", "sqlite3"
           dbfile = config[:database] ||config[:dbfile]
-          `#{config[:adapter]} #{dbfile} < schema/#{Merb.environment_ENV}_structure.sql`
+          `#{config[:adapter]} #{dbfile} < schema/#{Merb.environment}_structure.sql`
         when "sqlserver"
-          `osql -E -S #{config[:host]} -d #{config[:database]} -i schema\\#{Merb.environment_ENV}_structure.sql`
+          `osql -E -S #{config[:host]} -d #{config[:database]} -i schema\\#{Merb.environment}_structure.sql`
         when "oci", "oracle"
           ActiveRecord::Base.establish_connection(:test)
-          IO.readlines("schema/#{Merb.environment_ENV}_structure.sql").join.split(";\n\n").each do |ddl|
+          IO.readlines("schema/#{Merb.environment}_structure.sql").join.split(";\n\n").each do |ddl|
             ActiveRecord::Base.connection.execute(ddl)
           end
         when "firebird"
           set_firebird_env(config)
           db_string = firebird_db_string(config)
-          sh "isql -i schema/#{Merb.environment_ENV}_structure.sql #{db_string}"
+          sh "isql -i schema/#{Merb.environment}_structure.sql #{db_string}"
         else
           raise "Task not supported by '#{config[:adapter]}'"
       end
