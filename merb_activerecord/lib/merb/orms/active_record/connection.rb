@@ -33,7 +33,7 @@ module Merb
             Thread.new{ loop{ sleep(60*60); ::ActiveRecord::Base.verify_active_connections! } }.priority = -10
 
             ::ActiveRecord::Base.verification_timeout = 14400
-            ::ActiveRecord::Base.logger = Merb.environment_LOGGER
+            ::ActiveRecord::Base.logger = Merb.logger
             ::ActiveRecord::Base.establish_connection config
           else
             copy_sample_config
