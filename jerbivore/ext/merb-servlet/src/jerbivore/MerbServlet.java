@@ -111,7 +111,7 @@ public class MerbServlet extends HttpServlet {
             "end\n" +
             "Merb::Server.send :class_variable_set, :@@merb_opts, options\n" +
             "Merb::BootLoader.initialize_merb\n" +
-            "Jerbivore::ServletHandler.path_prefix = Merb::Server.config[:path_prefix]\n";
+            "Jerbivore::ServletHandler.path_prefix = Merb::Config[:path_prefix]\n";
         runtime.executeScript(merbInitScript, "MerbServlet:merbInitScript");
         return runtime;
     }
