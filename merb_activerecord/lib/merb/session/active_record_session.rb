@@ -3,7 +3,7 @@ require 'active_record'
 module Merb
   module SessionMixin
     def setup_session
-      MERB_LOGGER.info("Setting up session")
+      Merb.environment_LOGGER.info("Setting up session")
       before = cookies[_session_id_key]
       request.session, cookies[_session_id_key] = Merb::ActiveRecordSession.persist(cookies[_session_id_key])
       @_fingerprint = Marshal.dump(request.session.data).hash
@@ -11,7 +11,7 @@ module Merb
     end
 
     def finalize_session
-      MERB_LOGGER.info("Finalize session")
+      Merb.environment_LOGGER.info("Finalize session")
       request.session.save if @_fingerprint != Marshal.dump(request.session.data).hash
       set_cookie(_session_id_key, request.session.session_id, _session_expiry) if (@_new_cookie || request.session.needs_new_cookie)
     end

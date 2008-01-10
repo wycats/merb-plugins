@@ -19,7 +19,7 @@ module Merb
               # Convert string keys to symbols
               full_config = Erubis.load_yaml_file(config_file)
               config = (Merb::Plugins.config[:merb_active_record] = {})
-              (full_config[MERB_ENV.to_sym] || full_config[MERB_ENV]).each { |k, v| config[k.to_sym] = v }
+              (full_config[Merb.environment_ENV.to_sym] || full_config[Merb.environment_ENV]).each { |k, v| config[k.to_sym] = v }
                ::ActiveRecord::Base.configurations= full_config
               config
             end
@@ -33,7 +33,7 @@ module Merb
             Thread.new{ loop{ sleep(60*60); ::ActiveRecord::Base.verify_active_connections! } }.priority = -10
 
             ::ActiveRecord::Base.verification_timeout = 14400
-            ::ActiveRecord::Base.logger = MERB_LOGGER
+            ::ActiveRecord::Base.logger = Merb.environment_LOGGER
             ::ActiveRecord::Base.establish_connection config
           else
             copy_sample_config
