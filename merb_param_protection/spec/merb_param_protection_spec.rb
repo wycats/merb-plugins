@@ -1,11 +1,7 @@
 require File.dirname(__FILE__) + '/spec_helper'
 
 describe "merb_param_protection" do
-  describe "Controller", "parameter filtering" do
-    before(:each) do
-      @request = fake_request
-    end
-    
+  describe "Controller", "parameter filtering" do    
     describe "accessible parameters" do
       class ParamsAccessibleController < Merb::Controller
         params_accessible :customer => [:name, :phone, :email], :address => [:street, :zip]
@@ -17,22 +13,27 @@ describe "merb_param_protection" do
         params_protected :customer => [:activated?, :password], :address => [:long, :lat]
         def index; end
       end
-      
-      before(:each) do
-        @params_accessible_controller = ParamsAccessibleController.build(@request)
-        @params_accessible_controller.dispatch('index')
-      end
+
 
       it "should store the accessible parameters for that controller" do
+        @params_accessible_controller = ParamsAccessibleController.build(fake_request)
+        @params_accessible_controller.stub!(:initialize_params_filter)
+        @params_accessible_controller.dispatch('index')
         @params_accessible_controller.accessible_params_args.should == {
           :address=> [:street, :zip], :post=> [:title, :body], :customer=> [:name, :phone, :email]
         }
+      end
+      
+      it "should remove the parameters from the request that are not accessible" do
+        @request.post_body = "post[title]=hello&post[body]=something&post[status]=published"
+        @params_accessible_controller = ParamsAccessibleController.build(fake_request)
+        @params_accessible_controller.dispatch('index')
       end
     end
     
     describe "protected parameters" do
       before(:each) do
-        @params_protected_controller = ParamsProtectedController.build(@request)
+        @params_protected_controller = ParamsProtectedController.build(fake_request)
         @params_protected_controller.dispatch('index')
       end
       

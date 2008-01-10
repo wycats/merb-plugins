@@ -1,4 +1,27 @@
-# make sure we're running inside Merb
+# This plugin exposes two new controller methods which allow us to simply and flexibly filter the parameters available within the controller.
+
+# Setup:
+# The request sets: 
+# params => { :post => { :title => "ello", :body => "Want it", :status => "green", :author_id => 3, :rank => 4 } }
+#
+# Example 1: params_accessable
+# MyController < Application
+#   params_accessible :post => [:title, :body]
+# end
+
+# params.inspect # => { :post => { :title => "ello", :body => "Want it" } }
+
+# So we see that params_accessible removes everything except what is explictly specified.
+
+# Example 2: params_protected
+# MyOtherController < Application
+#   params_protected :post => [:status, :author_id]
+# end
+
+# params.inspect # => { :post => { :title => "ello", :body => "Want it", :rank => 4 } }
+
+# We also see that params_protected removes ONLY those parameters explicitly specified.
+
 if defined?(Merb::Plugins)
 
   # Merb gives you a Merb::Plugins.config hash...feel free to put your stuff in your piece of it
@@ -72,9 +95,17 @@ if defined?(Merb::Plugins)
             end
           end
         end
+        
         module InstanceMethods
           def initialize_params_filter
-            puts accessible_params_args.inspect
+            if accessible_params_args.is_a?(Hash)
+              puts accessible_params_args.inspect
+              accessible_params_args.keys.each do |obj|
+                puts obj.inspect
+                puts accessible_params_args[obj].inspect
+                self.request.restrict_params(obj, accessible_params_args[obj])
+              end
+            end
           end
         end
         
