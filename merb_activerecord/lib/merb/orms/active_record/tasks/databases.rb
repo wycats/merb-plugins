@@ -1,5 +1,5 @@
 task :environment do
- Merb.environment = ( ENV['Merb.environment'] || Merb.environment ).to_sym
+ Merb.environment = ( ENV['MERB_ENV'] || Merb.environment ).to_sym
 end
 
 namespace :db do
@@ -32,7 +32,7 @@ namespace :db do
             ActiveRecord::Base.establish_connection(config.merge({:database => nil}))
             ActiveRecord::Base.connection.create_database(config[:database]) #, {:charset => @charset, :collation => @collation})
             ActiveRecord::Base.establish_connection(config)
-            p "MySQL #{config[:database]} database succesfully created"
+            puts "MySQL #{config[:database]} database succesfully created"
           rescue
             $stderr.puts "Couldn't create database for #{config.inspect}"
           end
@@ -44,17 +44,16 @@ namespace :db do
           `sqlite3 "#{config[:database]}"`
         end
       else
-        p "#{config[:database]} already exists"
+        puts "#{config[:database]} already exists"
       end
     else
-      p "This task only creates local databases. #{config[:database]} is on a remote host."
+      puts "This task only creates local databases. #{config[:database]} is on a remote host."
     end
   end
 
   desc 'Drops the database for the current environment'
   task :drop => :environment do
     config = ActiveRecord::Base.configurations[Merb.environment || :development]
-    p config
     case config[:adapter]
     when 'mysql'
       ActiveRecord::Base.connection.drop_database config[:database]
@@ -67,6 +66,8 @@ namespace :db do
 
   desc "Migrate the database through scripts in schema/migrations. Target specific version with VERSION=x"
   task :migrate => :environment do
+    config = ActiveRecord::Base.configurations[Merb.environment || :development]
+    ActiveRecord::Base.establish_connection(config)
     ActiveRecord::Migrator.migrate("schema/migrations/", ENV["VERSION"] ? ENV["VERSION"].to_i : nil)
     Rake::Task["db:schema:dump"].invoke if ActiveRecord::Base.schema_format == :ruby
   end
