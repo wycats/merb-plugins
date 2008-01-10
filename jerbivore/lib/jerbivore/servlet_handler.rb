@@ -19,11 +19,11 @@ module Jerbivore
         benchmarks = {}
 
         request = ServletHandler::Request.new(servlet_request, input)
-        MERB_LOGGER.info("\nRequest: REQUEST_URI: #{servlet_request.getRequestURI}  (#{Time.now.strftime("%Y-%m-%d %H:%M:%S")})")
+        Merb.logger.info("\nRequest: REQUEST_URI: #{servlet_request.getRequestURI}  (#{Time.now.strftime("%Y-%m-%d %H:%M:%S")})")
 
         if @@path_prefix
           if request.params['REQUEST_URI'] =~ @@path_prefix
-            MERB_LOGGER.info("Path prefix #{@@path_prefix.inspect} removed from PATH_INFO and REQUEST_URI")
+            Merb.logger.info("Path prefix #{@@path_prefix.inspect} removed from PATH_INFO and REQUEST_URI")
             request.params['REQUEST_URI'].sub!(@@path_prefix, '')
             request.params['PATH_INFO'].sub!(@@path_prefix, '')
           else
@@ -36,7 +36,7 @@ module Jerbivore
         benchmarks[:controller] = controller.class.to_s
         benchmarks[:action]     = action
         
-        MERB_LOGGER.info("Routing to controller: #{controller.class} action: #{action}\nRoute Recognition & Parsing HTTP Input took: #{benchmarks[:setup_time]} seconds")
+        Merb.logger.info("Routing to controller: #{controller.class} action: #{action}\nRoute Recognition & Parsing HTTP Input took: #{benchmarks[:setup_time]} seconds")
         
         # TODO: handle X-SENDFILE 
         # TODO: handle procs and io objects in the controller.body
@@ -50,14 +50,14 @@ module Jerbivore
         
         total_request_time = Time.now - start
         benchmarks[:total_request_time] = total_request_time
-        MERB_LOGGER.info("Request Times: #{benchmarks.inspect}\nResponse status: #{servlet_response.status}\nComplete Request took: #{total_request_time} seconds, #{1.0/total_request_time} Requests/Second\n\n")
+        Merb.logger.info("Request Times: #{benchmarks.inspect}\nResponse status: #{servlet_response.status}\nComplete Request took: #{total_request_time} seconds, #{1.0/total_request_time} Requests/Second\n\n")
       rescue Object => e
         servlet_response.setStatus(500)
         output.write("500 Internal Server Error")
         output.flush
-        MERB_LOGGER.error(Merb.exception(e))
+        Merb.logger.error(Merb.exception(e))
       ensure
-        MERB_LOGGER.flush
+        Merb.logger.flush
       end
     end
     
