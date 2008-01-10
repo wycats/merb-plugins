@@ -6,35 +6,34 @@ describe "merb_param_protection" do
       class ParamsAccessibleController < Merb::Controller
         params_accessible :customer => [:name, :phone, :email], :address => [:street, :zip]
         params_accessible :post => [:title, :body]
-        def index; end
+        def create; end
       end
 
       class ParamsProtectedController < Merb::Controller
         params_protected :customer => [:activated?, :password], :address => [:long, :lat]
-        def index; end
+        def update; end
       end
 
 
       it "should store the accessible parameters for that controller" do
         @params_accessible_controller = ParamsAccessibleController.build(fake_request)
         @params_accessible_controller.stub!(:initialize_params_filter)
-        @params_accessible_controller.dispatch('index')
+        @params_accessible_controller.dispatch('create')
         @params_accessible_controller.accessible_params_args.should == {
           :address=> [:street, :zip], :post=> [:title, :body], :customer=> [:name, :phone, :email]
         }
       end
       
       it "should remove the parameters from the request that are not accessible" do
-        @request.post_body = "post[title]=hello&post[body]=something&post[status]=published"
         @params_accessible_controller = ParamsAccessibleController.build(fake_request)
-        @params_accessible_controller.dispatch('index')
+        @params_accessible_controller.dispatch('create')
       end
     end
     
     describe "protected parameters" do
       before(:each) do
         @params_protected_controller = ParamsProtectedController.build(fake_request)
-        @params_protected_controller.dispatch('index')
+        @params_protected_controller.dispatch('update')
       end
       
       it "should store the protected parameters for that controller" do

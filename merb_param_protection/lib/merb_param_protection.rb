@@ -99,10 +99,7 @@ if defined?(Merb::Plugins)
         module InstanceMethods
           def initialize_params_filter
             if accessible_params_args.is_a?(Hash)
-              puts accessible_params_args.inspect
               accessible_params_args.keys.each do |obj|
-                puts obj.inspect
-                puts accessible_params_args[obj].inspect
                 self.request.restrict_params(obj, accessible_params_args[obj])
               end
             end
@@ -132,9 +129,12 @@ if defined?(Merb::Plugins)
         #   restrict_params(:post, [:title, :body])
         # 
         def restrict_params(obj, attrs = [])
-          attrs = attrs.collect {|a| a.to_s}
-          @trashed_params = params[obj].keys - attrs
-          remove_params_from_object(obj, trashed_params)
+          # Make sure the params for the object exists
+          unless params[obj].nil?
+            attrs = attrs.collect {|a| a.to_s}
+            @trashed_params = params[obj].keys - attrs
+            remove_params_from_object(obj, trashed_params)
+          end
         end
       end
     end
