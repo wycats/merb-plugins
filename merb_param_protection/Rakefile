@@ -4,10 +4,10 @@ require 'spec/rake/spectask'
 
 PLUGIN = "merb_param_protection"
 NAME = "merb_param_protection"
-VERSION = "0.0.1"
+VERSION = "0.5.0"
 AUTHOR = "Lance Carlson"
 EMAIL = "lancecarlson@gmail.com"
-#HOMEPAGE = "http://merb-plugins.rubyforge.org/merb_param_protection/"
+HOMEPAGE = "http://merb.devjavu.com"
 SUMMARY = "Merb plugin that provides params_accessible and params_protected class methods"
 
 spec = Gem::Specification.new do |s|
@@ -33,6 +33,10 @@ end
 
 task :install => [:package] do
   sh %{sudo gem install pkg/#{NAME}-#{VERSION}}
+end
+
+task :release => :package do
+  sh %{rubyforge add_release merb #{PLUGIN} #{VERSION} pkg/#{NAME}-#{VERSION}.gem}
 end
 
 desc "Run all specs"
