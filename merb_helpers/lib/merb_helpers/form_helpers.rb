@@ -28,7 +28,7 @@ module Merb #:nodoc:
     #     </form>
     #
     # You may also create a normal form using form_tag
-    #     <% form_tag({url(:controller => "foo", :action => "bar", :id => 1)} do %>
+    #     <% form_tag(:action => url(:controller => "foo", :action => "bar", :id => 1)) do %>
     #       <%= text_field :name => 'first_name', :label => 'First Name' %>
     #       <%= submit_button 'Create' %>
     #     <% end %>
@@ -197,7 +197,7 @@ module Merb #:nodoc:
       # Provides a generic HTML password input tag.
       #
       # ==== Example
-      #     <%= password_field :password, :label => "Password" %>
+      #     <%= password_field :name => :password, :label => "Password" %>
       #     # => <label for="password">Password</label><input type="password" name="password" id="password"/>
       def password_field(attrs = {})
         attrs.delete(:value)
@@ -442,7 +442,7 @@ module Merb #:nodoc:
       # If we had a collection of people within a @project object, and want to use 'id' as the value, and 'name'
       # as the option content we could do something similar to this;
       #
-      #   <%= options_from_collection_for_select(@project.people, :text_method => "id", :value_method => "name") %>
+      #   <%= options_from_collection_for_select(@project.people, :value_method => "id", :text_method => "name") %>
       #   The iteration of the collection would create options in this manner;
       #   =>  <option value="#{person.id}">#{person.name}</option>
       #
