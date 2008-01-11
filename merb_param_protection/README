@@ -1,8 +1,6 @@
 merb_param_protection
 =================
 
-** Not fully functional **
-
 This plugin exposes two new controller methods which allow us to simply and flexibly filter the parameters available within the controller.
 
 Setup:
