@@ -73,7 +73,7 @@ module Merb #:nodoc:
 
       # Generates a form tag, which accepts a block that is not directly based on resource attributes
       # 
-      #     <% form_tag({url(:controller => "foo", :action => "bar", :id => 1)} do %>
+      #     <% form_tag(:action => url(:controller => "foo", :action => "bar", :id => 1)) do %>
       #       <%= text_field :name => 'first_name', :label => 'First Name' %>
       #       <%= submit_button 'Create' %>
       #     <% end %>
@@ -175,7 +175,7 @@ module Merb #:nodoc:
       # Provides a HTML text input tag based on a resource attribute.
       #
       # ==== Example
-      #     <%= text_field :fav_color, :label => 'Your Favorite Color' %>
+      #     <%= text_field :name => :fav_color, :label => 'Your Favorite Color' %>
       #     # => <label for="fav_color">Your Favorite Color</label><input type="text" name="fav_color" id="fav_color"/>
       def text_field(attrs = {})
         attrs.merge!(:type => "text")
