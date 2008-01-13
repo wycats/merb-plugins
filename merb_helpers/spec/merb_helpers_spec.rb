@@ -1,9 +1,9 @@
 require File.dirname(__FILE__) + '/spec_helper'
 require 'merb_helpers'
 
-include Merb::ViewContextMixin
-include Merb::ErubisCaptureMixin
-include Merb::Helpers::Form
+include Merb::ErubisCaptureMixin,
+        Merb::ViewContextMixin,
+        Merb::Helpers::Form
 
 describe "error_messages_for" do
   before :each do

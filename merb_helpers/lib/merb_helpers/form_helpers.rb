@@ -65,12 +65,7 @@ module Merb #:nodoc:
       def obj_from_ivar_or_sym(obj) #:nodoc:
         obj.is_a?(Symbol) ? instance_variable_get("@#{obj}") : obj
       end
-
-      # Creates a generic HTML tag 
-      def tag(tag_name, contents, attrs = {}) #:nodoc:
-        open_tag(tag_name, attrs) + contents.to_s + "</#{tag_name}>"
-      end
-
+      
       # Generates a form tag, which accepts a block that is not directly based on resource attributes
       # 
       #     <% form_tag(:action => url(:controller => "foo", :action => "bar", :id => 1)) do %>
