@@ -36,14 +36,15 @@ module Merb
           require "sequel_model"
 
           if File.exists?(config_file)
-            puts "#{Time.now.httpdate}: Connecting to the '#{config[:database]}' database on '#{config[:host]}' using '#{config[:adapter]}' ..."
+            Merb.logger.info "Connecting to the '#{config[:database]}' database on '#{config[:host]}' using '#{config[:adapter]}' ..."
             connection = ::Sequel.connect(config_options(config))
             Merb.logger.error("Connection Error: #{e}") unless connection
             connection
           else
             copy_sample_config
-            puts "#{Time.now.httpdate}: No database.yml file found in #{Merb.root}/config."
-            puts "A sample file was created called config/database.sample.yml for you to copy and edit."
+            Merb.logger.set_log(STDERR)
+            Merb.logger.error "No database.yml file found in #{Merb.root}/config."
+            Merb.logger.error "A sample file was created called config/database.sample.yml for you to copy and edit."
             exit(1)
           end
           
