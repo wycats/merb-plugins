@@ -1,6 +1,5 @@
 class <%= class_name %> < DataMapper::Base
-<% table_attributes.each do |attr| -%>
+<% model_attributes.each do |attr| -%>
   <%= "property :#{attr.name}, :#{attr.type}" %>
 <% end -%>
 end
-
