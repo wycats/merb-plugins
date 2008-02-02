@@ -1,4 +1,4 @@
-require 'merb'
+# require 'merb'
 class MigrationGenerator < RubiGen::Base
   
   default_options :author => nil
