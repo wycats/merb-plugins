@@ -3,7 +3,7 @@ require 'rake/gempackagetask'
 
 PLUGIN = "merb_activerecord"
 NAME = "merb_activerecord"
-VERSION = "0.5"
+VERSION = "0.9"
 AUTHOR = "Duane Johnson"
 EMAIL = "canadaduane@gmail.com"
 HOMEPAGE = "http://merbivore.com"
@@ -20,8 +20,8 @@ spec = Gem::Specification.new do |s|
   s.author = AUTHOR
   s.email = EMAIL
   s.homepage = HOMEPAGE
-  s.add_dependency('merb', '>= 0.5')
-  s.require_path = 'lib'
+  s.add_dependency("merb-core", ">= 0.9")
+  s.require_path = "lib"
   s.autorequire = PLUGIN
   s.files = %w(LICENSE README Rakefile TODO) + Dir.glob("{lib,specs,activerecord_generators}/**/*")
 end
