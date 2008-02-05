@@ -40,9 +40,11 @@ module Merb
         # Registering this ORM lets the user choose DataMapper as a session store
         # in merb.yml's session_store: option.
         def register_session_type
-          Merb::BootLoader.register_session_type("datamapper",
-            "merb/session/data_mapper_session",
-            "Using DataMapper database sessions")
+          Merb.after_app_loaded do
+            Merb.register_session_type("datamapper",
+              "merb/session/data_mapper_session",
+              "Using DataMapper database sessions")
+          end
         end
       end
     end
