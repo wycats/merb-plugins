@@ -9,30 +9,22 @@
   
 <%= "  " * counter %>  def index
 <%= "  " * counter %>    @<%= plural_model %> = <%= model_class_name %>.all
-<%= "  " * counter %>    display @<%= plural_model %>
+<%= "  " * counter %>    render @<%= plural_model %>
 <%= "  " * counter %>  end
 
-<%= "  " * counter %>  def show(id)
-<%= "  " * counter %>    @<%= singular_model %> = <%= model_class_name %>[id]
-<%= "  " * counter %>    raise NotFound unless @<%= singular_model %>
-<%= "  " * counter %>    display @<%= singular_model %>
+<%= "  " * counter %>  def show
+<%= "  " * counter %>     @<%= singular_model %> = <%= model_class_name %>[params[:id]]
+<%= "  " * counter %>    render @<%= singular_model %>
 <%= "  " * counter %>  end
 
 <%= "  " * counter %>  def new
 <%= "  " * counter %>    only_provides :html
-<%= "  " * counter %>    @<%= singular_model %> = <%= model_class_name %>.new
+<%= "  " * counter %>    @<%= singular_model %> = <%= model_class_name %>.new(params[:<%= singular_model %>])
 <%= "  " * counter %>    render
 <%= "  " * counter %>  end
 
-<%= "  " * counter %>  def edit(id)
-<%= "  " * counter %>    only_provides :html
-<%= "  " * counter %>    @<%= singular_model %> = <%= model_class_name %>[id]
-<%= "  " * counter %>    raise NotFound unless @<%= singular_model %>
-<%= "  " * counter %>    render
-<%= "  " * counter %>  end
-
-<%= "  " * counter %>  def create(singular_model)
-<%= "  " * counter %>    @<%= singular_model %> = <%= model_class_name %>.new(<%= singular_model %>)
+<%= "  " * counter %>  def create
+<%= "  " * counter %>    @<%= singular_model %> = <%= model_class_name %>.new(params[:<%= singular_model %>])
 <%= "  " * counter %>    if @<%= singular_model %>.save
 <%= "  " * counter %>      redirect url(:<%= singular_model %>, @<%= singular_model %>)
 <%= "  " * counter %>    else
@@ -40,21 +32,25 @@
 <%= "  " * counter %>    end
 <%= "  " * counter %>  end
 
-<%= "  " * counter %>  def update(id, singular_model)
-<%= "  " * counter %>    @<%= singular_model %> = <%= model_class_name %>[id]
-<%= "  " * counter %>    raise NotFound unless @<%= singular_model %>
-<%= "  " * counter %>    if @<%= singular_model %>.update_attributes(<%= singular_model %>)
+<%= "  " * counter %>  def edit
+<%= "  " * counter %>    only_provides :html
+<%= "  " * counter %>    @<%= singular_model %> = <%= model_class_name %>[params[:id]]
+<%= "  " * counter %>    render
+<%= "  " * counter %>  end
+
+<%= "  " * counter %>  def update
+<%= "  " * counter %>    @<%= singular_model %> = <%= model_class_name %>[params[:id]]
+<%= "  " * counter %>    if @<%= singular_model %>.update(params[:<%= singular_model %>])
 <%= "  " * counter %>      redirect url(:<%= singular_model %>, @<%= singular_model %>)
 <%= "  " * counter %>    else
 <%= "  " * counter %>      raise BadRequest
 <%= "  " * counter %>    end
 <%= "  " * counter %>  end
 
-<%= "  " * counter %>  def destroy(id)
-<%= "  " * counter %>    @<%= singular_model %> = <%= model_class_name %>[id]
-<%= "  " * counter %>    raise NotFound unless @<%= singular_model %>
-<%= "  " * counter %>    if @<%= singular_model %>.destroy!
-<%= "  " * counter %>      redirect url(:<%= singular_model.pluralize %>)
+<%= "  " * counter %>  def destroy
+<%= "  " * counter %>    @<%= singular_model %> = <%= model_class_name %>[params[:id]]
+<%= "  " * counter %>    if @<%= singular_model %>.destroy
+<%= "  " * counter %>      redirect url(:<%= singular_model %>s)
 <%= "  " * counter %>    else
 <%= "  " * counter %>      raise BadRequest
 <%= "  " * counter %>    end

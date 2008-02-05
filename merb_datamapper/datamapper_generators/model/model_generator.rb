@@ -3,13 +3,12 @@ class ModelGenerator < Merb::GeneratorBase
   
   def initialize(args, runtime_args = {})
     @base =                 File.dirname(__FILE__)
+    super
     @model_file_name =      args.shift.snake_case
     @model_class_name =     @model_file_name.to_const_string
     @model_attributes =     Hash[*(args.map{|a| a.split(":") }.flatten)]
     @model_file_name =      "#{@model_class_name.snake_case}"
-    args.unshift(".")  # Need to add this or the files are copied over to 
-                       # Merb.root/model_name/app/models/model_name.rb
-    super
+   
   end
   
   def manifest

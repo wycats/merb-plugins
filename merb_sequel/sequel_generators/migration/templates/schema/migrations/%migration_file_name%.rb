@@ -2,15 +2,15 @@
 # http://sequel.rubyforge.org/
 # http://code.google.com/p/ruby-sequel/wiki/Migrations
 
-class <%= class_name.snake_case.camel_case %> < Sequel::Migration
+class <%= model_class_name %>Migration < Sequel::Migration
 
   def up
     <%= "create_table :#{table_name} do" if table_name %>
-<% if table_attributes.empty? -%>
+<% if model_attributes.empty? -%>
       primary_key :id
 <% else -%>
-<% table_attributes.each do |attribute| -%>
-      <%= attribute.type %> :<%= attribute.name %>
+<% model_attributes.each do |attribute| -%>
+      <%= attribute.last %> :<%= attribute.first %>
 <% end -%>
 <% end -%>
     <%= "end" if table_name %>
