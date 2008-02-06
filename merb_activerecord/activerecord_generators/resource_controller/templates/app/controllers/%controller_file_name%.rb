@@ -8,12 +8,12 @@
 <%= "  " * counter %>  # provides :xml, :yaml, :js
   
 <%= "  " * counter %>  def index
-<%= "  " * counter %>    @<%= plural_model %> = <%= model_class_name %>.all
+<%= "  " * counter %>    @<%= plural_model %> = <%= model_class_name %>.find(:all)
 <%= "  " * counter %>    display @<%= plural_model %>
 <%= "  " * counter %>  end
 
 <%= "  " * counter %>  def show
-<%= "  " * counter %>    @<%= singular_model %> = <%= model_class_name %>[params[:id]]
+<%= "  " * counter %>    @<%= singular_model %> = <%= model_class_name %>.find_by_id(params[:id])
 <%= "  " * counter %>    raise NotFound unless @<%= singular_model %>
 <%= "  " * counter %>    display @<%= singular_model %>
 <%= "  " * counter %>  end
@@ -24,7 +24,7 @@
 <%= "  " * counter %>    render
 <%= "  " * counter %>  end
 
-<%= "  " * counter %>  def create
+<%= "  " * counter %>  def create(<%= singular_model %>)
 <%= "  " * counter %>    @<%= singular_model %> = <%= model_class_name %>.new(params[:<%= singular_model %>])
 <%= "  " * counter %>    if @<%= singular_model %>.save
 <%= "  " * counter %>      redirect url(:<%= singular_model %>, @<%= singular_model %>)
@@ -35,15 +35,15 @@
 
 <%= "  " * counter %>  def edit
 <%= "  " * counter %>    only_provides :html
-<%= "  " * counter %>    @<%= singular_model %> = <%= model_class_name %>[params[:id]]
+<%= "  " * counter %>    @<%= singular_model %> = <%= model_class_name %>.find_by_id(params[:id])
 <%= "  " * counter %>    raise NotFound unless @<%= singular_model %>
 <%= "  " * counter %>    render
 <%= "  " * counter %>  end
 
 <%= "  " * counter %>  def update
-<%= "  " * counter %>    @<%= singular_model %> = <%= model_class_name %>[params[:id]]
+<%= "  " * counter %>    @<%= singular_model %> = <%= model_class_name %>.find_by_id(params[:id])
 <%= "  " * counter %>    raise NotFound unless @<%= singular_model %>
-<%= "  " * counter %>    if @<%= singular_model %>.update(params[:<%= singular_model %>])
+<%= "  " * counter %>    if @<%= singular_model %>.update_attributes(params[:<%= singular_model %>])
 <%= "  " * counter %>      redirect url(:<%= singular_model %>, @<%= singular_model %>)
 <%= "  " * counter %>    else
 <%= "  " * counter %>      raise BadRequest
@@ -51,7 +51,7 @@
 <%= "  " * counter %>  end
 
 <%= "  " * counter %>  def destroy
-<%= "  " * counter %>    @<%= singular_model %> = <%= model_class_name %>[params[:id]]
+<%= "  " * counter %>    @<%= singular_model %> = <%= model_class_name %>.find_by_id(params[:id])
 <%= "  " * counter %>    raise NotFound unless @<%= singular_model %>
 <%= "  " * counter %>    if @<%= singular_model %>.destroy
 <%= "  " * counter %>      redirect url(:<%= singular_model %>s)

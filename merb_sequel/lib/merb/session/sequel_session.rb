@@ -18,6 +18,10 @@ module Merb
         set_cookie(_session_id_key, request.session.values[:session_id], _session_expiry) if (@_new_cookie || request.session.needs_new_cookie)
       end
     end
+    
+    def session_store_type
+      "sequel"
+    end
 
   end
 
