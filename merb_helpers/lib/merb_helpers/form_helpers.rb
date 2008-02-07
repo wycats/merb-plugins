@@ -586,6 +586,6 @@ module Merb #:nodoc:
   end
 end
 
-class Merb::ViewContext #:nodoc:
+class Merb::Controller #:nodoc:
   include Merb::Helpers::Form
 end
