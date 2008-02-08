@@ -25,6 +25,7 @@ class ModelGenerator < Merb::GeneratorBase
       copy_files
       
       m.dependency "migration", [*self.migration_args]
+      m.dependency "merb_model_test", [model_file_name], @assigns
     end
   end
   

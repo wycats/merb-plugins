@@ -21,6 +21,8 @@ class ModelGenerator < Merb::GeneratorBase
                   }
       copy_dirs
       copy_files
+      
+      m.dependency "merb_model_test", [model_file_name], @assigns
     end
   end
   

@@ -28,7 +28,7 @@ class DatabaseSessionsMigrationGenerator < Merb::GeneratorBase
     def banner
       <<-EOS
 A migration to add sessions to your database has been created.
-Run 'rake db:migrate' to add the sessions migration to your database.
+Run 'rake sequel:db:migrate' to add the sessions migration to your database.
 
 EOS
     end
