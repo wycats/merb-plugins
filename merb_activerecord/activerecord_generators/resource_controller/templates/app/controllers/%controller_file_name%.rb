@@ -24,7 +24,7 @@
 <%= "  " * counter %>    render
 <%= "  " * counter %>  end
 
-<%= "  " * counter %>  def create(<%= singular_model %>)
+<%= "  " * counter %>  def create
 <%= "  " * counter %>    @<%= singular_model %> = <%= model_class_name %>.new(params[:<%= singular_model %>])
 <%= "  " * counter %>    if @<%= singular_model %>.save
 <%= "  " * counter %>      redirect url(:<%= singular_model %>, @<%= singular_model %>)
