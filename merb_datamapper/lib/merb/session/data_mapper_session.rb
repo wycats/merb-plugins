@@ -28,7 +28,7 @@ module Merb
   class DataMapperSession < DataMapper::Base
     
     set_table_name "sessions"
-    property :session_id, :text, :lazy => false, :key => true
+    property :session_id, :string, :length => 255, :lazy => false, :key => true, :serial => true
     property :data,       :text, :lazy => false
   
     attr_accessor :needs_new_cookie
