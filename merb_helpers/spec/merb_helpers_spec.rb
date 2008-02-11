@@ -443,9 +443,9 @@ describe "radio button groups (data bound)" do
   it "should return a group of radio buttons" do
     form_for :obj do
       radio = radio_group_control(:foo, [:foowee, :baree]).scan(/<[^>]*>/)
-      radio[2].should match_tag(:input, :type => "radio", :name => "fake_model[foo]", :value => "foowee", :selected => "selected")
+      radio[2].should match_tag(:input, :type => "radio", :name => "fake_model[foo]", :value => "foowee", :checked => "checked")
       radio[5].should match_tag(:input, :type => "radio", :name => "fake_model[foo]", :value => "baree")
-      radio[3].should not_match_tag(:selected => "selected")
+      radio[3].should not_match_tag(:checked => "checked")
     end
   end
   

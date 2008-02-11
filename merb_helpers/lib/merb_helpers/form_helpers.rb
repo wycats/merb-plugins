@@ -293,7 +293,7 @@ module Merb #:nodoc:
         options.each do |opt|
           value, label = opt.is_a?(Hash) ? [opt[:value], opt[:label]] : [opt, opt]
           hash = {:name => "#{@_object_name}[#{col}]", :value => value, :label => label}
-          hash.merge!(:selected => "selected") if val.to_s == value.to_s
+          hash.merge!(:checked => "checked") if val.to_s == value.to_s
           ret << radio_field(hash)
         end
         ret
