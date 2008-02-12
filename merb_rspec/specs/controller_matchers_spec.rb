@@ -12,23 +12,23 @@ module Merb::Test::Rspec
         @target = RedirectableTarget.new
       end
       
-      it "should match a 301 'Moved Permanently'" do
+      it "should match a 301 'Moved Permanently' redirect code" do
         BeRedirect.new.matches?(301).should be_true
       end
       
-      it "should match a 302 'Found'" do
+      it "should match a 302 'Found' redirect code" do
         BeRedirect.new.matches?(302).should be_true
       end
       
-      it "should match a 303 'See Other'" do
+      it "should match a 303 'See Other' redirect code" do
         BeRedirect.new.matches?(303).should be_true
       end
       
-      it "should match a 304 'Not Modified'" do
+      it "should match a 304 'Not Modified' redirect code" do
         BeRedirect.new.matches?(304).should be_true
       end
       
-      it "should match a 307 'Temporary Redirect'" do
+      it "should match a 307 'Temporary Redirect' redirect code" do
         BeRedirect.new.matches?(307).should be_true
       end
       

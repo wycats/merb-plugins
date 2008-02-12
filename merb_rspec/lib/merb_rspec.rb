@@ -7,9 +7,8 @@ module Merb::Test::Rspec
 end
 
 if Merb.environment == "test"
-  require 'hpricot'
-  require 'merb-gen'
-  require 'merb-test'
+  dependency 'hpricot'
+  dependency 'merb-test'
   
   require 'spec'
   require 'spec/mocks'

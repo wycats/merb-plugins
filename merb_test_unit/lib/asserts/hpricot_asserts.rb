@@ -10,6 +10,9 @@
 # Web: www.lukeredpath.co.uk / opensource.agileevolved.com
 
 module Merb::Test::Unit::HpricotAsserts
+  include Test::Unit::Assertions
+  include Merb::Test::HpricotHelper
+  
   def assert_elements css_query, equality = nil, &block
     message = equality.delete(:message) if equality.is_a?(Hash)
 
