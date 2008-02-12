@@ -7,7 +7,7 @@ module Merb
     class RspecStory
       #Helper has not been ported to 0.9.0 as of 2/10/08
       #include Merb::Test::Helper
-      include Merb::Test::RspecMatchers
+      include Merb::Test::Rspec::ControllerMatchers
     end
   end
 end

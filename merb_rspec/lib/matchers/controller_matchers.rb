@@ -1,27 +1,20 @@
 module Merb::Test::Rspec::ControllerMatchers
+  include Merb::Test::ControllerHelper
+  
   class BeRedirect
     def matches?(target)
       @target = target
-      [301, 302].include? target
+      [307, *(300..305)].include?(target.respond_to?(:status) ? target.status : target)
     end
     def failure_message
-      "expected to redirect"
+      "expected#{target_message} to redirect"
     end
     def negative_failure_message
-      "expected not to redirect"
+      "expected#{target_message} not to redirect"
     end
-  end
-  
-  class Redirect
-    def matches?(target)
-      @target = target
-      BeRedirect.new.matches?(target.status)
-    end
-    def failure_message
-      "expected #{@target.inspect} to redirect"
-    end
-    def negative_failure_message
-      "expected #{@target.inspect} not to redirect"
+    
+    def target_message
+      " #{@target.inspect}" if target.respond_to?(:status)
     end
   end
   
@@ -33,7 +26,7 @@ module Merb::Test::Rspec::ControllerMatchers
     def matches?(target)
       @target = target.headers['Location']
       @redirected = BeRedirect.new.matches?(target.status)
-      @target == @expected
+      @target == @expected && @redirected
     end
     
     def failure_message
@@ -53,8 +46,8 @@ module Merb::Test::Rspec::ControllerMatchers
   class BeSuccess
     
     def matches?(target)
-      @target = target.status
-      (200..299).include?(@target)
+      @target = target
+      (200..207).include?(target.respond_to?(:status) ? target.status : target)
     end
     
     def failure_message
@@ -69,7 +62,7 @@ module Merb::Test::Rspec::ControllerMatchers
   class BeMissing
     def matches?(target)
       @target = target
-      (400..499).include?(@target.status)
+      (400..417).include?(target.respond_to?(:status) ? target.status : target)
     end
     
     def failure_message
@@ -86,9 +79,7 @@ module Merb::Test::Rspec::ControllerMatchers
     BeRedirect.new
   end
   
-  def redirect
-    Redirect.new
-  end
+  alias_method :redirect, :be_redirect
   
   def redirect_to(expected)
     RedirectTo.new(expected)

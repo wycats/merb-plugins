@@ -84,7 +84,7 @@ module Merb::Test::Rspec::MarkupMatchers
       @id, @class = @attributes.delete(:id), @attributes.delete(:class)
     end
 
-    def matches?(stringlike, &block)
+    def matches?(stringlike, &blk)
       @document = case stringlike
       when Hpricot::Elem
         stringlike
@@ -94,9 +94,11 @@ module Merb::Test::Rspec::MarkupMatchers
         Hpricot.parse(stringlike)
       end
       
-      @document.search(selector)
-      
-      !@document.search(selector(&block)).empty?
+      if block_given?
+        !@document.search(selector).find_all{|ele| blk.call(ele) rescue nil}.empty?
+      else
+        !@document.search(selector(&block)).empty?
+      end
     end
 
     def selector(&block)
