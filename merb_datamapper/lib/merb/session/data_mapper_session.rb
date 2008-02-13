@@ -14,7 +14,7 @@ module Merb
       base.add_hook :after_dispatch do
         Merb.logger.info("Finalize DataMapper session")
         request.session.save if @_fingerprint != Marshal.dump(request.session.data).hash
-        set_cookie(_session_id_key, request.session.session_id, _session_expiry) if (@_new_cookie || request.session.needs_new_cookie)
+        set_cookie(_session_id_key, request.session.session_id, Time.now + _session_expiry) if (@_new_cookie || request.session.needs_new_cookie)
       end
     end
 
@@ -28,7 +28,7 @@ module Merb
   class DataMapperSession < DataMapper::Base
     
     set_table_name "sessions"
-    property :session_id, :string, :length => 255, :lazy => false, :key => true, :serial => true
+    property :session_id, :string, :length => 255, :lazy => false, :key => true
     property :data,       :text, :lazy => false
   
     attr_accessor :needs_new_cookie
