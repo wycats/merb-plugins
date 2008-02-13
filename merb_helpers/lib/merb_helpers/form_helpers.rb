@@ -291,8 +291,9 @@ module Merb #:nodoc:
         val = @_obj.send(col)
         ret = ""
         options.each do |opt|
-          value, label = opt.is_a?(Hash) ? [opt[:value], opt[:label]] : [opt, opt]
-          hash = {:name => "#{@_object_name}[#{col}]", :value => value, :label => label}
+          value, label = opt.is_a?(Hash) ? [opt.delete(:value), opt.delete(:label)] : [opt, opt]
+          hash = {:name => "#{@_object_name}[#{col}]", :value => value, :label => label, :id => "#{control_id(col)}_#{value}" }
+          hash.merge!(opt) if opt.is_a?(Hash)
           hash.merge!(:checked => "checked") if val.to_s == value.to_s
           ret << radio_field(hash)
         end
@@ -319,6 +320,7 @@ module Merb #:nodoc:
       def text_area_control(col, attrs = {})
         attrs ||= {}
         errorify_field(attrs, col)
+        attrs.merge!(:id => control_id(col))
         text_area_field(control_value(col), attrs.merge(:name => control_name(col)))
       end
       
@@ -568,7 +570,14 @@ module Merb #:nodoc:
         if label
           title = label.is_a?(Hash) ? label.delete(:title) : label
           named = attrs[:id].blank? ? {} : {:for => attrs[:id]}
-          label(title, '', label.is_a?(Hash) ? label.merge(named) : named) + yield
+          align = label.delete(:align) if label.is_a?(Hash)
+          align ||= ['radio', 'checkbox'].include?(attrs[:type].to_s) ? :right : :left
+          label_tag = label(title, '', label.is_a?(Hash) ? label.merge(named) : named)
+          if align && align.to_sym == :right
+            yield + label_tag
+          else
+            label_tag + yield
+          end
         else
           yield
         end
