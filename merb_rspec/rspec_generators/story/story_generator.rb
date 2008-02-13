@@ -28,7 +28,7 @@ class StoryGenerator < Merb::GeneratorBase
         m.dependency "merb_story_setup", [""]
       end
       
-      m.directory File.join("stories", "stories", self.story_path)
+      m.directory File.join("stories", "stories", self.story_path) unless self.story_path.nil?
       
       copy_dirs
       copy_files
