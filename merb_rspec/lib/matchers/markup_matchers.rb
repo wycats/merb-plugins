@@ -1,3 +1,4 @@
+
 module Merb::Test::Rspec::MarkupMatchers
   class HaveSelector
     def initialize(expected)
@@ -83,7 +84,7 @@ module Merb::Test::Rspec::MarkupMatchers
       @tag, @attributes = tag, attributes
       @id, @class = @attributes.delete(:id), @attributes.delete(:class)
     end
-
+    
     def matches?(stringlike, &blk)
       @document = case stringlike
       when Hpricot::Elem
@@ -95,17 +96,23 @@ module Merb::Test::Rspec::MarkupMatchers
       end
       
       if block_given?
-        !@document.search(selector).find_all{|ele| blk.call(ele) rescue nil}.empty?
+        !@document.search(selector).select do |ele|
+          begin
+            blk.call(ele)
+          rescue Spec::Expectations::ExpectationNotMetError
+            false
+          end
+        end.empty?
       else
-        !@document.search(selector(&block)).empty?
+        !@document.search(selector).empty?
       end
     end
 
-    def selector(&block)
-      start = "//#{@tag}#{id_selector}#{class_selector}"
-      start << @attributes.map{|a, v| "[@#{key}=\"#{value}\"]"}.join
+    def selector
+      @selector = "//#{@tag}#{id_selector}#{class_selector}"
+      @selector << @attributes.map{|a, v| "[@#{a}=\"#{v}\"]"}.join
 
-      @selector << @inner_has_tag.selector if (@inner_has_tag = block.call).is_a?(HasTag) unless block.nil?
+      @selector << @inner_has_tag.selector unless @inner_has_tag.nil?
 
       @selector
     end
@@ -143,11 +150,11 @@ module Merb::Test::Rspec::MarkupMatchers
     end
 
     def attributes_for_error
-      @attributes.map{|a,v| " #{key}=\"#{pair}\""}.join
+      @attributes.map{|a,v| " #{a}=\"#{v}\""}.join
     end
 
-    def with_tag(*args)
-      @inner_has_tag = HasTag.new(*args)
+    def with_tag(name, attrs={})
+      @inner_has_tag = HasTag.new(name, attrs)
     end
   end
   

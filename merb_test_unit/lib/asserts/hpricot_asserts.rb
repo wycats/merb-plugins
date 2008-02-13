@@ -13,7 +13,7 @@ module Merb::Test::Unit::HpricotAsserts
   include Test::Unit::Assertions
   include Merb::Test::HpricotHelper
   
-  def assert_elements css_query, equality = nil, &block
+  def assert_elements(css_query, output = nil, equality = {}, &block)
     message = equality.delete(:message) if equality.is_a?(Hash)
 
     case equality
@@ -24,7 +24,7 @@ module Merb::Test::Unit::HpricotAsserts
     
     equality.merge!({:minimum => 1}) if (equality.keys & [:minimum, :maximum, :count]).empty?
     
-    els = get_elements(css_query, equality[:text])
+    els = get_elements(css_query, equality[:text], output)
 
     ret = equality.keys.include?(:minimum) ? (els.size >= equality[:minimum]) : true 
     ret &&= (els.size <= equality[:maximum]) if equality.keys.include?(:maximum)
