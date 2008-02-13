@@ -411,22 +411,23 @@ module Merb #:nodoc:
         prompt     = attrs.delete(:prompt)
         blank      = attrs.delete(:include_blank)
         selected   = attrs.delete(:selected)
-        returning '' do |ret|
-          ret << tag('option', prompt, :value => '') if prompt
-          ret << tag("option", '', :value => '') if blank
-          unless collection.blank?
-            if collection.is_a?(Hash)
-              collection.each do |label,group|
-                ret << open_tag("optgroup", :label => label.to_s.titleize) + options_for_select(group, :selected => selected) + "</optgroup>"
-              end
-            else
-              collection.each do |value,text|
-                options = selected.to_a.include?(value) ? {:selected => 'selected'} : {}
-                ret << tag( 'option', text, {:value => value}.merge(options) )
-              end
+        ret = String.new
+        ret << tag('option', prompt, :value => '') if prompt
+        ret << tag("option", '', :value => '') if blank
+        unless collection.blank?
+          if collection.is_a?(Hash)
+            collection.each do |label,group|
+              ret << open_tag("optgroup", :label => label.to_s.titleize) + options_for_select(group, :selected => selected) + "</optgroup>"
+            end
+          else
+            collection.each do |value,text|
+              options = selected.to_a.include?(value) ? {:selected => 'selected'} : {}
+              ret << tag( 'option', text, {:value => value}.merge(options) )
             end
           end
         end
+
+        return ret
       end
 
       # Returns a string of option tags that have been compiled by iterating over the collection and
@@ -455,14 +456,14 @@ module Merb #:nodoc:
       def options_from_collection_for_select(collection, attrs = {})
         prompt     = attrs.delete(:prompt)
         blank      = attrs.delete(:include_blank)
+        ret = String.new
         if collection.is_a?(Hash)
-          returning '' do |ret|
-	          ret << tag("option", prompt, :value => '') if prompt
-	          ret << tag("option", '',     :value => '') if blank
-            collection.each do |label, group|
-              ret << open_tag("optgroup", :label => label.to_s.humanize.titleize) + options_from_collection_for_select(group, attrs) + "</optgroup>"
-            end
+          ret << tag("option", prompt, :value => '') if prompt
+          ret << tag("option", '',     :value => '') if blank
+          collection.each do |label, group|
+            ret << open_tag("optgroup", :label => label.to_s.humanize.titleize) + options_from_collection_for_select(group, attrs) + "</optgroup>"
           end
+          return ret
         else
           text_method    = attrs[:text_method]
           value_method   = attrs[:value_method]
