@@ -4,9 +4,9 @@ require File.join(File.dirname(__FILE__), "..", "spec", "spec_helper")
 require 'spec/mocks'
 require 'spec/story'
 
-require 'merb_stories'
+require 'merb-rspec'
 
-class MerbStory
+class Merb::Test::RspecStory
   # Include your custom helpers here
 end
 

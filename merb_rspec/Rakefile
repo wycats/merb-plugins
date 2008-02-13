@@ -25,7 +25,7 @@ spec = Gem::Specification.new do |s|
   s.add_dependency('hpricot', '>= 0.6')
   s.require_path = 'lib'
   s.autorequire = PLUGIN
-  s.files = %w(LICENSE README Rakefile TODO) + Dir.glob("{lib,rspec_generators}/**/*")
+  s.files = %w(LICENSE README Rakefile TODO) + Dir.glob("{lib,specs,rspec_generators}/**/*")
 end
 
 Rake::GemPackageTask.new(spec) do |pkg|

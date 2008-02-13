@@ -1,4 +1,3 @@
-
 module Merb::Test::Rspec::MarkupMatchers
   class HaveSelector
     def initialize(expected)

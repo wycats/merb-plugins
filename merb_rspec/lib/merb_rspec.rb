@@ -6,9 +6,15 @@ module Merb::Test::Rspec
   
 end
 
+# Don't include anything for RSpec if we're not in the test environment
 if Merb.environment == "test"
+  require 'merb-core/test/fake_request'
+  require 'merb-core/test/multipart_helper'
+  require 'merb-core/test/request_helper'
+  
   dependency 'hpricot'
   dependency 'merb-test'
+  
   
   require 'spec'
   require 'spec/mocks'
