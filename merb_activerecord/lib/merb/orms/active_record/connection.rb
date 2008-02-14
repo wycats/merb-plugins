@@ -28,7 +28,7 @@ module Merb
         # Database connects as soon as the gem is loaded
         def connect
           if File.exists?(config_file)
-            puts "Connecting to database..."
+            Merb.logger.info("Connecting to database...")
 
             Thread.new{ loop{ sleep(60*60); ::ActiveRecord::Base.verify_active_connections! } }.priority = -10
 
