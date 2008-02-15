@@ -1,11 +1,11 @@
 if defined?(Merb::Plugins)
-  Merb::Plugins.add_rakefiles "merbtasks"
+  Merb::Plugins.add_rakefiles "merb_rspec" / "merbtasks"
 end
 
 # Don't include anything for RSpec if we're not in the test environment
 if Merb.environment == "test"  
-  dependency 'hpricot'
-  dependency 'merb-test'
+  require 'hpricot'
+  require 'merb-test'
   
   require 'spec'
   require 'spec/mocks'
@@ -14,10 +14,10 @@ if Merb.environment == "test"
   module Merb::Test::Rspec
   end
   
-  require File.join(File.dirname(__FILE__), 'matchers', 'controller_matchers')
-  require File.join(File.dirname(__FILE__), 'matchers', 'markup_matchers')
+  require File.join(File.dirname(__FILE__) / 'matchers' / 'controller_matchers')
+  require File.join(File.dirname(__FILE__) / 'matchers' / 'markup_matchers')
   
   Merb::BootLoader.after_app_loads do
-    require File.join(File.dirname(__FILE__), "merb_rspec", "story")
+    require File.join(File.dirname(__FILE__) / "merb_rspec" / "story")
   end
 end
