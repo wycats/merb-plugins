@@ -43,19 +43,34 @@ module Merb #:nodoc:
     
       # Provides a HTML formatted display of resource errors in an unordered list with a h2 form submission error
       # ==== Options
+      # +error_li+:: Block for generating a list item for an error. It receives an instance of the error.
       # +html_class+:: Set for custom error div class default is <tt>submittal_failed<tt>
       #
-      # ==== Example
-      #   <%= error_messages_for :person %>      
-      def error_messages_for(obj, error_li = nil, html_class='submittal_failed')
-        return "" if !obj.respond_to?(:errors) || obj.errors.empty?
-        header_message = block_given? ? yield(obj.errors) : "<h2>Form submittal failed because of #{obj.errors.size} #{obj.errors.size == 1 ? 'problem' : 'problems'}</h2>"
+      # ==== Examples
+      #   <%= error_messages_for :person %>
+      #   <%= error_messages_for :person {|errors| "You can has probs nao: #{errors.size} of em!"}
+      #   <%= error_messages_for :person, lambda{|error| "<li class='aieeee'>#{error.join(' ')}"} %>
+      #   <%= error_messages_for :person, nil, 'bad_mojo' %>
+      def error_messages_for(obj, error_li = nil, html_class='error')
+        return "" unless obj.respond_to?(:errors) && ! obj.errors.empty?
+
+        header_message = if block_given?
+          yield(obj.errors)
+        else
+          error_plurality = (obj.errors.size == 1 ? 'problem' : 'problems')
+          "<h2>There was #{obj.errors.size} #{error_plurality} while handling your request</h2>"
+        end
+        
+        error_li = lambda{|err| "<li>#{err.join(" ")}</li>"}
+        
         ret = %Q{
           <div class='#{html_class}'>
             #{header_message}
             <ul>
         }
-        obj.errors.each {|err| ret << (error_li ? error_li.call(err) : "<li>#{err.join(" ")}</li>") }
+        
+        obj.errors.each {|err| ret << error_li.call(err) }
+        
         ret << %Q{
             </ul>
           </div>
