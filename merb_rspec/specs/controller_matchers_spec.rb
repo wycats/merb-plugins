@@ -49,6 +49,38 @@ module Merb::Test::Rspec
         
         BeRedirect.new.matches?(@target).should_not be_true
       end
+      
+      describe "#failure_message" do
+        it "should be 'expected to redirect' when the target is a status code" do
+          matcher = BeRedirect.new
+          matcher.matches?(200)
+          matcher.failure_message.should == "expected to redirect"
+        end
+        
+        it "should be 'expected Foo#bar to redirect' when the target's controller is Foo and action is bar" do
+          matcher = BeRedirect.new
+          @target.stub!(:controller_name).and_return :Foo
+          @target.stub!(:action_name).and_return :bar
+          matcher.matches?(@target)
+          matcher.failure_message.should == "expected Foo#bar to redirect"
+        end
+      end
+      
+      describe "#negative_failure_message" do
+        it "should be 'expected not to redirect' when the target is a status code" do
+          matcher = BeRedirect.new
+          matcher.matches?(200)
+          matcher.negative_failure_message.should == "expected not to redirect"
+        end
+        
+        it "should be 'expected Foo#bar to redirect' when the target's controller is Foo and action is bar" do
+          matcher = BeRedirect.new
+          @target.stub!(:controller_name).and_return :Foo
+          @target.stub!(:action_name).and_return :bar
+          matcher.matches?(@target)
+          matcher.negative_failure_message.should == "expected Foo#bar not to redirect"
+        end
+      end
     end
     
     describe RedirectTo do
@@ -75,6 +107,40 @@ module Merb::Test::Rspec
         @target.headers['Location'] = "http://merbivore.com/"
         
         RedirectTo.new("http://example.com/").matches?(@target).should_not be_true
+      end
+      
+      describe "#failure_message" do
+        it "should be 'expected Foo#bar to redirect to <http://expected.com/>, but was <http://target.com/>' when the expected url is http://expected.com/ and the target url is http://target.com/" do
+          @target.stub!(:controller_name).and_return :Foo
+          @target.stub!(:action_name).and_return :bar
+          @target.status = 301
+          @target.headers['Location'] = "http://target.com/"
+          matcher = RedirectTo.new("http://expected.com/")
+          matcher.matches?(@target)
+          matcher.failure_message.should == "expected Foo#bar to redirect to <http://expected.com/>, but was <http://target.com/>"
+        end
+        
+        it "should be 'expected Foo#bar to redirect, but there was no redirection' when the target is not redirected" do
+          @target.stub!(:controller_name).and_return :Foo
+          @target.stub!(:action_name).and_return :bar
+          @target.status = 200
+          @target.headers['Location'] = "http://target.com/"
+          matcher = RedirectTo.new("http://expected.com/")
+          matcher.matches?(@target)
+          matcher.failure_message.should == "expected Foo#bar to redirect to <http://expected.com/>, but there was no redirection"
+        end
+      end
+      
+      describe "#negative_failure_message" do
+        it "should be 'expected Foo#bar not to redirect to <http://expected.com/>, but it did anyways" do
+          @target.stub!(:controller_name).and_return :Foo
+          @target.stub!(:action_name).and_return :bar
+          @target.status = 200
+          @target.headers['Location'] = "http://target.com/"
+          matcher = RedirectTo.new("http://expected.com/")
+          matcher.matches?(@target)
+          matcher.negative_failure_message.should == "expected Foo#bar not to redirect to <http://expected.com/>, but did anyway"
+        end
       end
     end
     
@@ -122,6 +188,40 @@ module Merb::Test::Rspec
       it "should not match a target with a non 200 level status code" do
         BeSuccess.new.matches?(301).should_not be_true
       end
+      
+      describe "#failure_message" do
+        it "should be 'expected to be successful but was 300' when the target is status code 300" do
+          matcher = BeSuccess.new
+          matcher.matches?(300)
+          matcher.failure_message.should == "expected to be successful but was 300"
+        end
+        
+        it "should be 'expected Foo#bar to be successful but was 404' when the target is controller-ish" do
+          @target.stub!(:controller_name).and_return :Foo
+          @target.stub!(:action_name).and_return :bar
+          @target.status = 404
+          matcher = BeSuccess.new
+          matcher.matches?(@target)
+          matcher.failure_message.should == "expected Foo#bar to be successful but was 404"
+        end
+      end
+      
+      describe "#negative_failure_message" do
+        it "should be 'expected not to be successful but it was' when the target is a 200 status code" do
+          matcher = BeSuccess.new
+          matcher.matches?(200)
+          matcher.negative_failure_message.should == "expected not to be successful but it was 200"
+        end
+        
+        it "should be 'expected Foo#bar not to be successful but it was 200' when the target is controller-ish" do
+          @target.stub!(:controller_name).and_return :Foo
+          @target.stub!(:action_name).and_return :bar
+          @target.status = 200
+          matcher = BeSuccess.new
+          matcher.matches?(@target)
+          matcher.negative_failure_message.should == "expected Foo#bar not to be successful but it was 200"
+        end
+      end
     end
     
     describe BeMissing do
@@ -165,6 +265,40 @@ module Merb::Test::Rspec
         @target.status = 200
         
         BeMissing.new.matches?(@target).should_not be_true
+      end
+      
+      describe "#failure_message" do
+        it "should be 'expected to be missing but was 300' when the target is status code 300" do
+          matcher = BeMissing.new
+          matcher.matches?(300)
+          matcher.failure_message.should == "expected to be missing but was 300"
+        end
+        
+        it "should be 'expected Foo#bar to be successful but was 301' when the target is controller-ish" do
+          @target.stub!(:controller_name).and_return :Foo
+          @target.stub!(:action_name).and_return :bar
+          @target.status = 301
+          matcher = BeMissing.new
+          matcher.matches?(@target)
+          matcher.failure_message.should == "expected Foo#bar to be missing but was 301"
+        end
+      end
+      
+      describe "#negative_failure_message" do
+        it "should be 'expected not to be successful but it was' when the target is a 400 status code" do
+          matcher = BeMissing.new
+          matcher.matches?(400)
+          matcher.negative_failure_message.should == "expected not to be missing but it was 400"
+        end
+        
+        it "should be 'expected Foo#bar not to be missing but it was 404' when the target is controller-ish" do
+          @target.stub!(:controller_name).and_return :Foo
+          @target.stub!(:action_name).and_return :bar
+          @target.status = 404
+          matcher = BeMissing.new
+          matcher.matches?(@target)
+          matcher.negative_failure_message.should == "expected Foo#bar not to be missing but it was 404"
+        end
       end
     end
   end

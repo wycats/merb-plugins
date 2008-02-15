@@ -7,14 +7,14 @@ module Merb::Test::Rspec::ControllerMatchers
       [307, *(300..305)].include?(target.respond_to?(:status) ? target.status : target)
     end
     def failure_message
-      "expected#{target_message} to redirect"
+      "expected#{inspect_target} to redirect"
     end
     def negative_failure_message
-      "expected#{target_message} not to redirect"
+      "expected#{inspect_target} not to redirect"
     end
     
-    def target_message
-      " #{@target.inspect}" if target.respond_to?(:status)
+    def inspect_target
+      " #{@target.controller_name}##{@target.action_name}" if @target.respond_to?(:controller_name) && @target.respond_to?(:action_name)
     end
   end
   
@@ -24,22 +24,30 @@ module Merb::Test::Rspec::ControllerMatchers
     end
     
     def matches?(target)
-      @target = target.headers['Location']
+      @target, @location = target, target.headers['Location']
       @redirected = BeRedirect.new.matches?(target.status)
-      @target == @expected && @redirected
+      @location == @expected && @redirected
     end
     
     def failure_message
-      msg = "expected a redirect to <#{@expected}>, but "
+      msg = "expected #{inspect_target} to redirect to <#{@expected}>, but "
       if @redirected
-        msg << "found one to <#{@target}>" 
+        msg << "was <#{target_location}>" 
       else
-        msg << "there was no redirect"
+        msg << "there was no redirection"
       end
     end
     
     def negative_failure_message
-      "expected not to redirect to <#{@expected}>, but did anyway"
+      "expected #{inspect_target} not to redirect to <#{@expected}>, but did anyway"
+    end
+    
+    def inspect_target
+      "#{@target.controller_name}##{@target.action_name}"
+    end
+    
+    def target_location
+      @target.respond_to?(:headers) ? @target.headers['Location'] : @target
     end
   end
   
@@ -47,30 +55,46 @@ module Merb::Test::Rspec::ControllerMatchers
     
     def matches?(target)
       @target = target
-      (200..207).include?(target.respond_to?(:status) ? target.status : target)
+      (200..207).include?(status_code)
     end
     
     def failure_message
-      "expected #{@target} to be successful but was #{@target.status}"
+      "expected#{inspect_target} to be successful but was #{status_code}"
     end
     
     def negative_failure_message
-      "expected #{@target} not to be successful but it was"
+      "expected#{inspect_target} not to be successful but it was #{status_code}"
+    end
+    
+    def inspect_target
+      " #{@target.controller_name}##{@target.action_name}" if @target.respond_to?(:controller_name) && @target.respond_to?(:action_name)
+    end
+    
+    def status_code
+      @target.respond_to?(:status) ? @target.status : @target
     end
   end
   
   class BeMissing
     def matches?(target)
       @target = target
-      (400..417).include?(target.respond_to?(:status) ? target.status : target)
+      (400..417).include?(status_code)
     end
     
     def failure_message
-      "expected #{@target} to be missing but was #{@target.status}"
+      "expected#{inspect_target} to be missing but was #{status_code}"
     end
     
     def negative_failure_message
-      "expected #{@target} not to be missing but it was"
+      "expected#{inspect_target} not to be missing but it was #{status_code}"
+    end
+    
+    def inspect_target
+      " #{@target.controller_name}##{@target.action_name}" if @target.respond_to?(:controller_name) && @target.respond_to?(:action_name)
+    end
+    
+    def status_code
+      @target.respond_to?(:status) ? @target.status : @target
     end
   end
   
