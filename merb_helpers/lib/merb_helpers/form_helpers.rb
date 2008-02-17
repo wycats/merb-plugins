@@ -61,7 +61,7 @@ module Merb #:nodoc:
           "<h2>There was #{obj.errors.size} #{error_plurality} while handling your request</h2>"
         end
         
-        build_li = lambda{|err| "<li>#{err.join(' ')}</li>"}
+        build_li ||= lambda{|err| "<li>#{err.join(' ')}</li>"}
         
         markup = %Q{
           <div class='#{html_class}'>
