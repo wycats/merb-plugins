@@ -24,8 +24,6 @@ module Merb
       else
         load_helpers
       end
-
-      Merb::Plugins.add_rakefiles "tasks/merb_tasks"
     end
     
   end
