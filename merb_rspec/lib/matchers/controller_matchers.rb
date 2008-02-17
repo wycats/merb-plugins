@@ -98,30 +98,112 @@ module Merb::Test::Rspec::ControllerMatchers
     end
   end
   
-  
-  def be_redirect
+  # Passes if the target was redirected, or the target is a redirection (300 level) response code.
+  #
+  # ==== Example
+  #   # Passes if the controller was redirected
+  #   controller.should redirect
+  #   
+  #   # Also works if the target is the response code
+  #   controller.status.should redirect
+  #
+  # ==== Note
+  # valid HTTP Redirection codes:
+  # * 300: Multiple Choices
+  # * 301: Moved Permanently
+  # * 302: Moved Temporarily (HTTP/1.0)
+  # * 302: Found (HTTP/1.1)
+  # * 303: See Other (HTTP/1.1)
+  # * 304: Not Modified
+  # * 305: Use Proxy
+  # * 307: Temporary Redirect
+  #--
+  # status codes based on: http://cheat.errtheblog.com/s/http_status_codes/
+  def redirect
     BeRedirect.new
   end
   
-  alias_method :redirect, :be_redirect
+  alias_method :be_redirection, :redirect
   
+  # Passes if the target was redirected to the expected location.
+  #
+  # ==== Paramters
+  # expected<String>::
+  #   A relative or absolute url.
+  # ==== Example
+  #   # Passes if the controller was redirected to http://example.com/
+  #   controller.should redirect_to('http://example.com/')
+  #
   def redirect_to(expected)
     RedirectTo.new(expected)
   end
   
-  def be_success
-    BeSuccess.new
-  end
+  alias_method :be_redirection_to, :redirect_to
   
-  def be_successful
-    BeSuccess.new
-  end
-  
+  # Passes if the request that generated the target was successful,
+  # or the target is a success (200 level) response code.
+  #
+  # ==== Example
+  #   # Passes if the controller call was successful
+  #   controller.should respond_successfully
+  #   
+  #   # Also works if the target is the response code
+  #   controller.status.should respond_successfully
+  #
+  # ==== Note
+  # valid HTTP Success codes:
+  # * 200: OK
+  # * 201: Created
+  # * 202: Accepted
+  # * 203: Non-Authoritative Information
+  # * 204: No Content
+  # * 205: Reset Content
+  # * 206: Partial Content
+  # * 207: Multi-Status
+  #--
+  # status codes based on: http://cheat.errtheblog.com/s/http_status_codes/
   def respond_successfully
     BeSuccess.new
   end
   
+  alias_method :be_successful, :respond_successfully
+  
+  # Passes if the request that generated the target was missing,
+  # or the target is a client-side error (400 level) response code.
+  #
+  # ==== Example
+  #   # Passes if the controller call was unknown or not understood
+  #   controller.should be_missing
+  #   
+  #   # Also passes if the target is a response code
+  #   controller.status.should be_missing
+  #
+  # ==== Note
+  # valid HTTP Client Error codes:
+  # * 400: Bad Request
+  # * 401: Unauthorized
+  # * 402: Payment Required
+  # * 403: Forbidden
+  # * 404: Not Found
+  # * 405: Method Not Allowed
+  # * 406: Not Acceptable
+  # * 407: Proxy Authentication Required
+  # * 408: Request Timeout
+  # * 409: Conflict
+  # * 410: Gone
+  # * 411: Length Required
+  # * 412: Precondition Failed
+  # * 413: Request Entity Too Large
+  # * 414: Request-URI Too Long
+  # * 415: Unsupported Media Type
+  # * 416: Requested Range Not Satisfiable
+  # * 417: Expectation Failed
+  # * 422: Unprocessable Entity
+  #--
+  # status codes based on: http://cheat.errtheblog.com/s/http_status_codes/
   def be_missing
     BeMissing.new
   end
+  
+  alias_method :be_client_error, :be_missing
 end

@@ -1,5 +1,74 @@
 require File.dirname(__FILE__) + '/spec_helper'
 
+class TestController < Merb::Controller
+  def redirect_action; redirect(@redirect_to || "/"); end
+  def success_action; end
+  def missing_action; render("i can has errorz", :status => 404); end
+end
+
+describe Merb::Test::Rspec::ControllerMatchers do
+  before(:each) do
+    Merb::Router.prepare do |r|
+      r.match("/redirect").to(:controller => "test_controller", :action => "redirect_action")
+      r.match("/success").to(:controller => "test_controller", :action => "success_action")
+      r.match("/missing").to(:controller => "test_controller", :action => "missing_action")
+    end
+  end
+  
+  describe "#redirect" do
+    it "should work with the result of a dispatch_to helper call" do
+      dispatch_to(TestController, :redirect_action).should redirect
+    end
+    
+    it "should work with the result of a get helper call" do
+      get("/redirect").should redirect
+    end
+    
+    it "should work with a redirection code" do
+      dispatch_to(TestController, :redirect_action).status.should redirect
+    end
+  end
+  
+  describe "#redirect_to" do
+    it "should work with the result of a dispatch_to helper call" do
+      dispatch_to(TestController, :redirect_action).should redirect_to("/")
+      dispatch_to(TestController, :redirect_action){ @redirect_to = "http://example.com/" }.should redirect_to("http://example.com/")
+    end
+    
+    it "should work with the result of a get helper call" do
+      get("/redirect"){ @redirect_to = "http://example.com/" }.should redirect_to("http://example.com/")
+    end
+  end
+  
+  describe "#respond_successfully" do
+    it "should work with the result of a dispatch_to helper call" do
+      dispatch_to(TestController, :success_action).should respond_successfully
+    end
+    
+    it "should work with the result of a get helper call" do
+      get("/success").should respond_successfully
+    end
+    
+    it "should work with a redirection code" do
+      dispatch_to(TestController, :success_action).status.should be_successful
+    end
+  end
+  
+  describe "#be_missing" do
+    it "should work with the result of a dispatch_to helper call" do
+      dispatch_to(TestController, :missing_action).should be_missing
+    end
+    
+    it "should work with the result of a get helper call" do
+      get("/missing").should be_client_error
+    end
+    
+    it "should work with a redirection code" do
+      dispatch_to(TestController, :missing_action).status.should be_missing
+    end
+  end
+end
+
 module Merb::Test::Rspec
   module ControllerMatchers
     class RedirectableTarget
