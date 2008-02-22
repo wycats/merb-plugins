@@ -164,7 +164,7 @@ module Merb #:nodoc:
       end
       
       def control_value(col) #:nodoc:
-        @_obj.send(col)
+        escape_xml(@_obj.send(col))
       end
       
       def control_name_value(col, attrs) #:nodoc:

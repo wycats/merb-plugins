@@ -762,3 +762,14 @@ describe "optional_label" do
     (optional_label({:label => {:title => 'foo', :align => 'foo'}}) {'bar'}).should   == '<label>foo</label>bar'
   end
 end
+
+describe "control_value" do
+  it_should_behave_like "FakeBufferConsumer"
+
+  it 'should escape [&"<>]' do
+    @obj.vin = '&"<>'
+    f = form_for :obj do
+      control_value(:vin).should == '&amp;&quot;&lt;&gt;'
+    end
+  end
+end
