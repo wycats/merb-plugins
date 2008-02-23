@@ -8,6 +8,7 @@ if Merb.environment == "test"
   require 'merb-test'
   
   require 'spec'
+  require 'spec/rake/spectask' if $RAKE_ENV
   require 'spec/mocks'
   require 'spec/story'
   

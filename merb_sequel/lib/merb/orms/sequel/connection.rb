@@ -36,7 +36,7 @@ module Merb
           require "sequel_model"
 
           if File.exists?(config_file)
-            Merb.logger.info "Connecting to the '#{config[:database]}' database on '#{config[:host]}' using '#{config[:adapter]}' ..."
+            Merb.logger.info("Connecting to the '#{config[:database]}' database on '#{config[:host]}' using '#{config[:adapter]}' ...")
             connection = ::Sequel.connect(config_options(config))
             Merb.logger.error("Connection Error: #{e}") unless connection
             connection
