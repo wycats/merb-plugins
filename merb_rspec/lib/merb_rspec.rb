@@ -3,8 +3,7 @@ if defined?(Merb::Plugins)
 end
 
 # Don't include anything for RSpec if we're not in the test environment
-if Merb.environment == "test"  
-  require 'hpricot'
+if Merb.environment == "test"
   require 'merb-test'
   
   require 'spec'
@@ -16,13 +15,14 @@ if Merb.environment == "test"
   end
   
   require File.join(File.dirname(__FILE__) / 'matchers' / 'controller_matchers')
-  require File.join(File.dirname(__FILE__) / 'matchers' / 'markup_matchers')
+  require File.join(File.dirname(__FILE__) / 'matchers' / 'route_matchers')
+  require File.join(File.dirname(__FILE__) / 'matchers' / 'view_matchers')
   
   Merb::BootLoader.after_app_loads do
     require File.join(File.dirname(__FILE__) / "merb_rspec" / "story")
   end
   
-  Merb::Test::Helpers.send(:include, Merb::Test::Rspec::ControllerMatchers)
-  Merb::Test::Helpers.send(:include, Merb::Test::Rspec::MarkupMatchers)
-  
+  Merb::Test::ControllerHelper.send(:include, Merb::Test::Rspec::ControllerMatchers)
+  Merb::Test::RouteHelper.send(:include, Merb::Test::Rspec::RouteMatchers)
+  Merb::Test::ViewHelper.send(:include, Merb::Test::Rspec::ViewMatchers)
 end

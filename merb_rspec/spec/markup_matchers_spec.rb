@@ -1,6 +1,6 @@
 require File.dirname(__FILE__) + '/spec_helper'
 
-module Merb::Test::Rspec::MarkupMatchers
+module Merb::Test::Rspec::ViewMatchers
   describe HasTag do
     describe "#matches?" do
       before(:each) do

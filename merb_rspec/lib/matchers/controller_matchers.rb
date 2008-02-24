@@ -1,5 +1,4 @@
 module Merb::Test::Rspec::ControllerMatchers
-  include Merb::Test::ControllerHelper
   
   class BeRedirect
     def matches?(target)

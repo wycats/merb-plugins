@@ -1,12 +1,14 @@
 require File.dirname(__FILE__) + '/spec_helper'
 
 class TestController < Merb::Controller
+  attr_accessor :redirect_to
   def redirect_action; redirect(@redirect_to || "/"); end
   def success_action; end
   def missing_action; render("i can has errorz", :status => 404); end
 end
 
 describe Merb::Test::Rspec::ControllerMatchers do
+  include Merb::Test::ControllerHelper
   before(:each) do
     Merb::Router.prepare do |r|
       r.match("/redirect").to(:controller => "test_controller", :action => "redirect_action")
@@ -32,11 +34,11 @@ describe Merb::Test::Rspec::ControllerMatchers do
   describe "#redirect_to" do
     it "should work with the result of a dispatch_to helper call" do
       dispatch_to(TestController, :redirect_action).should redirect_to("/")
-      dispatch_to(TestController, :redirect_action){ @redirect_to = "http://example.com/" }.should redirect_to("http://example.com/")
+      dispatch_to(TestController, :redirect_action){ |controller| controller.redirect_to = "http://example.com/" }.should redirect_to("http://example.com/")
     end
     
     it "should work with the result of a get helper call" do
-      get("/redirect"){ @redirect_to = "http://example.com/" }.should redirect_to("http://example.com/")
+      get("/redirect"){|controller| controller.redirect_to = "http://example.com/" }.should redirect_to("http://example.com/")
     end
   end
   
