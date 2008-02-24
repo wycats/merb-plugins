@@ -43,7 +43,7 @@ module Merb::Test::Rspec::RouteMatchers
       @expected = {}
       case hash_or_object
       when Hash then @expected = hash_or_object
-      else @expected[:id] = hash_or_object.id
+      else @expected[:id] = hash_or_object.to_param
       end
     end
   
