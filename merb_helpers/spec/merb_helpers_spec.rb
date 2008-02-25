@@ -1,9 +1,8 @@
 require File.dirname(__FILE__) + '/spec_helper'
 require 'merb_helpers'
 
-include Merb::ErubisCaptureMixin,
-        Merb::ViewContextMixin,
-        Merb::Helpers::Form
+include Merb::Helpers::Tag
+include Merb::Helpers::Form
 
 describe "error_messages_for" do
   before :each do
@@ -27,11 +26,6 @@ describe "error_messages_for" do
     errs = error_messages_for(@obj) {|errs| "<h3>Failure: #{errs.size} issues</h3>"}
     errs.should include("<h3>Failure: 2 issues</h3>")
   end
-  
-  it "should accept a custom error list item block" do
-    errs = error_messages_for(@obj, proc {|err| "<li>#{err[0]} column: #{err[1]}</li>"})
-    errs.should include("<li>foo column: bar</li>")
-  end  
 end
 
 describe "form_tag" do
@@ -589,7 +583,7 @@ describe "option tag generation (data bound)" do
     @model2 = FakeModel.new ; @model2.make = "Ford"   ; @model2.model = "Falcon"    ; @model2.vin = '2'
     @model3 = FakeModel.new ; @model3.make = "Holden" ; @model3.model = "Commodore" ; @model3.vin = '3'
   
-    collection = [@model1, @model2, @model3].group_by( &:make )
+    collection = [@model1, @model2, @model3].inject({}) {|s,e| (s[e.make] ||= []) << e; s }
     content = options_from_collection_for_select(collection, :text_method => 'model', :value_method => 'vin', :selected => '1')
     
     content.should match_tag( :optgroup, :label => "Ford" )
@@ -609,6 +603,8 @@ describe "option tag generation (data bound)" do
 
   
 end
+
+require "hpricot"
 
 describe "option tags generation (basic)" do
   it_should_behave_like "FakeBufferConsumer"
@@ -721,11 +717,14 @@ describe 'delete_button' do
     Merb::Router.prepare do |r|
       r.resources :objs
     end
+    def url(sym, obj)
+      "/objs/#{obj.object_id}"
+    end
   end
   
   it 'should return a button inside of a form for the object' do
     result = delete_button(:obj, @obj)
-    result.should match_tag(:form, :action => "/objs/#{@obj.id}", :method => "post")
+    result.should match_tag(:form, :action => "/objs/#{@obj.object_id}", :method => "post")
     result.should match_tag(:input, :type => "hidden", :value => "delete", :name => "_method")
     result.should match_tag(:button, :type => "submit")
     result.should match(/<button.*>Delete<\/button>/)

@@ -1,3 +1,5 @@
+require "#{File.dirname(__FILE__)}/tag_helpers"
+
 module Merb #:nodoc:
   
   # Merb helpers include several helpers used for simplifying view creation.
@@ -58,7 +60,7 @@ module Merb #:nodoc:
           yield(obj.errors)
         else
           error_plurality = (obj.errors.size == 1 ? 'problem' : 'problems')
-          "<h2>There was #{obj.errors.size} #{error_plurality} while handling your request</h2>"
+          "<h2>Form submittal failed because of #{obj.errors.size} #{error_plurality}</h2>"
         end
         
         build_li = lambda{|err| "<li>#{err.join(' ')}</li>"}
@@ -432,7 +434,8 @@ module Merb #:nodoc:
         unless collection.blank?
           if collection.is_a?(Hash)
             collection.each do |label,group|
-              ret << open_tag("optgroup", :label => label.to_s.titleize) + options_for_select(group, :selected => selected) + "</optgroup>"
+              ret << open_tag("optgroup", :label => label.to_s.gsub(/\b[a-z]/) {|x| x.upcase}) + 
+                options_for_select(group, :selected => selected) + "</optgroup>"
             end
           else
             collection.each do |value,text|
@@ -476,7 +479,9 @@ module Merb #:nodoc:
           ret << tag("option", prompt, :value => '') if prompt
           ret << tag("option", '',     :value => '') if blank
           collection.each do |label, group|
-            ret << open_tag("optgroup", :label => label.to_s.humanize.titleize) + options_from_collection_for_select(group, attrs) + "</optgroup>"
+            # .gsub(/_/, " ").gsub(/\b[a-z]/) {|x| x.upcase}) == .humanize.titleize, which is no longer in -core
+            ret << open_tag("optgroup", :label => label.to_s.gsub(/_/, " ").gsub(/\b[a-z]/) {|x| x.upcase}) + 
+              options_from_collection_for_select(group, attrs) + "</optgroup>"
           end
           return ret
         else
@@ -565,47 +570,46 @@ module Merb #:nodoc:
       end
       
     private
-      
-      # Fake out the browser to send back the method for RESTful stuff.
-      # Fall silently back to post if a method is given that is not supported here
-      def set_form_method(options = {}, obj = nil)
-        options[:method] ||= ((obj && obj.respond_to?(:new_record?) && !obj.new_record?) ? :put : :post)
-        if ![:get,:post].include?(options[:method])
-          fake_form_method = options[:method] if [:put, :delete].include?(options[:method])
-          options[:method] = :post
-        end
-        fake_form_method
+    # Fake out the browser to send back the method for RESTful stuff.
+    # Fall silently back to post if a method is given that is not supported here
+    def set_form_method(options = {}, obj = nil)
+      options[:method] ||= ((obj && obj.respond_to?(:new_record?) && !obj.new_record?) ? :put : :post)
+      if ![:get,:post].include?(options[:method])
+        fake_form_method = options[:method] if [:put, :delete].include?(options[:method])
+        options[:method] = :post
       end
-      
-      def generate_fake_form_method(fake_form_method)
-        fake_form_method ? hidden_field(:name => "_method", :value => "#{fake_form_method}") : ""
-      end
-      
-      def optional_label(attrs = {})
-        label = attrs.delete(:label) if attrs
-        if label
-          title = label.is_a?(Hash) ? label.delete(:title) : label
-          named = attrs[:id].blank? ? {} : {:for => attrs[:id]}
-          align = label.delete(:align) if label.is_a?(Hash)
-          align ||= ['radio', 'checkbox'].include?(attrs[:type].to_s) ? :right : :left
-          label_tag = label(title, '', label.is_a?(Hash) ? label.merge(named) : named)
-          if align && align.to_sym == :right
-            yield + label_tag
-          else
-            label_tag + yield
-          end
+      fake_form_method
+    end
+    
+    def generate_fake_form_method(fake_form_method)
+      fake_form_method ? hidden_field(:name => "_method", :value => "#{fake_form_method}") : ""
+    end
+    
+    def optional_label(attrs = {})
+      label = attrs.delete(:label) if attrs
+      if label
+        title = label.is_a?(Hash) ? label.delete(:title) : label
+        named = attrs[:id].blank? ? {} : {:for => attrs[:id]}
+        align = label.delete(:align) if label.is_a?(Hash)
+        align ||= ['radio', 'checkbox'].include?(attrs[:type].to_s) ? :right : :left
+        label_tag = label(title, '', label.is_a?(Hash) ? label.merge(named) : named)
+        if align && align.to_sym == :right
+          yield + label_tag
         else
-          yield
+          label_tag + yield
         end
+      else
+        yield
       end
-      
-      def errorify_field(attrs, col)
-        attrs.add_html_class!("error") if @_obj.respond_to?(:errors) && @_obj.errors.on(col)
-      end   
-      
-      def set_multipart_attribute!(attrs = {})
-        attrs.merge!( :enctype => "multipart/form-data" ) if attrs.delete(:multipart)      
-      end
+    end
+    
+    def errorify_field(attrs, col)
+      attrs.add_html_class!("error") if @_obj.respond_to?(:errors) && @_obj.errors.on(col)
+    end   
+    
+    def set_multipart_attribute!(attrs = {})
+      attrs.merge!( :enctype => "multipart/form-data" ) if attrs.delete(:multipart)      
+    end
       
     end
   end
