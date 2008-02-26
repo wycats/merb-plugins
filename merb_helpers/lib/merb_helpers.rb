@@ -30,4 +30,6 @@ module Merb
   
 end
 
-Merb::Helpers.load if defined?(Merb::Plugins)
+before_app_loads do
+  Merb::Helpers.load if defined?(Merb::Plugins)
+end
