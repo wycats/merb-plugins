@@ -26,15 +26,20 @@ spec = Gem::Specification.new do |s|
   s.files = %w(LICENSE README Rakefile TODO) + Dir.glob("{lib,specs,activerecord_generators}/**/*")
 end
 
+windows = (PLATFORM =~ /win32|cygwin/) rescue nil
+
+SUDO = windows ? "" : "sudo"
+
 Rake::GemPackageTask.new(spec) do |pkg|
   pkg.gem_spec = spec
 end
 
-task :install do
-  sh %{rake package}
-  sh %{sudo gem install pkg/#{NAME}-#{VERSION}}
+desc "Install merb_activerecord"
+task :install => :package do
+  sh %{#{SUDO} gem install pkg/#{NAME}-#{VERSION} --no-rdoc --no-ri}
 end
 
+desc "Release the current version on rubyforge"
 task :release => :package do
   sh %{rubyforge add_release merb #{PLUGIN} #{VERSION} pkg/#{NAME}-#{VERSION}.gem}
 end

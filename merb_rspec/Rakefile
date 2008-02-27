@@ -28,12 +28,17 @@ spec = Gem::Specification.new do |s|
   s.files = %w(LICENSE README Rakefile TODO) + Dir.glob("{lib,specs,rspec_generators}/**/*")
 end
 
+windows = (PLATFORM =~ /win32|cygwin/) rescue nil
+
+SUDO = windows ? "" : "sudo"
+
 Rake::GemPackageTask.new(spec) do |pkg|
   pkg.gem_spec = spec
 end
 
+desc "Install merb_rspec"
 task :install => [:package] do
-  sh %{sudo gem install pkg/#{NAME}-#{VERSION}}
+  sh %{#{SUDO} gem install pkg/#{NAME}-#{VERSION} --no-rdoc --no-ri}
 end
 
 namespace :jruby do
@@ -42,5 +47,5 @@ namespace :jruby do
   task :install => :package do
     sh %{#{SUDO} jruby -S gem install pkg/#{NAME}-#{Merb::VERSION}.gem --no-rdoc --no-ri}
   end
-  
+
 end
