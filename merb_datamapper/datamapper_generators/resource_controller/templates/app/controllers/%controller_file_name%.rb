@@ -36,7 +36,7 @@
 <%= "  " * counter %>    if @<%= singular_model %>.save
 <%= "  " * counter %>      redirect url(:<%= singular_model %>, @<%= singular_model %>)
 <%= "  " * counter %>    else
-<%= "  " * counter %>      render :action => :new
+<%= "  " * counter %>      render :new
 <%= "  " * counter %>    end
 <%= "  " * counter %>  end
 
