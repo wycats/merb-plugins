@@ -19,7 +19,13 @@ module Merb
               # Convert string keys to symbols
               full_config = Erubis.load_yaml_file(config_file)
               config = (Merb::Plugins.config[:merb_datamapper] = {})
-              (full_config[Merb.environment.to_sym] || full_config[Merb.environment]).each { |k, v| config[k.to_sym] = v }
+              (full_config[Merb.environment.to_sym] || full_config[Merb.environment]).each do |k, v| 
+                if k == 'port'
+                  config[k.to_sym] = v.to_i
+                else
+                  config[k.to_sym] = v
+                end
+              end
               config
             end
         end
