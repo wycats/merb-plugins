@@ -63,7 +63,7 @@ module Merb #:nodoc:
           "<h2>Form submittal failed because of #{obj.errors.size} #{error_plurality}</h2>"
         end
         
-        build_li = lambda{|err| "<li>#{err.join(' ')}</li>"}
+        build_li ||= lambda{|err| "<li>#{err.join(' ')}</li>"}
         
         markup = %Q{
           <div class='#{html_class}'>
