@@ -16,8 +16,4 @@ if Merb.environment == "test"
   Merb::BootLoader.after_app_loads do
     require File.join(File.dirname(__FILE__) / "merb_rspec" / "story")
   end
-  
-  Merb::Test::ControllerHelper.send(:include, Merb::Test::Rspec::ControllerMatchers)
-  Merb::Test::RouteHelper.send(:include, Merb::Test::Rspec::RouteMatchers)
-  Merb::Test::ViewHelper.send(:include, Merb::Test::Rspec::ViewMatchers)
 end
