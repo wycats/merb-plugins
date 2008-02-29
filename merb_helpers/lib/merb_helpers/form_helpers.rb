@@ -402,6 +402,7 @@ module Merb #:nodoc:
       def select_control(col, attrs = {})
         attrs.merge!(:name => attrs[:name] || control_name(col))
         attrs.merge!(:id   => attrs[:id]   || control_id(col))
+        attrs.merge!(:selected => attrs[:selected] || control_value(col))
         errorify_field(attrs, col)
         optional_label(attrs) { select_field(attrs) }
       end
