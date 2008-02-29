@@ -5,7 +5,6 @@ end
 #Don't include anything for Test::Unit if we're not 
 if Merb.environment == "test"
   require 'hpricot'
-  require 'merb-test'
   
   require 'test/unit'
   
