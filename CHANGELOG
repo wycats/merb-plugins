@@ -1,0 +1,32 @@
+== 0.9.1 "Some are half-wild, and some are just outlaws." 2008-02-29
+* merb_activerecord: updated render syntax in new action of db plugin
+  resource_controller controller templates.
+* merb_activerecord: renamed sample yml files for orm db config as
+  .yml.sample; added install:orm rake task
+* merb_activerecord: Replace calls to puts with Merb.logger
+* merb_activerecord: expiry time was not being passed in properly for both
+  sequel and active_record
+* merb_datamapper: updated render syntax in new action of db plugin
+  resource_controller controller templates.
+* merb_datamapper: Added to_param method for data_mapper
+* merb_datamapper: merb_dm casts port to an integer
+* merb_datamapper: renamed sample yml files for orm db config as .yml.sample;
+  added install:orm rake task
+* merb_datamapper: Replace calls to puts with Merb.logger
+* merb_helpers: Escape characters in form control values
+* merb_helpers: Let error_messages_for actually use the custom error lambda
+* merb_helpers: helpers has no tasks
+* merb_helpers: Better variable names in errors_messages_for.
+* merb_helpers: Added examples for error_messages_for, and other cleanups.
+* merb_rspec: removed duplicate includes for the matchers, this has moved to merb-core
+* merb_sequel: updated render syntax in new action of db plugin
+  resource_controller controller templates.
+* merb_sequel: renamed sample yml files for orm db config as .yml.sample;
+  added install:orm rake task
+* merb_sequel: rearranging the merbtasks files in all plugins
+* merb_sequel: expiry time was not being passed in properly for both sequel
+  and active_record
+* merb_test_unit: Adding rspec dependency to merb_rspec, removing merb-test
+  references in merb_test_unit
+* merb_test_unit: moving plugin rakefiles into a plugin name parent folder
+* merb_test_unit: Normalize calls to Merb.start
