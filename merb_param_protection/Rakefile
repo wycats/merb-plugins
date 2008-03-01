@@ -4,7 +4,7 @@ require 'spec/rake/spectask'
 
 PLUGIN = "merb_param_protection"
 NAME = "merb_param_protection"
-VERSION = "0.9.0"
+VERSION = "0.9.1"
 AUTHOR = "Lance Carlson"
 EMAIL = "lancecarlson@gmail.com"
 HOMEPAGE = "http://merb.devjavu.com"
@@ -21,7 +21,7 @@ spec = Gem::Specification.new do |s|
   s.author = AUTHOR
   s.email = EMAIL
   #s.homepage = HOMEPAGE
-  s.add_dependency('merb', '>= 0.9.0')
+  s.add_dependency('merb', '>= 0.9.1')
   s.require_path = 'lib'
   s.autorequire = PLUGIN
   s.files = %w(LICENSE README Rakefile TODO) + Dir.glob("{lib,specs}/**/*")

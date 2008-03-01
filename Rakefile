@@ -27,3 +27,16 @@ namespace :install do
     end
   end
 end
+
+
+desc "Bundle up all the merb-plugins gems"
+task :bundle do
+  mkdir_p "bundle"
+  gems.each do |gem|
+    File.open("#{gem}/Rakefile") do |rakefile|
+      rakefile.read.detect {|l| l =~ /^VERSION\s*=\s*"(.*)"$/ }
+      sh %{cd #{gem} ;  rake package ; cd ..}
+      sh %{cp #{gem}/pkg/#{gem}-#{$1}.gem bundle/}
+    end
+  end
+end

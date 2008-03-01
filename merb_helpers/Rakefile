@@ -5,7 +5,7 @@ require 'spec/rake/spectask'
 
 PLUGIN = "merb_helpers"
 NAME = "merb_helpers"
-GEM_VERSION = "0.9.0"
+VERSION = "0.9.1"
 AUTHOR = "Yehuda Katz"
 EMAIL = "wycats@gmail.com"
 HOMEPAGE = "http://merb.rubyforge.org/"
@@ -17,7 +17,7 @@ SUDO = windows ? "" : "sudo"
 
 spec = Gem::Specification.new do |s|
   s.name = NAME
-  s.version = GEM_VERSION
+  s.version = VERSION
   s.platform = Gem::Platform::RUBY
   s.has_rdoc = true
   s.extra_rdoc_files = ["README", "LICENSE", 'TODO']
@@ -26,7 +26,7 @@ spec = Gem::Specification.new do |s|
   s.author = AUTHOR
   s.email = EMAIL
   s.homepage = HOMEPAGE
-  s.add_dependency("merb-core", ">=0.9")
+  s.add_dependency("merb-core", ">=0.9.1")
   s.require_path = 'lib'
   s.autorequire = PLUGIN
   s.files = %w(LICENSE README Rakefile TODO) + Dir.glob("{lib,specs}/**/*")
@@ -39,7 +39,7 @@ end
 
 desc "Run :package and install resulting .gem"
 task :install => [:package] do
-  sh %{#{SUDO} gem install pkg/#{NAME}-#{GEM_VERSION} --no-rdoc --no-ri}
+  sh %{#{SUDO} gem install pkg/#{NAME}-#{VERSION} --no-rdoc --no-ri}
 end
 
 Rake::RDocTask.new do |rdoc|
