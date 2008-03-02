@@ -107,7 +107,7 @@ module Merb
   end
 
   
-  unless DataMapper.database.table_exists?(table_name)
+  unless DataMapper.repository.table_exists?(table_name)
     puts "Warning: The database did not contain a '#{table_name}' table for sessions."
     DataMapperSession.auto_migrate!
     puts "Created sessions table."

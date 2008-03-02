@@ -34,7 +34,7 @@ module Merb
         def connect
           if File.exists?(config_file)
             Merb.logger.info("Connecting to database...")
-            ::DataMapper::Database.setup(config)
+            ::DataMapper::Repository.setup(config)
           else
             copy_sample_config
             puts "No database.yml file found in #{Merb.root}/config."
