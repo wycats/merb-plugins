@@ -25,7 +25,7 @@ module Merb
 
   table_name = (Merb::Plugins.config[:merb_datamapper][:session_table_name] || "sessions")
   
-  class DataMapperSession < DataMapper::Base
+  class DataMapperSession < DataMapper::Repository
     
     set_table_name "sessions"
     property :session_id, :string, :length => 255, :lazy => false, :key => true
