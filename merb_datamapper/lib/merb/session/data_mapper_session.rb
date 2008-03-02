@@ -30,6 +30,7 @@ module Merb
     set_table_name "sessions"
     property :session_id, :string, :length => 255, :lazy => false, :key => true
     property :data,       :text, :lazy => false
+    property :updated_at, :datetime
   
     attr_accessor :needs_new_cookie
   
