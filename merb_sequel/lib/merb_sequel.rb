@@ -1,7 +1,8 @@
 if defined?(Merb::Plugins)
-  Merb::BootLoader.before_app_loads do
-    Merb::Plugins.config[:merb_sequel] = {}
-    require File.join(File.dirname(__FILE__) / "merb" / "orms" / "sequel" / "connection")
+  Merb::Plugins.config[:merb_sequel] = {}
+  require File.join(File.dirname(__FILE__) / "merb" / "orms" / "sequel" / "connection")
+  
+  Merb::BootLoader.after_app_loads do
     Merb::Orms::Sequel.connect
     Merb::Orms::Sequel.register_session_type
   end
