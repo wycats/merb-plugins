@@ -1,8 +1,8 @@
 require 'rubygems'
 require 'rake/gempackagetask'
 
-PLUGIN = "merb_rspec"
-NAME = "merb_rspec"
+PLUGIN = "merb_stories"
+NAME = "merb_stories"
 VERSION = "0.9.1"
 AUTHOR = "Yehuda Katz"
 EMAIL = "ykatz@engineyard.com"
