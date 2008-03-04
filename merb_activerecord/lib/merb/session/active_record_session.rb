@@ -2,20 +2,16 @@ require "active_record"
 
 module Merb
   module SessionMixin
-    def self.included(base)
-      base.add_hook :before_dispatch do
-        Merb.logger.info("Setting up session")
-        before = cookies[_session_id_key]
-        request.session, cookies[_session_id_key] = Merb::ActiveRecordSession.persist(cookies[_session_id_key])
-        @_fingerprint = Marshal.dump(request.session.data).hash
-        @_new_cookie = cookies[_session_id_key] != before
-      end
+    def setup_session
+      before = cookies[_session_id_key]
+      request.session, cookies[_session_id_key] = Merb::ActiveRecordSession.persist(cookies[_session_id_key])
+      @_fingerprint = Marshal.dump(request.session.data).hash
+      @_new_cookie = cookies[_session_id_key] != before
+    end
 
-      base.add_hook :after_dispatch do
-        Merb.logger.info("Finalize session")
-        request.session.save if @_fingerprint != Marshal.dump(request.session.data).hash
-        set_cookie(_session_id_key, request.session.session_id, Time.now + _session_expiry) if (@_new_cookie || request.session.needs_new_cookie)
-      end
+    def finalize_session
+      request.session.save if @_fingerprint != Marshal.dump(request.session.data).hash
+      set_cookie(_session_id_key, request.session.session_id, Time.now + _session_expiry) if (@_new_cookie || request.session.needs_new_cookie)
     end
     
     def session_store_type
