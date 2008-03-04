@@ -1,7 +1,8 @@
 namespace :db do
   
   task :merb_start do
-    Merb.start :adapter => 'runner'
+    Merb.start :adapter => 'runner',
+               :environment => ENV['MERB_ENV'] || 'development'
   end
   
   namespace :create do
