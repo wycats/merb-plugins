@@ -6,7 +6,7 @@
 <% counter = counter == 0 ? 0 : (counter + 1) -%>
 <%= "  " * counter %>class <%= controller_class_name %> < Application
 <%= "  " * counter %>  # provides :xml, :yaml, :js
-  
+
 <%= "  " * counter %>  def index
 <%= "  " * counter %>    @<%= plural_model %> = <%= model_class_name %>.find(:all)
 <%= "  " * counter %>    display @<%= plural_model %>
@@ -27,7 +27,7 @@
 <%= "  " * counter %>  def create
 <%= "  " * counter %>    @<%= singular_model %> = <%= model_class_name %>.new(params[:<%= singular_model %>])
 <%= "  " * counter %>    if @<%= singular_model %>.save
-<%= "  " * counter %>      redirect url(:<%= singular_model %>, @<%= singular_model %>)
+<%= "  " * counter %>      redirect url(:<%= (controller_modules.collect{|m| m.downcase} << singular_model).join("_") %>, @<%= singular_model %>)
 <%= "  " * counter %>    else
 <%= "  " * counter %>      render :new
 <%= "  " * counter %>    end
@@ -44,7 +44,7 @@
 <%= "  " * counter %>    @<%= singular_model %> = <%= model_class_name %>.find_by_id(params[:id])
 <%= "  " * counter %>    raise NotFound unless @<%= singular_model %>
 <%= "  " * counter %>    if @<%= singular_model %>.update_attributes(params[:<%= singular_model %>])
-<%= "  " * counter %>      redirect url(:<%= singular_model %>, @<%= singular_model %>)
+<%= "  " * counter %>      redirect url(:<%= (controller_modules.collect{|m| m.downcase} << singular_model).join("_") %>, @<%= singular_model %>)
 <%= "  " * counter %>    else
 <%= "  " * counter %>      raise BadRequest
 <%= "  " * counter %>    end
@@ -54,12 +54,12 @@
 <%= "  " * counter %>    @<%= singular_model %> = <%= model_class_name %>.find_by_id(params[:id])
 <%= "  " * counter %>    raise NotFound unless @<%= singular_model %>
 <%= "  " * counter %>    if @<%= singular_model %>.destroy
-<%= "  " * counter %>      redirect url(:<%= singular_model %>s)
+<%= "  " * counter %>      redirect url(:<%= (controller_modules.collect{|m| m.downcase} << singular_model).join("_") %>s)
 <%= "  " * counter %>    else
 <%= "  " * counter %>      raise BadRequest
 <%= "  " * counter %>    end
 <%= "  " * counter %>  end
-  
+
 <%= "  " * counter %>end
 <% counter = counter == 0 ? 0 : (counter - 1) -%>
 <% controller_modules.reverse.each_with_index do |mod, i| -%>
