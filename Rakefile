@@ -5,7 +5,7 @@ windows = (PLATFORM =~ /win32|cygwin/) rescue nil
 
 SUDO = windows ? "" : "sudo"
 
-gems = %w[merb_activerecord merb_datamapper merb_helpers merb_sequel merb_param_protection merb_rspec merb_test_unit]
+gems = %w[merb_activerecord merb_datamapper merb_helpers merb_sequel merb_param_protection merb_test_unit merb_stories]
 
 orm_gems = %w[merb_activerecord merb_datamapper merb_sequel]
 
