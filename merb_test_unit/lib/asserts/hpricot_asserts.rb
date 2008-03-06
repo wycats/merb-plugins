@@ -11,7 +11,7 @@
 
 module Merb::Test::Unit::HpricotAsserts
   include Test::Unit::Assertions
-  include Merb::Test::HpricotHelper
+  # include Merb::Test::HpricotHelper
   
   def assert_elements(css_query, output = nil, equality = {}, &block)
     message = equality.delete(:message) if equality.is_a?(Hash)
