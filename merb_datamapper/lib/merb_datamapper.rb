@@ -1,11 +1,5 @@
 if defined?(Merb::Plugins)
-  require File.join(File.dirname(__FILE__) / "merb" / "orms" / "data_mapper" / "connection")
-  require File.join(File.dirname(__FILE__) / "merb" / "orms" / "data_mapper" / "base")
-  
-  Merb::BootLoader.after_app_loads do
-    Merb::Orms::DataMapper.connect
-    Merb::Orms::DataMapper.register_session_type
-  end
+  autoload :DataMapper, File.join(File.dirname(__FILE__) / "merb_datamapper" / "autoconnect")
   
   Merb::Plugins.add_rakefiles "merb_datamapper" / "merbtasks"
 end
