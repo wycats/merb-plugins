@@ -28,15 +28,15 @@ namespace :db do
       rescue
         case config[:adapter]
         when 'mysql'
-          #~ @charset   = ENV['CHARSET']   || 'utf8'
-          #~ @collation = ENV['COLLATION'] || 'utf8_general_ci'
+          @charset   = ENV['CHARSET']   || 'utf8'
+          @collation = ENV['COLLATION'] || 'utf8_general_ci'
           begin
             ActiveRecord::Base.establish_connection(config.merge({:database => nil}))
-            ActiveRecord::Base.connection.create_database(config[:database]) #, {:charset => @charset, :collation => @collation})
+            ActiveRecord::Base.connection.create_database(config[:database], {:charset => (config[:database][:charset] || @charset), :collation => (config[:database][:collation] || @collation)})
             ActiveRecord::Base.establish_connection(config)
             puts "MySQL #{config[:database]} database succesfully created"
           rescue
-            $stderr.puts "Couldn't create database for #{config.inspect}"
+            $stderr.puts "Couldn't create database for #{config.inspect}, charset: #{@charset}, collation: #{@collation} (if you set the charset manually, make sure you have a matching collation)"
           end
         when 'postgresql'
           `createdb "#{config[:database]}" -E utf8`
@@ -58,7 +58,11 @@ namespace :db do
     config = ActiveRecord::Base.configurations[Merb.environment.to_sym || :development]
     case config[:adapter]
     when 'mysql'
-      ActiveRecord::Base.connection.drop_database config[:database]
+      begin
+        ActiveRecord::Base.connection.drop_database config[:database]
+      rescue
+        puts "#{config[:database]} seems to have been dropped already"
+      end
     when /^sqlite/
       FileUtils.rm_f File.join(Merb.root, config[:database])
     when 'postgresql'
@@ -77,29 +81,29 @@ namespace :db do
   desc 'Drops, creates and then migrates the database for the current environment. Target specific version with VERSION=x'
   task :reset => ['db:drop', 'db:create', 'db:migrate']
 
-  # desc "Retrieves the charset for the current environment's database"
-  # task :charset => :environment do
-  #   config = ActiveRecord::Base.configurations[Merb.environment || :development]
-  #   case config[:adapter]
-  #   when 'mysql'
-  #     ActiveRecord::Base.establish_connection(config)
-  #     puts ActiveRecord::Base.connection.charset
-  #   else
-  #     puts 'sorry, your database adapter is not supported yet, feel free to submit a patch'
-  #   end
-  # end
+  desc "Retrieves the charset for the current environment's database"
+  task :charset => :merb_start do
+    config = ActiveRecord::Base.configurations[Merb.environment.to_sym || :development]
+    case config[:adapter]
+    when 'mysql'
+      ActiveRecord::Base.establish_connection(config)
+      puts ActiveRecord::Base.connection.charset
+    else
+      puts 'sorry, your database adapter is not supported yet, feel free to submit a patch'
+    end
+  end
 
-  # desc "Retrieves the collation for the current environment's database"
-  # task :collation => :environment do
-  #   config = ActiveRecord::Base.configurations[Merb.environment || :development]
-  #   case config[:adapter]
-  #   when 'mysql'
-  #     ActiveRecord::Base.establish_connection(config)
-  #     puts ActiveRecord::Base.connection.collation
-  #   else
-  #     puts 'sorry, your database adapter is not supported yet, feel free to submit a patch'
-  #   end
-  # end
+  desc "Retrieves the collation for the current environment's database"
+  task :collation => :merb_start do
+    config = ActiveRecord::Base.configurations[Merb.environment.to_sym || :development]
+    case config[:adapter]
+    when 'mysql'
+      ActiveRecord::Base.establish_connection(config)
+      puts ActiveRecord::Base.connection.collation
+    else
+      puts 'sorry, your database adapter is not supported yet, feel free to submit a patch'
+    end
+  end
 
   desc "Retrieves the current schema version number"
   task :version => :merb_start do
