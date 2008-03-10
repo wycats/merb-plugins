@@ -52,38 +52,93 @@ namespace :db do
       puts "This task only creates local databases. #{config[:database]} is on a remote host."
     end
   end
-
-  desc 'Drops the database for the current environment'
-  task :drop => :merb_start do
-    config = ActiveRecord::Base.configurations[Merb.environment.to_sym || :development]
+  
+  def drop_database(config)
     case config[:adapter]
     when 'mysql'
-      begin
-        ActiveRecord::Base.connection.drop_database config[:database]
-      rescue
-        puts "#{config[:database]} seems to have been dropped already"
-      end
+      ActiveRecord::Base.connection.drop_database config[:database]
     when /^sqlite/
-      FileUtils.rm_f File.join(Merb.root, config[:database])
+      FileUtils.rm(File.join(RAILS_ROOT, config[:database]))
     when 'postgresql'
+      ActiveRecord::Base.clear_active_connections!    
       `dropdb "#{config[:database]}"`
     end
   end
+  
+  def local_database?(config, &block)
+    if %w( 127.0.0.1 localhost ).include?(config[:host]) || config[:host].blank?
+      yield
+    else
+      puts "This task only modifies local databases. #{config[:database]} is on a remote host."
+    end
+  end
 
+  namespace :drop do
+    desc 'Drops all the local databases defined in config/database.yml'
+    task :all => :merb_start do
+      ActiveRecord::Base.configurations.each_value do |config|
+        # Skip entries that don't have a database key
+        next unless config[:database]
+        # Only connect to local databases
+        local_database?(config) { drop_database(config) }
+      end
+    end
+  end
+
+  desc 'Drops the database for the current environment (set MERB_ENV to target another environment)'
+  task :drop => :merb_start do
+    config = ActiveRecord::Base.configurations[Merb.environment.to_sym]
+    begin
+      drop_database(config)
+    rescue Exception => e
+      puts "#{e.inspect} - #{config['database']} might have been already dropped"
+    end
+  end
+  
   desc "Migrate the database through scripts in schema/migrations. Target specific version with VERSION=x"
   task :migrate => :merb_start do
-    config = ActiveRecord::Base.configurations[Merb.environment.to_sym || :development]
+    config = ActiveRecord::Base.configurations[Merb.environment.to_sym]
     ActiveRecord::Base.establish_connection(config)
     ActiveRecord::Migrator.migrate("schema/migrations/", ENV["VERSION"] ? ENV["VERSION"].to_i : nil)
     Rake::Task["db:schema:dump"].invoke if ActiveRecord::Base.schema_format == :ruby
   end
 
-  desc 'Drops, creates and then migrates the database for the current environment. Target specific version with VERSION=x'
-  task :reset => ['db:drop', 'db:create', 'db:migrate']
+  namespace :migrate do
+    desc  'Rollbacks the database one migration and re migrate up. If you want to rollback more than one step, define STEP=x'
+    task :redo => [ 'db:rollback', 'db:migrate' ]
 
+    desc 'Resets your database using your migrations for the current environment'
+    task :reset => ["db:drop", "db:create", "db:migrate"]
+  end
+  
+  desc 'Drops and recreates the database from db/schema.rb for the current environment.'
+  task :reset => ['db:drop', 'db:create', 'db:schema:load']
+
+  desc 'Rolls the schema back to the previous version. Specify the number of steps with STEP=n'
+  task :rollback => :merb_start do
+    step = ENV['STEP'] ? ENV['STEP'].to_i : 1
+    version = ActiveRecord::Migrator.current_version - step
+    ActiveRecord::Migrator.migrate('schema/migrations/', version)
+  end
+  
+  desc "Raises an error if there are pending migrations"
+  task :abort_if_pending_migrations => :merb_start do
+    if defined? ActiveRecord
+      pending_migrations = ActiveRecord::Migrator.new(:up, 'schema/migrations').pending_migrations
+
+      if pending_migrations.any?
+        puts "You have #{pending_migrations.size} pending migrations:"
+        pending_migrations.each do |pending_migration|
+          puts '  %4d %s' % [pending_migration.version, pending_migration.name]
+        end
+        abort "Run `rake db:migrate` to update your database then try again."
+      end
+    end
+  end
+  
   desc "Retrieves the charset for the current environment's database"
   task :charset => :merb_start do
-    config = ActiveRecord::Base.configurations[Merb.environment.to_sym || :development]
+    config = ActiveRecord::Base.configurations[Merb.environment.to_sym]
     case config[:adapter]
     when 'mysql'
       ActiveRecord::Base.establish_connection(config)
@@ -95,7 +150,7 @@ namespace :db do
 
   desc "Retrieves the collation for the current environment's database"
   task :collation => :merb_start do
-    config = ActiveRecord::Base.configurations[Merb.environment.to_sym || :development]
+    config = ActiveRecord::Base.configurations[Merb.environment.to_sym]
     case config[:adapter]
     when 'mysql'
       ActiveRecord::Base.establish_connection(config)
