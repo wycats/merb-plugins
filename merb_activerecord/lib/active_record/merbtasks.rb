@@ -31,9 +31,9 @@ namespace :db do
           @collation = ENV['COLLATION'] || 'utf8_general_ci'
           begin
             ActiveRecord::Base.establish_connection(config.merge({:database => nil}))
-            ActiveRecord::Base.connection.create_database(config[:database], {:charset => (config[:database][:charset] || @charset), :collation => (config[:database][:collation] || @collation)})
+            ActiveRecord::Base.connection.create_database(config[:database], {:charset => (config[:charset] || @charset), :collation => (config[:collation] || @collation)})
             ActiveRecord::Base.establish_connection(config)
-            puts "MySQL #{config[:database]} database succesfully created"
+            puts "MySQL #{config[:database]} database successfully created"
           rescue
             $stderr.puts "Couldn't create database for #{config.inspect}, charset: #{@charset}, collation: #{@collation} (if you set the charset manually, make sure you have a matching collation)"
           end
