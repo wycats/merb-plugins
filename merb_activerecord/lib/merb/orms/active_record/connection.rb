@@ -4,6 +4,23 @@ require 'active_record'
 module Merb
   module Orms
     module ActiveRecord
+      
+      # Start a transaction.
+      #
+      # Used by Merb::Rack::Console#open_sandbox!
+      def self.open_sandbox!
+        ::ActiveRecord::Base.send :increment_open_transactions
+        ::ActiveRecord::Base.connection.begin_db_transaction
+      end
+      
+      # Rollback a transaction.
+      #
+      # Used by Merb::Rack::Console#open_sandbox!
+      def self.close_sandbox!
+        ::ActiveRecord::Base.connection.rollback_db_transaction
+        ::ActiveRecord::Base.send :decrement_open_transactions
+      end     
+      
       class << self
         def config_file() Merb.dir_for(:config) / "database.yml" end
         def sample_dest() Merb.dir_for(:config) / "database.yml.sample" end
