@@ -236,6 +236,7 @@ namespace :db do
     task :clone => %w(db:schema:dump db:test:purge) do
       ActiveRecord::Base.establish_connection(ActiveRecord::Base.configurations[:test])
       ActiveRecord::Schema.verbose = false
+      Merb.environment = 'test'
       Rake::Task["db:schema:load"].invoke
     end
 
