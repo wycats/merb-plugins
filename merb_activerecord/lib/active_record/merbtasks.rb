@@ -35,7 +35,7 @@ namespace :db do
             ActiveRecord::Base.establish_connection(config)
             puts "MySQL #{config[:database]} database successfully created"
           rescue
-            $stderr.puts "Couldn't create database for #{config.inspect}, charset: #{@charset}, collation: #{@collation} (if you set the charset manually, make sure you have a matching collation)"
+            $stderr.puts "Couldn't create database for #{config.inspect}, charset: #{config[:charset] || @charset}, collation: #{config[:collation] || @collation} (if you set the charset manually, make sure you have a matching collation)"
           end
         when 'postgresql'
           `createdb "#{config[:database]}" -E utf8`
