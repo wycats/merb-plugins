@@ -1,8 +1,10 @@
 require File.dirname(__FILE__) + '/spec_helper'
 require 'merb_helpers'
+Merb.load_dependencies :environment => "test"
 
 include Merb::Helpers::Tag
 include Merb::Helpers::Form
+include Merb::ControllerMixin
 
 describe "error_messages_for" do
   before :each do
