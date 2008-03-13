@@ -9,6 +9,7 @@ module Merb
     end
     
     def self.load
+      puts "Loading.. #{Merb::Plugins.config[:merb_helpers].inspect}"
       if Merb::Plugins.config[:merb_helpers]
         config = Merb::Plugins.config[:merb_helpers]
         raise "With and Without options cannot be used with merb_helpers plugin configuration" if config[:with] && config[:without]
@@ -30,6 +31,6 @@ module Merb
   
 end
 
-Merb::BootLoader.before_app_loads do
+Merb::BootLoader.before_app_loads do  
   Merb::Helpers.load if defined?(Merb::Plugins)
 end
