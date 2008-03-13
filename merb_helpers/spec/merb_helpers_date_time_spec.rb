@@ -151,6 +151,52 @@ describe "relative_time_span" do
   end
 end
 
+describe "time_lost_in_words" do
+  it "Should show seconds" do
+    time_lost_in_words(Time.now, Time.now, true).should == "less than 5 seconds"
+  end
+  
+  it "Should not show seconds" do
+    time_lost_in_words(Time.now).should == "less than a minute"
+  end
+  
+  it "Should do minutes" do
+    time_lost_in_words(2.minutes.ago).should == "2 minutes"
+  end
+  
+  it "Should do hour" do
+    time_lost_in_words(50.minutes.ago).should == "about 1 hour"
+  end
+  
+  it "Should do hours" do
+    time_lost_in_words(2.hours.ago).should == "about 2 hours"
+  end
+  
+  it "Should do day" do
+    time_lost_in_words(1.day.ago).should == "1 day"
+  end
+  
+  it "Should do days" do
+    time_lost_in_words(5.days.ago).should == "5 days"
+  end
+  
+  it "Should do month" do
+    time_lost_in_words(1.month.ago).should == "about 1 month"
+  end
+  
+  it "Should do months" do
+    time_lost_in_words(5.months.ago).should == "5 months"
+  end
+  
+  it "Should do year" do
+    time_lost_in_words(1.2.years.ago).should == "about 1 year"
+  end
+  
+  it "Should do years" do
+    time_lost_in_words(5.5.years.ago).should == "over 5 years"
+  end
+end
+
 describe "prettier_time" do  
   # prettier time"
   it "Should not show leading zero in hour" do
