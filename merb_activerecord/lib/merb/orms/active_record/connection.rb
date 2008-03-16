@@ -31,14 +31,20 @@ module Merb
         end
       
         def config
-          @config ||=
+          @config ||= (Merb::Plugins.config[:merb_active_record] = configurations[Merb.environment.to_sym])
+        end
+
+        def configurations
+          @configurations ||= 
             begin
-              # Convert string keys to symbols
-              full_config = Erubis.load_yaml_file(config_file)
-              config = (Merb::Plugins.config[:merb_active_record] = {})
-              (full_config[Merb.environment.to_sym] || full_config[Merb.environment]).each { |k, v| config[k.to_sym] = v }
-               ::ActiveRecord::Base.configurations= full_config
-              config
+              #A proc that will recursively intern(a.k.a symbolize) the keys of the hash
+              intern_keys = lambda { |x|
+                x.inject({}) do |y, (k,v)|
+                  y[k.to_sym || k] = v.is_a?(Hash) ? intern_keys.call(v) : v
+                  y
+                end
+              } 
+              intern_keys.call(Erubis.load_yaml_file(config_file))           
             end
         end
 
