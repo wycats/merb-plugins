@@ -36,7 +36,7 @@ end
 
 desc "Install merb_activerecord"
 task :install => :package do
-  sh %{#{SUDO} gem install pkg/#{NAME}-#{VERSION} --no-rdoc --no-ri}
+  sh %{#{SUDO} gem install pkg/#{NAME}-#{VERSION} --no-rdoc --no-ri --no-update-sources}
 end
 
 desc "Release the current version on rubyforge"

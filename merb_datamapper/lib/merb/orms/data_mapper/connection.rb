@@ -33,12 +33,12 @@ module Merb
         # Database connects as soon as the gem is loaded
         def connect
           if File.exists?(config_file)
-            Merb.logger.info("Connecting to database...")
+            Merb.logger.info!("Connecting to database...")
             ::DataMapper::Database.setup(config)
           else
             copy_sample_config
-            puts "No database.yml file found in #{Merb.root}/config."
-            puts "A sample file was created called database.sample.yml for you to copy and edit."
+            Merb.logger.error! "No database.yml file found in #{Merb.root}/config."
+            Merb.logger.error! "A sample file was created called database.sample.yml for you to copy and edit."
             exit(1)
           end
         end
