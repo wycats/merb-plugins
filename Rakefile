@@ -16,14 +16,14 @@ namespace :install do
   desc "Install the merb-plugins sub-gems"
   task :gems do
     gems.each do |dir|
-      sh %{cd #{dir}; #{SUDO} rake install}
+      Dir.chdir(dir){ sh "#{SUDO} rake install" }
     end
   end
 
   desc "Install the ORM merb-plugins sub-gems"
   task :orm do
     orm_gems.each do |dir|
-      sh %{cd #{dir}; #{SUDO} rake install}
+       Dir.chdir(dir){ sh "#{SUDO} rake install" }
     end
   end
 end
@@ -35,7 +35,7 @@ task :bundle do
   gems.each do |gem|
     File.open("#{gem}/Rakefile") do |rakefile|
       rakefile.read.detect {|l| l =~ /^VERSION\s*=\s*"(.*)"$/ }
-      sh %{cd #{gem} ;  rake package ; cd ..}
+      Dir.chdir(gem){ sh "rake package" }
       sh %{cp #{gem}/pkg/#{gem}-#{$1}.gem bundle/}
     end
   end
