@@ -2,9 +2,11 @@ class <%= model_class_name %>Migration < ActiveRecord::Migration
   def self.up
     <%= "create_table :#{table_name} do |t|" if table_name %>
 <% for attribute in model_attributes -%>
-      t.column :<%= attribute.first %>, :<%= attribute.last %> 
+      t.<%= "%-11s" % attribute.last %> :<%= attribute.first %> 
 <% end -%>
-    <%= "end" if table_name %>    
+
+      t.timestamps
+    <%= "end" if table_name %> 
   end
 
   def self.down

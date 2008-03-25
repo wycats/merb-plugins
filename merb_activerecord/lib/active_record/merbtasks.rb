@@ -7,7 +7,7 @@ namespace :db do
   namespace :create do
     desc 'Create all the local databases defined in config/database.yml'
     task :all => :merb_start do
-      ActiveRecord::Base.configurations.each_value do |config|
+      Merb::Orms::ActiveRecord.configurations.each_value do |config|
         create_local_database(config)
       end
     end
@@ -15,7 +15,7 @@ namespace :db do
 
   desc 'Create the local database defined in config/database.yml for the current Merb.environment'
   task :create => :merb_start do
-    create_local_database(ActiveRecord::Base.configurations[Merb.environment.to_sym])
+    create_local_database(Merb::Orms::ActiveRecord.configurations[Merb.environment.to_sym])
   end
 
   def create_local_database(config)
@@ -75,7 +75,7 @@ namespace :db do
   namespace :drop do
     desc 'Drops all the local databases defined in config/database.yml'
     task :all => :merb_start do
-      ActiveRecord::Base.configurations.each_value do |config|
+      Merb::Orms::ActiveRecord.configurations.each_value do |config|
         # Skip entries that don't have a database key
         next unless config[:database]
         # Only connect to local databases
@@ -86,7 +86,7 @@ namespace :db do
 
   desc 'Drops the database for the current environment (set MERB_ENV to target another environment)'
   task :drop => :merb_start do
-    config = ActiveRecord::Base.configurations[Merb.environment.to_sym]
+    config = Merb::Orms::ActiveRecord.configurations[Merb.environment.to_sym]
     begin
       drop_database(config)
     rescue Exception => e
@@ -96,7 +96,7 @@ namespace :db do
   
   desc "Migrate the database through scripts in schema/migrations. Target specific version with VERSION=x"
   task :migrate => :merb_start do
-    config = ActiveRecord::Base.configurations[Merb.environment.to_sym]
+    config = Merb::Orms::ActiveRecord.configurations[Merb.environment.to_sym]
     ActiveRecord::Base.establish_connection(config)
     ActiveRecord::Migrator.migrate("schema/migrations/", ENV["VERSION"] ? ENV["VERSION"].to_i : nil)
     Rake::Task["db:schema:dump"].invoke if ActiveRecord::Base.schema_format == :ruby
@@ -137,7 +137,7 @@ namespace :db do
   
   desc "Retrieves the charset for the current environment's database"
   task :charset => :merb_start do
-    config = ActiveRecord::Base.configurations[Merb.environment.to_sym]
+    config = Merb::Orms::ActiveRecord.configurations[Merb.environment.to_sym]
     case config[:adapter]
     when 'mysql'
       ActiveRecord::Base.establish_connection(config)
@@ -149,7 +149,7 @@ namespace :db do
 
   desc "Retrieves the collation for the current environment's database"
   task :collation => :merb_start do
-    config = ActiveRecord::Base.configurations[Merb.environment.to_sym]
+    config = Merb::Orms::ActiveRecord.configurations[Merb.environment.to_sym]
     case config[:adapter]
     when 'mysql'
       ActiveRecord::Base.establish_connection(config)
@@ -168,7 +168,7 @@ namespace :db do
     desc "Load fixtures into the current environment's database.  Load specific fixtures using FIXTURES=x,y"
     task :load => :merb_start do
       require 'active_record/fixtures'
-      config = ActiveRecord::Base.configurations[Merb.environment.to_sym]
+      config = Merb::Orms::ActiveRecord.configurations[Merb.environment.to_sym]
       ActiveRecord::Base.establish_connection(config)
       (ENV['FIXTURES'] ? ENV['FIXTURES'].split(/,/) : Dir.glob(File.join(Merb.root, 'test', 'fixtures', '*.{yml,csv}'))).each do |fixture_file|
         Fixtures.create_fixtures('test/fixtures', File.basename(fixture_file, '.*'))
@@ -187,7 +187,7 @@ namespace :db do
     
     desc "Load a schema.rb file into the database"
     task :load => :merb_start do
-      config = ActiveRecord::Base.configurations[Merb.environment.to_sym]
+      config = Merb::Orms::ActiveRecord.configurations[Merb.environment.to_sym]
       ActiveRecord::Base.establish_connection(config)
       file = ENV['SCHEMA'] || "schema/schema.rb"
       load(file)
@@ -197,7 +197,7 @@ namespace :db do
  namespace :structure do
     desc "Dump the database structure to a SQL file"
     task :dump => :merb_start do
-      config = ActiveRecord::Base.configurations[Merb.environment.to_sym]
+      config = Merb::Orms::ActiveRecord.configurations[Merb.environment.to_sym]
       case config[:adapter]
         when "mysql", "oci", "oracle"
           ActiveRecord::Base.establish_connection(config)
@@ -234,7 +234,7 @@ namespace :db do
     
     desc "Recreate the test database from the current environment's database schema"
     task :clone => %w(db:schema:dump db:test:purge) do
-      ActiveRecord::Base.establish_connection(ActiveRecord::Base.configurations[:test])
+      ActiveRecord::Base.establish_connection(Merb::Orms::ActiveRecord.configurations[:test])
       ActiveRecord::Schema.verbose = false
       Merb.environment = 'test'
       Rake::Task["db:schema:load"].invoke
@@ -242,7 +242,7 @@ namespace :db do
 
     desc "Recreate the test databases from the development structure"
     task :clone_structure => [ "db:structure:dump", "db:test:purge" ] do
-      config = ActiveRecord::Base.configurations[:test]
+      config = Merb::Orms::ActiveRecord.configurations[:test]
       case config[:adapter]
         when "mysql"
           ActiveRecord::Base.establish_connection(config)
@@ -276,7 +276,8 @@ namespace :db do
     
     desc "Empty the test database"
     task :purge => :merb_start do
-      config = ActiveRecord::Base.configurations[:test]
+      config = Merb::Orms::ActiveRecord.configurations[:test]
+      puts "config => #{config.inspect}"
       case config[:adapter]
         when "mysql"
           ActiveRecord::Base.establish_connection(config)
@@ -307,7 +308,7 @@ namespace :db do
 
     desc "Prepare the test database and load the schema"
     task :prepare => ["db:test:clone_structure", "db:test:clone"] do
-      if defined?(ActiveRecord::Base) && !ActiveRecord::Base.configurations.blank?
+      if defined?(ActiveRecord::Base) && !Merb::Orms::ActiveRecord.configurations.blank?
         Rake::Task[{ :sql  => "db:test:clone_structure", :ruby => "db:test:clone" }[ActiveRecord::Base.schema_format]].invoke
       end
     end
