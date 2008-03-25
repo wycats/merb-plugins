@@ -1,3 +1,29 @@
+== 0.9.2 "appropriate response to reality" 2008-03-24
+* have select_control use database value as the default selected value
+* windows support in rakefile
+* Session should respond to each_with_index
+* merb-gen fix for namespaced resources
+* fix rakefiles in plugins. Fix merb_sequel and Merb-datamapper and merb_activerecord to use autoflush logging so log messages are immediately flushed instead of showing nothing.
+* Updated format of migrations to ActiveRecord 2.0 style
+* Minor cleanup and comment about using the assistance instead of my custom extensions...
+* Time_ago_in_words and spec for her
+* Initial stab at some date_time helpers up in here...
+* Implementation of IRB sandbox methods
+* added better error message when a database can't be created
+* fixed rake db:test:clone
+* fixed bug when using custom charset and collation in database.yml
+* Merb.logger is now correctly setup from Merb::Config for :merb_start task
+* Make helper specs pass again. NOTE: Config specs do not work.
+* ORM plugins (AR, DM, Sequel) now hook into the BootLoader
+* cleaned up the existing rake tasks + added rake db:drop:all, rake db:migrate:redo, rake db:migrate:reset + rake db:reset now drops your dbs, recreate them and load schema.rb + rake db:rollback + rake db:abort_if_pending_migrations
+* Changed merb active record rake tasks to create utf8 dabases when using rake db:create / db:reset Added rake db:charset rake db:collation Support for charset/collation arguments: rake db:create CHARSET=latin1, COLLATION=latin1_bin
+* cleaned up the existing rake tasks + added rake db:drop:all, rake db:migrate:redo, rake db:migrate:reset + rake db:reset now drops your dbs, recreate them and load schema.rb + rake db:rollback + rake db:abort_if_pending_migrations
+* Changed merb active record rake tasks to create utf8 dabases when using rake db:create / db:reset
+* fix rakefile to not build merb_rspec as it is in -core now.
+* Using autoload to connect to the database on the first use of DataMapper
+* Corrects some issues with merb_test_unit
+* Adding updated_at for DM sessions.
+
 == 0.9.1 "Some are half-wild, and some are just outlaws." 2008-02-29
 * merb_activerecord: updated render syntax in new action of db plugin
   resource_controller controller templates.
