@@ -57,6 +57,7 @@ module Merb
 
             ::ActiveRecord::Base.verification_timeout = 14400
             ::ActiveRecord::Base.logger = Merb.logger
+            ::ActiveRecord::Base.configurations = configurations
             ::ActiveRecord::Base.establish_connection config
           else
             copy_sample_config
