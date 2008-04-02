@@ -451,7 +451,7 @@ module Merb #:nodoc:
             end
           else
             collection.each do |value,text|
-              options = selected.to_a.include?(value) ? {:selected => 'selected'} : {}
+              options = Array(selected).include?(value) ? {:selected => 'selected'} : {}
               ret << tag( 'option', text, {:value => value}.merge(options) )
             end
           end
