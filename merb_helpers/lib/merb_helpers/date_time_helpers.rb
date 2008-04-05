@@ -103,14 +103,15 @@ module Merb
     # The key methods are `relative_date`, `relative_date_span`, and `relative_time_span`.  This also gives
     # you the Rails style Time DSL for working with numbers eg. 3.months.ago or 5.days.until(1.year.from_now)
     module DateAndTime
-      TIME_CLASS = Time
+      TIME_CLASS = Time unless const_defined? "TIME_CLASS"
       TIME_OUTPUT = {
         :today          => 'today',
         :yesterday      => 'yesterday',
         :tomorrow       => 'tomorrow',
         :initial_format => '%b %d',
         :year_format    => ', %Y'
-      }
+      } unless const_defined? "TIME_OUTPUT"
+
       DATE_FORMATS = {
         :db           => "%Y-%m-%d %H:%M:%S",
         :time         => "%H:%M",
@@ -118,7 +119,7 @@ module Merb
         :long         => "%B %d, %Y %H:%M",
         :long_ordinal => lambda { |time| time.strftime("%B #{time.day.ordinalize}, %Y %H:%M") },
         :rfc822       => "%a, %d %b %Y %H:%M:%S %z"
-      }
+      } unless const_defined? "DATE_FORMATS"
       
       # Gives you a relative date in an attractive format
       #
