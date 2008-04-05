@@ -16,14 +16,14 @@ namespace :install do
   desc "Install the merb-plugins sub-gems"
   task :gems do
     gems.each do |dir|
-      Dir.chdir(dir){ sh "#{SUDO} rake install" }
+      Dir.chdir(dir){ sh "rake install" }
     end
   end
 
   desc "Install the ORM merb-plugins sub-gems"
   task :orm do
     orm_gems.each do |dir|
-       Dir.chdir(dir){ sh "#{SUDO} rake install" }
+       Dir.chdir(dir){ sh "rake install" }
     end
   end
 end
