@@ -10,7 +10,7 @@ class AddSessionsTable < Sequel::Migration
   end
   
   def down
-    execute "DROP TABLE sessions"
+    drop_table :sessions
   end
 
 end
