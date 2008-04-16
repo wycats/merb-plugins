@@ -54,6 +54,8 @@ module Merb #:nodoc:
       #   <%= error_messages_for :person, lambda{|error| "<li class='aieeee'>#{error.join(' ')}"} %>
       #   <%= error_messages_for :person, nil, 'bad_mojo' %>
       def error_messages_for(obj, build_li = nil, html_class='error')
+        obj = self.instance_variable_get("@#{obj}") if obj.kind_of?(Symbol)
+        
         return "" unless obj.respond_to?(:errors) && ! obj.errors.empty?
 
         header_message = if block_given?
