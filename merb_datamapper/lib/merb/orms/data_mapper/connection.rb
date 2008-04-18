@@ -5,7 +5,11 @@ module Merb
   module Orms
     module DataMapper
       class << self
-        def config_file() Merb.root / "config" / "database.yml" end
+        def config_file
+          file   = Merb::Plugins.config[:datamapper] && Merb::Plugins.config[:datamapper][:config_file]
+          file ||= Merb.root / "config" / "database.yml"
+          file
+        end
         def sample_dest() Merb.root / "config" / "database.yml.sample" end
         def sample_source() File.dirname(__FILE__) / "database.yml.sample" end
       
