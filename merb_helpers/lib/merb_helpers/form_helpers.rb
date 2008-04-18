@@ -62,7 +62,7 @@ module Merb #:nodoc:
           yield(obj.errors)
         else
           error_plurality = (obj.errors.size == 1 ? 'problem' : 'problems')
-          "<h2>Form submittal failed because of #{obj.errors.size} #{error_plurality}</h2>"
+          "<h2>Form submittal failed because of #{obj.errors.full_messages.size} #{error_plurality}</h2>"
         end
         
         build_li ||= lambda{|err| "<li>#{err.join(' ')}</li>"}
