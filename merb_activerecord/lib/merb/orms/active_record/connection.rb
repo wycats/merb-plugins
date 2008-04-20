@@ -4,7 +4,7 @@ require 'active_record'
 module Merb
   module Orms
     module ActiveRecord
-      
+
       # Start a transaction.
       #
       # Used by Merb::Rack::Console#open_sandbox!
@@ -12,30 +12,30 @@ module Merb
         ::ActiveRecord::Base.send :increment_open_transactions
         ::ActiveRecord::Base.connection.begin_db_transaction
       end
-      
+
       # Rollback a transaction.
       #
-      # Used by Merb::Rack::Console#open_sandbox!
+      # Used by Merb::Rack::Console#close_sandbox!
       def self.close_sandbox!
         ::ActiveRecord::Base.connection.rollback_db_transaction
         ::ActiveRecord::Base.send :decrement_open_transactions
-      end     
-      
+      end
+
       class << self
         def config_file() Merb.dir_for(:config) / "database.yml" end
         def sample_dest() Merb.dir_for(:config) / "database.yml.sample" end
         def sample_source() File.dirname(__FILE__) / "database.yml.sample" end
-      
+
         def copy_sample_config
           FileUtils.cp sample_source, sample_dest unless File.exists?(sample_dest)
         end
-      
+
         def config
           @config ||= (Merb::Plugins.config[:merb_active_record] = configurations[Merb.environment.to_sym])
         end
 
         def configurations
-          @configurations ||= 
+          @configurations ||=
             begin
               #A proc that will recursively intern(a.k.a symbolize) the keys of the hash
               intern_keys = lambda { |x|
@@ -43,8 +43,8 @@ module Merb
                   y[k.to_sym || k] = v.is_a?(Hash) ? intern_keys.call(v) : v
                   y
                 end
-              } 
-              intern_keys.call(Erubis.load_yaml_file(config_file))           
+              }
+              intern_keys.call(Erubis.load_yaml_file(config_file))
             end
         end
 
@@ -66,7 +66,7 @@ module Merb
             exit(1)
           end
         end
-        
+
         # Registering this ORM lets the user choose active_record as a session
         # in merb.yml's session_store: option.
         def register_session_type
