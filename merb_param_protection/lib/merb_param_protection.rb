@@ -39,10 +39,12 @@ if defined?(Merb::Plugins)
           base.send(:include, InstanceMethods)
           base.send(:class_inheritable_accessor, :accessible_params_args)
           base.send(:class_inheritable_accessor, :protected_params_args)
+          base.send(:class_inheritable_accessor, :log_params_args)
+          
           base.send(:before, :initialize_params_filter)
         end
 
-        module ClassMethods          
+        module ClassMethods
           # Ensures these parameters are sent for the object
           # 
           #   params_accessible :post => [:title, :body]
@@ -57,6 +59,16 @@ if defined?(Merb::Plugins)
           # 
           def params_protected(args = {})
             assign_filtered_params(:protected_params_args, args)
+          end
+
+          # Filters parameters out from the default log string
+          #  Params will still be passed to the controller properly, they will
+          #  show up as [FILTERED] in the merb logs.
+          #
+          # log_params_filtered :password, 'token'
+          # 
+          def log_params_filtered(*args)
+            self.log_params_args = args.collect { |arg| arg.to_sym }
           end
           
           private
@@ -141,4 +153,15 @@ if defined?(Merb::Plugins)
   
   Merb::Controller.send(:include, Merb::ParamsFilter::ControllerMixin)
   Merb::Request.send(:include, Merb::ParamsFilter::RequestMixin)
+  
+  class Merb::Controller
+    def self._filter_params(params)
+      return params if self.log_params_args.nil?
+      result = { }
+      params.each do |k,v|
+        result[k] = (self.log_params_args.include?(k.to_sym) ? '[FILTERED]' : v)
+      end
+      result
+    end
+  end
 end
