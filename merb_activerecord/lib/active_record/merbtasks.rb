@@ -284,8 +284,8 @@ namespace :db do
           ActiveRecord::Base.connection.recreate_database(config[:database])
         when "postgresql"
           ENV['PGHOST']     = config[:host] if config[:host]
-          ENV['PGPORT']     = configs[:port].to_s if config[:port]
-          ENV['PGPASSWORD'] = configs[:password].to_s if config[:password]
+          ENV['PGPORT']     = config[:port].to_s if config[:port]
+          ENV['PGPASSWORD'] = config[:password].to_s if config[:password]
           enc_option = "-E #{config[:encoding]}" if config[:encoding]
           ActiveRecord::Base.clear_active_connections!
           `dropdb -U "#{config[:username]}" #{config[:database]}`
