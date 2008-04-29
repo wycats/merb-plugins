@@ -80,7 +80,7 @@ module Merb #:nodoc:
             <ul>
         }
         
-        error_collection.each {|error| markup << build_li.call(error) }
+        error_collection.each {|error, message| markup << build_li.call([error, message])}
 
         markup << %Q{
             </ul>
