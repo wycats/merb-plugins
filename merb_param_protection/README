@@ -1,7 +1,7 @@
 merb_param_protection
 =================
 
-This plugin exposes two new controller methods which allow us to simply and flexibly filter the parameters available within the controller.
+This plugin exposes three new controller methods which allow us to simply and flexibly filter the parameters available within the controller.
 
 Setup:
 The request sets: 
@@ -25,3 +25,13 @@ So we see that params_accessible removes everything except what is explictly spe
   params.inspect # => { :post => { :title => "ello", :body => "Want it", :rank => 4 } }
 
 We also see that params_protected removes ONLY those parameters explicitly specified.
+
+Sometimes you have certain post parameters that are best left unlogged, we support that too.  Your
+actions continue to receive the variable correctly, but the requested parameters are scrubbed
+at log time.
+
+  MySuperDuperController < Application
+    log_params_filtered :password
+  end
+  
+  params.inspect # => { :username => 'atmos', :password => '[FILTERED]' }

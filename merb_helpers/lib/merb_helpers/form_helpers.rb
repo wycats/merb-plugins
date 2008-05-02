@@ -54,16 +54,25 @@ module Merb #:nodoc:
       #   <%= error_messages_for :person, lambda{|error| "<li class='aieeee'>#{error.join(' ')}"} %>
       #   <%= error_messages_for :person, nil, 'bad_mojo' %>
       def error_messages_for(obj, build_li = nil, html_class='error')
+        obj = self.instance_variable_get("@#{obj}") if obj.kind_of?(Symbol)
+        
         return "" unless obj.respond_to?(:errors) && ! obj.errors.empty?
+        
+        if obj.errors.respond_to?(:each) # AR & DM
+          build_li ||= lambda{|err| "<li>#{err.join(' ')}</li>"}
+          error_collection = obj.errors
+        else # Sequel
+          build_li ||= lambda{|msg| "<li>#{msg}</li>"}
+          error_collection = obj.errors.full_messages
+        end
+        error_count = error_collection.size
 
         header_message = if block_given?
           yield(obj.errors)
         else
-          error_plurality = (obj.errors.size == 1 ? 'problem' : 'problems')
-          "<h2>Form submittal failed because of #{obj.errors.size} #{error_plurality}</h2>"
+          error_plurality = (error_count == 1 ? 'problem' : 'problems')
+          "<h2>Form submittal failed because of #{error_count} #{error_plurality}</h2>"
         end
-        
-        build_li ||= lambda{|err| "<li>#{err.join(' ')}</li>"}
         
         markup = %Q{
           <div class='#{html_class}'>
@@ -71,8 +80,8 @@ module Merb #:nodoc:
             <ul>
         }
         
-        obj.errors.each {|error| markup << build_li.call(error) }
-        
+        error_collection.each {|error, message| markup << build_li.call([error, message])}
+
         markup << %Q{
             </ul>
           </div>

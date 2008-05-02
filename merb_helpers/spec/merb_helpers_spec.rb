@@ -9,11 +9,20 @@ include Merb::ControllerMixin
 describe "error_messages_for" do
   before :each do
     @obj = Object.new
-    def @obj.errors() [["foo", "bar"], ["baz", "bat"]] end
+    @errors = [["foo", "bar"],["baz","bat"]]
+    @errors.stub!(:full_messages).and_return(["foo", "baz"])
+    @obj.stub!(:errors).and_return(@errors)
   end
   
   it "should build default error messages" do
     errs = error_messages_for(@obj)
+    errs.should include("<h2>Form submittal failed because of 2 problems</h2>")
+    errs.should include("<li>foo bar</li>")
+    errs.should include("<li>baz bat</li>")
+  end
+
+  it "should build default error messages for symbol" do
+    errs = error_messages_for(:obj)
     errs.should include("<h2>Form submittal failed because of 2 problems</h2>")
     errs.should include("<li>foo bar</li>")
     errs.should include("<li>baz bat</li>")

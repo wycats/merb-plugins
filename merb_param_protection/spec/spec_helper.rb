@@ -1,13 +1,13 @@
 require 'rubygems'
 $TESTING=true
 $:.push File.join(File.dirname(__FILE__), '..', 'lib')
-require 'merb'
+require 'merb-core'
 require 'merb_param_protection'
-require 'merb/core_ext/class'
-require 'merb/test/helper'
 
 Spec::Runner.configure do |config|
-  config.include(Merb::Test::Helper)
+  config.include(Merb::Test::ViewHelper)
+  config.include(Merb::Test::RouteHelper)
+  config.include(Merb::Test::ControllerHelper)
 end
 
 def new_controller(action = 'index', controller = nil, additional_params = {})
@@ -25,8 +25,8 @@ def new_controller(action = 'index', controller = nil, additional_params = {})
 end
 
 class Merb::Controller
-  require 'merb/session/memory_session'
-  Merb::MemorySessionContainer.setup
-  include ::Merb::SessionMixin
-  self.session_secret_key = "footo the bar to the baz"
+  # require 'merb/session/memory_session'
+  # Merb::MemorySessionContainer.setup
+  # include ::Merb::SessionMixin
+  # self.session_secret_key = "footo the bar to the baz"
 end
