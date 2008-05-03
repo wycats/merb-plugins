@@ -56,13 +56,13 @@ Numeric.send :include, TimeDSL
 # => "February 28th, 2006 21:10"
 module OrdinalizedFormatting
   def to_ordinalized_s(format = :default)
-    format = Merb::Helpers::DateAndTime::DATE_FORMATS[format] 
-    return to_default_s if format.nil?
+    format = Merb::Helpers::DateAndTime.date_formats[format] 
+    return self.to_s if format.nil?
     strftime_ordinalized(format)
   end
 
   def strftime_ordinalized(fmt)
-    strftime(fmt.gsub(/%d/, '_%d_')).gsub(/_(\d+)_/) { |s| s.to_i.ordinalize }
+    strftime(fmt.gsub(/(^|[^-])%d/, '\1_%d_')).gsub(/_(\d+)_/) { |s| s.to_i.ordinalize }
   end
 end
 
@@ -103,15 +103,15 @@ module Merb
     # The key methods are `relative_date`, `relative_date_span`, and `relative_time_span`.  This also gives
     # you the Rails style Time DSL for working with numbers eg. 3.months.ago or 5.days.until(1.year.from_now)
     module DateAndTime
-      TIME_CLASS = Time
-      TIME_OUTPUT = {
+      @@time_class = Time
+      @@time_output = {
         :today          => 'today',
         :yesterday      => 'yesterday',
         :tomorrow       => 'tomorrow',
         :initial_format => '%b %d',
         :year_format    => ', %Y'
       }
-      DATE_FORMATS = {
+      @@date_formats = {
         :db           => "%Y-%m-%d %H:%M:%S",
         :time         => "%H:%M",
         :short        => "%d %b %H:%M",
@@ -119,6 +119,18 @@ module Merb
         :long_ordinal => lambda { |time| time.strftime("%B #{time.day.ordinalize}, %Y %H:%M") },
         :rfc822       => "%a, %d %b %Y %H:%M:%S %z"
       }
+      
+      def self.time_class
+        @@time_class
+      end
+      
+      def time_output
+        @@time_output
+      end
+      
+      def date_formats
+        @@date_formats
+      end
       
       # Gives you a relative date in an attractive format
       #
@@ -134,16 +146,16 @@ module Merb
       #   relative_date(1.year.ago) => "March 10th, 2007"
       def relative_date(time)
         date  = time.to_date
-        today = TIME_CLASS.now.to_date
+        today = DateAndTime.time_class.now.to_date
         if date == today
-          TIME_OUTPUT[:today]
+          DateAndTime.time_output[:today]
         elsif date == (today - 1)
-          TIME_OUTPUT[:yesterday]
+          DateAndTime.time_output[:yesterday]
         elsif date == (today + 1)
-          TIME_OUTPUT[:tomorrow]
+          DateAndTime.time_output[:tomorrow]
         else
-          fmt  = TIME_OUTPUT[:initial_format].dup
-          fmt << TIME_OUTPUT[:year_format] unless date.year == today.year
+          fmt  = DateAndTime.time_output[:initial_format].dup
+          fmt << DateAndTime.time_output[:year_format] unless date.year == today.year
           time.strftime_ordinalized(fmt)
         end
       end
@@ -167,7 +179,7 @@ module Merb
         if times.first == times.last
           relative_date(times.first)
         else
-          first = times.first; last = times.last; now = TIME_CLASS.now
+          first = times.first; last = times.last; now = DateAndTime.time_class.now
           arr = [first.strftime_ordinalized('%b %d')]
           arr << ", #{first.year}" unless first.year == last.year
           arr << ' - '
@@ -201,7 +213,7 @@ module Merb
             "#{prettier_time(times.first, !same_half)} - #{prettier_time(times.last)} #{relative_date(times.first)}"
       
         else
-          first = times.first; last = times.last; now = TIME_CLASS.now        
+          first = times.first; last = times.last; now = DateAndTime.time_class.now        
           arr = [prettier_time(first)]
           arr << ' '
           arr << first.strftime_ordinalized('%b %d')
