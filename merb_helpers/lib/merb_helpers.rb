@@ -9,6 +9,13 @@ module Merb
     end
     
     def self.load
+      require HELPERS_DIR + '/time_dsl'
+      require HELPERS_DIR + '/ordinalize'
+      # TODO remove with and without and only allow 2 options:
+      # config[:load] 
+      # if defined then load the modules passed along
+      # otherwise load everything
+       
       if Merb::Plugins.config[:merb_helpers]
         config = Merb::Plugins.config[:merb_helpers]
         raise "With and Without options cannot be used with merb_helpers plugin configuration" if config[:with] && config[:without]
