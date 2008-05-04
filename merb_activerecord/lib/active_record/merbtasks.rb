@@ -307,7 +307,7 @@ namespace :db do
     end
 
     desc "Prepare the test database and load the schema"
-    task :prepare => ["db:test:clone_structure", "db:test:clone"] do
+    task :prepare  do
       if defined?(ActiveRecord::Base) && !Merb::Orms::ActiveRecord.configurations.blank?
         Rake::Task[{ :sql  => "db:test:clone_structure", :ruby => "db:test:clone" }[ActiveRecord::Base.schema_format]].invoke
       end
