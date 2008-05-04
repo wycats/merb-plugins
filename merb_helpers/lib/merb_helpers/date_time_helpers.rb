@@ -55,6 +55,11 @@ Numeric.send :include, TimeDSL
 # Time.now.to_ordinalized_s :long
 # => "February 28th, 2006 21:10"
 module OrdinalizedFormatting
+  
+  def self.extended(obj)
+    include Merb::Helpers::DateAndTime
+  end
+  
   def to_ordinalized_s(format = :default)
     format = Merb::Helpers::DateAndTime.date_formats[format] 
     return self.to_s if format.nil?
