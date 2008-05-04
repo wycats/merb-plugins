@@ -125,7 +125,7 @@ if defined?(Merb::Plugins)
 
         # Removes specified parameters of an object
         # 
-        #   params_filter_from_object(:post, [:status, :author_id])
+        #   remove_params_from_object(:post, [:status, :author_id])
         # 
         def remove_params_from_object(obj, attrs = [])
           unless params[obj].nil?
