@@ -33,7 +33,6 @@ module Merb
         def connect
           
           require "sequel"
-          require "sequel_model"
 
           if File.exists?(config_file)
             Merb.logger.info!("Connecting to the '#{config[:database]}' database on '#{config[:host]}' using '#{config[:adapter]}' ...")

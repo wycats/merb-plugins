@@ -25,8 +25,7 @@ specification = Gem::Specification.new do |spec|
   # Dependencies
   #spec.add_dependency("merb",         ">= 0.9")
   spec.add_dependency("merb-core", ">= 0.9.3")    # This will probably only be temporary until there is an official merb gem greater than 0.9
-  spec.add_dependency("sequel",       ">= 1.0.0")
-  spec.add_dependency("sequel_model", ">= 0.3.3")
+  spec.add_dependency("sequel",       ">= 1.4.0")
   spec.files = %w(LICENSE README Rakefile TODO) + Dir.glob("{lib,specs,sequel_generators}/**/*")
 end
 
