@@ -15,6 +15,7 @@ describe "loading configuration" do
   def reload_merb_helpers
     unload_merb_helpers
     load(MERB_HELPERS_ROOT + "/lib/merb_helpers.rb") 
+    Merb::Helpers.load
   end
   
   before :each do

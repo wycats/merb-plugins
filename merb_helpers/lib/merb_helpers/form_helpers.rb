@@ -241,9 +241,11 @@ module Merb #:nodoc:
       #     <%= checkbox_control :is_activated, :label => "Activated?" %>
       def checkbox_control(col, attrs = {}, hidden_attrs={})
         errorify_field(attrs, col)
-        attrs.merge!(:checked => "checked") if col_val_to_bool(@_obj.send(col))
+        method_name = @_obj.respond_to?(col) ? col : :"#{col}?"
+        attrs.merge!(:checked => "checked") if col_val_to_bool(@_obj.send(method_name))
         attrs.merge!(:id => control_id(col))
-        checkbox_field(control_name_value(col, attrs), hidden_attrs)
+        attrs = {:name => control_name(col), :value => control_value(method_name)}.merge(attrs)
+        checkbox_field(attrs, hidden_attrs)
       end
 
       # Provides a generic HTML checkbox input tag.
@@ -449,7 +451,7 @@ module Merb #:nodoc:
             end
           else
             collection.each do |value,text|
-              options = selected.to_a.include?(value) ? {:selected => 'selected'} : {}
+              options = Array(selected).include?(value) ? {:selected => 'selected'} : {}
               ret << tag( 'option', text, {:value => value}.merge(options) )
             end
           end

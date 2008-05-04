@@ -312,6 +312,14 @@ describe "checkbox_control (data bound)" do
     end
   end
   
+  it "should support models from datamapper" do
+    @dm_obj =  FakeDMModel.new
+    form_for :dm_obj do 
+      checkbox_control(:baz).should match_tag(:input, :type =>"checkbox", :name => "fake_d_m_model[baz]", :class => "checkbox", :value => "1", :checked => "checked", :id => "fake_d_m_model_baz")
+      checkbox_control(:bat).should match_tag(:input, :type =>"checkbox", :name => "fake_d_m_model[bat]", :class => "checkbox", :value => "0")
+    end
+  end
+  
   it "should allow a user to set the :off value" do
     form_for :obj do
       checkbox_control(:baz, :off => "off", :on => "on").should match_tag(:input, :type =>"checkbox", :name => "fake_model[baz]", :class => "checkbox", :value => "on", :checked => "checked")
