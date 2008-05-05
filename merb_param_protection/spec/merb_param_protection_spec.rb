@@ -101,7 +101,7 @@ describe "merb_param_protection" do
       request.params[:post][:status].should_not == "published"
       request.params[:post][:author_id].should_not == 1
       request.params[:commit].should == "Submit"
-      request.trashed_params.should == ["status", "author_id"]
+      request.trashed_params.should == {"status"=>"published", "author_id"=>"1"}
     end
   end
 

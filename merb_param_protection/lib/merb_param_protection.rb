@@ -1,7 +1,7 @@
 # This plugin exposes two new controller methods which allow us to simply and flexibly filter the parameters available within the controller.
 
 # Setup:
-# The request sets: 
+# The request sets:
 # params => { :post => { :title => "ello", :body => "Want it", :status => "green", :author_id => 3, :rank => 4 } }
 #
 # Example 1: params_accessable
@@ -28,9 +28,9 @@ if defined?(Merb::Plugins)
   #Merb::Plugins.config[:merb_param_protection] = {
     #:chickens => false
   #}
-  
+
   #Merb::Plugins.add_rakefiles "merb_param_protection/merbtasks"
-  
+
   module Merb
     module ParamsFilter
       module ControllerMixin
@@ -40,23 +40,23 @@ if defined?(Merb::Plugins)
           base.send(:class_inheritable_accessor, :accessible_params_args)
           base.send(:class_inheritable_accessor, :protected_params_args)
           base.send(:class_inheritable_accessor, :log_params_args)
-          
+
           base.send(:before, :initialize_params_filter)
         end
 
         module ClassMethods
           # Ensures these parameters are sent for the object
-          # 
+          #
           #   params_accessible :post => [:title, :body]
-          # 
+          #
           def params_accessible(args = {})
             assign_filtered_params(:accessible_params_args, args)
           end
 
           # Protects parameters of an object
-          # 
+          #
           #   params_protected :post => [:status, :author_id]
-          # 
+          #
           def params_protected(args = {})
             assign_filtered_params(:protected_params_args, args)
           end
@@ -66,26 +66,26 @@ if defined?(Merb::Plugins)
           #  show up as [FILTERED] in the merb logs.
           #
           # log_params_filtered :password, 'token'
-          # 
+          #
           def log_params_filtered(*args)
             self.log_params_args = args.collect { |arg| arg.to_sym }
           end
-          
+
           private
-          
+
           def assign_filtered_params(method, args)
             validate_filtered_params(method, args)
-            
+
             # If the method is nil, set to initial hash, otherwise merge
             self.send(method).nil? ? self.send(method.to_s + '=', args) : self.send(method).merge!(args)
           end
-          
+
           def validate_filtered_params(method, args)
             # Reversing methods
             params_methods = [:accessible_params_args, :protected_params_args]
             params_methods.delete(method)
             params_method = params_methods.first
-            
+
             # Make sure the opposite method is not nil
             unless self.send(params_method).nil?
               # Loop through arg's keys
@@ -101,7 +101,7 @@ if defined?(Merb::Plugins)
             end
           end
         end
-        
+
         module InstanceMethods
           def initialize_params_filter
             if accessible_params_args.is_a?(Hash)
@@ -109,7 +109,7 @@ if defined?(Merb::Plugins)
                 self.request.restrict_params(obj, accessible_params_args[obj])
               end
             end
-            
+
             if protected_params_args.is_a?(Hash)
               protected_params_args.keys.each do |obj|
                 self.request.remove_params_from_object(obj, protected_params_args[obj])
@@ -117,16 +117,16 @@ if defined?(Merb::Plugins)
             end
           end
         end
-        
+
       end
 
       module RequestMixin
         attr_accessor :trashed_params
 
         # Removes specified parameters of an object
-        # 
+        #
         #   remove_params_from_object(:post, [:status, :author_id])
-        # 
+        #
         def remove_params_from_object(obj, attrs = [])
           unless params[obj].nil?
             filtered = params
@@ -138,22 +138,31 @@ if defined?(Merb::Plugins)
         # Restricts parameters of an object
         #
         #   restrict_params(:post, [:title, :body])
-        # 
+        #
         def restrict_params(obj, attrs = [])
           # Make sure the params for the object exists
           unless params[obj].nil?
             attrs = attrs.collect {|a| a.to_s}
-            @trashed_params = params[obj].keys - attrs
-            remove_params_from_object(obj, trashed_params)
+            trashed_params_keys = params[obj].keys - attrs
+
+            # Store a hash of the key/value pairs we are going
+            # to remove in case we need them later.  Lighthouse Bug # 105
+            @trashed_params = {}
+            trashed_params_keys.each do |key|
+              @trashed_params.merge!({key => params[obj][key]})
+            end
+
+            remove_params_from_object(obj, trashed_params_keys)
           end
         end
+
       end
     end
   end
-  
+
   Merb::Controller.send(:include, Merb::ParamsFilter::ControllerMixin)
   Merb::Request.send(:include, Merb::ParamsFilter::RequestMixin)
-  
+
   class Merb::Controller
     def self._filter_params(params)
       return params if self.log_params_args.nil?
