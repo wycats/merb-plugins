@@ -57,7 +57,7 @@ namespace :db do
     when 'mysql'
       ActiveRecord::Base.connection.drop_database config[:database]
     when /^sqlite/
-      FileUtils.rm(File.join(RAILS_ROOT, config[:database]))
+      FileUtils.rm(File.join(Merb.root, config[:database]))
     when 'postgresql'
       ActiveRecord::Base.clear_active_connections!    
       `dropdb "#{config[:database]}"`
