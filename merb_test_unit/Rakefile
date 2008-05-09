@@ -3,7 +3,7 @@ require 'rake/gempackagetask'
 
 PLUGIN = "merb_test_unit"
 NAME = "merb_test_unit"
-VERSION = "0.9.3"
+VERSION = "0.9.4"
 AUTHOR = "Yehuda Katz"
 EMAIL = "ykatz@engineyard.com"
 HOMEPAGE = "http://merb-plugins.rubyforge.org/merb-test_unit/"
@@ -20,7 +20,7 @@ spec = Gem::Specification.new do |s|
   s.author = AUTHOR
   s.email = EMAIL
   s.homepage = HOMEPAGE
-  s.add_dependency('merb-core', '>= 0.9.3')
+  s.add_dependency('merb-core', '>= 0.9.4')
   s.require_path = 'lib'
   s.autorequire = PLUGIN
   s.files = %w(LICENSE README Rakefile TODO) + Dir.glob("{lib,test_unit_generators}/**/*")
