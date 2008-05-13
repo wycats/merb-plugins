@@ -1,6 +1,6 @@
 require "#{File.dirname(__FILE__)}/tag_helpers"
 
-module Merb #:nodoc:
+module Merb
   
   # Merb helpers include several helpers used for simplifying view creation.
   # The available helpers currently include form tag helpers for both resource based and generic HTML form tag creation
@@ -88,7 +88,7 @@ module Merb #:nodoc:
         }
       end
       
-      def obj_from_ivar_or_sym(obj) #:nodoc:
+      def obj_from_ivar_or_sym(obj) 
         obj.is_a?(Symbol) ? instance_variable_get("@#{obj}") : obj
       end
       
@@ -164,19 +164,19 @@ module Merb #:nodoc:
         @_obj, @_block, @_object_name = old_obj, old_block, old_object_name
       end
       
-      def control_name(col) #:nodoc:
+      def control_name(col)
         "#{@_object_name}[#{col}]"
       end
       
-      def control_id(col) #:nodoc:
+      def control_id(col)
         "#{@_object_name}_#{col}"
       end
       
-      def control_value(col) #:nodoc:
+      def control_value(col)
         escape_xml(@_obj.send(col))
       end
       
-      def control_name_value(col, attrs) #:nodoc:
+      def control_name_value(col, attrs)
         {:name => control_name(col), :value => control_value(col)}.merge(attrs)
       end
       
@@ -229,7 +229,7 @@ module Merb #:nodoc:
       
       # translate column values from the db to boolean
       # nil, false, 0 and '0' are false. All others are true
-      def col_val_to_bool(val) #:nodoc:
+      def col_val_to_bool(val)
         !(val == "0" || val == 0 || !val)
       end
       private :col_val_to_bool
@@ -627,6 +627,6 @@ module Merb #:nodoc:
   end
 end
 
-class Merb::Controller #:nodoc:
+class Merb::Controller
   include Merb::Helpers::Form
 end

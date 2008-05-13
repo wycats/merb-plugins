@@ -56,6 +56,6 @@ module Merb
   end
 end
 
-class Merb::Controller #:nodoc:
+class Merb::Controller
   include Merb::Helpers::Tag
 end    
