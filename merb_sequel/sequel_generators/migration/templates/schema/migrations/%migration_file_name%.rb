@@ -17,7 +17,7 @@ class <%= model_class_name %>Migration < Sequel::Migration
   end
 
   def down
-    <% "drop_table :#{table_name}" if table_name -%>
+    <%= "drop_table :#{table_name}" if table_name %>
   end
 
 end
