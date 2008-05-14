@@ -78,7 +78,7 @@ module Merb
         @@time_class
       end
       
-      def time_output
+      def self.time_output
         @@time_output
       end
       
