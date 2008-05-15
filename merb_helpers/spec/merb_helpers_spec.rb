@@ -229,6 +229,52 @@ describe "text_control (data bound)" do
   end
 end
 
+describe "radio_control (data bound)" do
+  it_should_behave_like "FakeBufferConsumer"
+
+  it "should take a string object and return a useful text control" do
+    f = form_for :obj do
+      radio_control(:foo).should match_tag(:input, :type => "radio", :name => "fake_model[foo]", :value => "foowee")
+    end
+  end
+
+  it "should take additional attributes and use them" do
+    form_for :obj do
+      radio_control(:foo, :bar => "7").should match_tag(:input, :type => "radio", :name => "fake_model[foo]", :value => "foowee", :bar => "7")
+    end
+  end
+
+  it "should provide an additional label tag if the :label option is passed in" do
+    form_for :obj do
+      _buffer << radio_control(:foo, :label => "LABEL")
+    end
+    _buffer.should match(/<label.*>LABEL<\/label><input/)
+    res = _buffer.scan(/<[^>]*>/)
+    res[2].should_not match_tag(:input, :label => "LABEL")
+  end
+
+  it "should not errorify the field for a new object" do
+    f = form_for :obj do
+      radio_control(:foo, :bar =>"7").should_not match_tag(:input, :type => "radio", :name => "fake_model[foo]", :class => "error")
+    end
+  end
+
+  it "should errorify a field for a model with errors" do
+    model = mock("model")
+    model.stub!(:new_record?).and_return(true)
+    model.stub!(:class).and_return("MyClass")
+    model.stub!(:foo).and_return("FOO")
+    errors = mock("errors")
+    errors.should_receive(:on).with(:foo).and_return(true)
+
+    model.stub!(:errors).and_return(errors)
+
+    f = form_for model do
+      radio_control(:foo).should match_tag(:input, :class => "error radio")
+    end
+  end
+end
+
 describe "password_field (basic)" do
   it_should_behave_like "FakeBufferConsumer"
 

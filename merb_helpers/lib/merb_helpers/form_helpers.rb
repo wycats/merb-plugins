@@ -305,6 +305,20 @@ module Merb
         self_closing_tag("input", attrs)
       end
       
+      # Provides a HTML radio input tag based on a resource attribute.
+      #
+      # ==== Example
+      #     <% form_for :person, :action => url(:people) do %>
+      #       <%= radio_control :first_name %>
+      #     <% end %>
+      def radio_control(col, attrs = {})
+        errorify_field(attrs, col)
+        attrs.merge!(:id => control_id(col))
+        val = @_obj.send(col)
+        attrs.merge!(:checked => "checked") if val.to_s == attrs[:value]
+        optional_label(attrs) { radio_field(control_name_value(col, attrs)) }
+      end
+
       # Provides a radio group based on a resource attribute.
       # This is generally used within a resource block such as +form_for+.
       #
