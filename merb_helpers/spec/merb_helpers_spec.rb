@@ -808,6 +808,11 @@ describe 'delete_button' do
   it 'should allow you to omit the ivar reference if its name is the same as the attribute' do
     delete_button(:obj).should == delete_button(:obj, @obj)
   end
+  
+  it 'should allow you to modify the action so you can use routes with multiple params' do
+    result = delete_button('/objs/2/subobjs/1')
+    result.should match_tag(:form, :action => "/objs/2/subobjs/1", :method => "post")
+  end
 end
 
 describe "optional_label" do

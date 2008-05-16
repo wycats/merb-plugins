@@ -573,6 +573,7 @@ module Merb
       # Generates a delete button inside of a form. 
       # 
       #     <%= delete_button :news_post, @news_post, 'Remove' %>
+      #     <%= delete_button('/posts/24/comments/10') %>
       # 
       # The HTML generated for this would be:
       # 
@@ -580,10 +581,17 @@ module Merb
       #       <input type="hidden" value="delete" name="_method"/>
       #       <button type="submit">Remove</button>
       #     </form>
-      def delete_button(symbol, obj = instance_variable_get("@#{symbol}"), contents = 'Delete', form_attrs = {}, button_attrs = {})
+      #
+      #     <form method="post" action="/posts/24/comments/10">
+      #       <input type="hidden" value="delete" name="_method"/>
+      #       <button type="submit">Remove</button>
+      #     </form>
+      def delete_button(symbol_or_string, obj = nil, contents = 'Delete', form_attrs = {}, button_attrs = {})
+        obj = instance_variable_get("@#{symbol_or_string}") if symbol_or_string.kind_of?(Symbol)
+        
         button_attrs[:type] = :submit
         
-        form_attrs.merge! :action => url(symbol, obj), :method => :delete
+        form_attrs.merge! :action => symbol_or_string.kind_of?(Symbol) ? url(symbol_or_string, obj) : symbol_or_string, :method => :delete
         
         fake_form_method = set_form_method(form_attrs, obj)
         
