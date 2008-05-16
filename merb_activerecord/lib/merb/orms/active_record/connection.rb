@@ -31,7 +31,9 @@ module Merb
         end
 
         def config
-          @config ||= (Merb::Plugins.config[:merb_active_record] = configurations[Merb.environment.to_sym])
+          env_sym = Merb.environment.to_sym
+          raise ArgumentError, "missing environment :#{Merb.environment} in config file #{config_file}" unless configurations.key?(env_sym)
+          @config ||= (Merb::Plugins.config[:merb_active_record] = configurations[env_sym])
         end
 
         def configurations
