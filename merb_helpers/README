@@ -13,27 +13,4 @@ dependency "merb_helpers"
 
 #...
 
-By default all modules of merb_helpers are loaded and are available to your merb app.
-
-You can selectively include/exclude modules from this list to keep you app lean if you like. 
-The inclusions/exclusions are relative to all modules.  
-
-\:include: will only include the specified modules.
-
-\:exclude: will include all except the specified modules.
-
-Do not use :include: and :exclude: options at the same time or an error will be raised.
-
-To set this up in config/plugins.yml
-
-To Include specified helpers
-
-  \:merb_helpers:
-    \:include: - date_time_helpers
-              - form_helpers
-
-To Exclude specified helpers
-
-  \:merb_helpers:
-    \:exclude: - date_time_helpers
-              - form_helpers
+# TODO: describe date_time_helpers, form_helpers, tag_helpers

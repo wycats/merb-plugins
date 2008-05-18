@@ -1,6 +1,6 @@
 #!/bin/bash
 
-for i in merb_activerecord merb_datamapper merb_helpers merb_sequel merb_param_protection merb_rspec merb_test_unit; do
+for i in merb_activerecord merb_helpers merb_sequel merb_param_protection merb_rspec merb_test_unit; do
 	cd $i
 	rake package
 	#rubyforge add_release merb $i $1 pkg/$i-$1.gem

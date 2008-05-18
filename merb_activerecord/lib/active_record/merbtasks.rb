@@ -57,7 +57,7 @@ namespace :db do
     when 'mysql'
       ActiveRecord::Base.connection.drop_database config[:database]
     when /^sqlite/
-      FileUtils.rm(File.join(RAILS_ROOT, config[:database]))
+      FileUtils.rm(File.join(Merb.root, config[:database]))
     when 'postgresql'
       ActiveRecord::Base.clear_active_connections!    
       `dropdb "#{config[:database]}"`
@@ -284,8 +284,8 @@ namespace :db do
           ActiveRecord::Base.connection.recreate_database(config[:database])
         when "postgresql"
           ENV['PGHOST']     = config[:host] if config[:host]
-          ENV['PGPORT']     = configs[:port].to_s if config[:port]
-          ENV['PGPASSWORD'] = configs[:password].to_s if config[:password]
+          ENV['PGPORT']     = config[:port].to_s if config[:port]
+          ENV['PGPASSWORD'] = config[:password].to_s if config[:password]
           enc_option = "-E #{config[:encoding]}" if config[:encoding]
           ActiveRecord::Base.clear_active_connections!
           `dropdb -U "#{config[:username]}" #{config[:database]}`
@@ -307,7 +307,7 @@ namespace :db do
     end
 
     desc "Prepare the test database and load the schema"
-    task :prepare => ["db:test:clone_structure", "db:test:clone"] do
+    task :prepare  do
       if defined?(ActiveRecord::Base) && !Merb::Orms::ActiveRecord.configurations.blank?
         Rake::Task[{ :sql  => "db:test:clone_structure", :ruby => "db:test:clone" }[ActiveRecord::Base.schema_format]].invoke
       end

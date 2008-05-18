@@ -16,3 +16,6 @@
 :production:
   <<: *defaults
   :database: sample_production
+  
+:rake:
+  <<: *defaults

@@ -11,7 +11,7 @@ namespace :sequel do
 
     desc "Perform migration using migrations in schema/migrations"
     task :migrate => :merb_start do
-      Sequel::Migrator.apply(Merb::Orms::Sequel.connect, "schema/migrations", ENV["VERSION"] ? ENV["VERSION"].to_i : nil)
+      Sequel::Migrator.apply(Sequel::Model.db, "schema/migrations", ENV["VERSION"] ? ENV["VERSION"].to_i : nil)
     end
 
   end

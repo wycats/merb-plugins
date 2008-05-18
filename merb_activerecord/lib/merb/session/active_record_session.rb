@@ -47,7 +47,7 @@ module Merb
       end
     
       # Don't try to reload ARStore::Session in dev mode.
-      def reloadable? #:nodoc:
+      def reloadable?
         false
       end
 

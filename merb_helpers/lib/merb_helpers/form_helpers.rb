@@ -1,6 +1,6 @@
 require "#{File.dirname(__FILE__)}/tag_helpers"
 
-module Merb #:nodoc:
+module Merb
   
   # Merb helpers include several helpers used for simplifying view creation.
   # The available helpers currently include form tag helpers for both resource based and generic HTML form tag creation
@@ -88,7 +88,7 @@ module Merb #:nodoc:
         }
       end
       
-      def obj_from_ivar_or_sym(obj) #:nodoc:
+      def obj_from_ivar_or_sym(obj) 
         obj.is_a?(Symbol) ? instance_variable_get("@#{obj}") : obj
       end
       
@@ -164,19 +164,19 @@ module Merb #:nodoc:
         @_obj, @_block, @_object_name = old_obj, old_block, old_object_name
       end
       
-      def control_name(col) #:nodoc:
+      def control_name(col)
         "#{@_object_name}[#{col}]"
       end
       
-      def control_id(col) #:nodoc:
+      def control_id(col)
         "#{@_object_name}_#{col}"
       end
       
-      def control_value(col) #:nodoc:
+      def control_value(col)
         escape_xml(@_obj.send(col))
       end
       
-      def control_name_value(col, attrs) #:nodoc:
+      def control_name_value(col, attrs)
         {:name => control_name(col), :value => control_value(col)}.merge(attrs)
       end
       
@@ -229,7 +229,7 @@ module Merb #:nodoc:
       
       # translate column values from the db to boolean
       # nil, false, 0 and '0' are false. All others are true
-      def col_val_to_bool(val) #:nodoc:
+      def col_val_to_bool(val)
         !(val == "0" || val == 0 || !val)
       end
       private :col_val_to_bool
@@ -241,9 +241,11 @@ module Merb #:nodoc:
       #     <%= checkbox_control :is_activated, :label => "Activated?" %>
       def checkbox_control(col, attrs = {}, hidden_attrs={})
         errorify_field(attrs, col)
-        attrs.merge!(:checked => "checked") if col_val_to_bool(@_obj.send(col))
+        method_name = @_obj.respond_to?(col) ? col : :"#{col}?"
+        attrs.merge!(:checked => "checked") if col_val_to_bool(@_obj.send(method_name))
         attrs.merge!(:id => control_id(col))
-        checkbox_field(control_name_value(col, attrs), hidden_attrs)
+        attrs = {:name => control_name(col), :value => control_value(method_name)}.merge(attrs)
+        checkbox_field(attrs, hidden_attrs)
       end
 
       # Provides a generic HTML checkbox input tag.
@@ -303,6 +305,20 @@ module Merb #:nodoc:
         self_closing_tag("input", attrs)
       end
       
+      # Provides a HTML radio input tag based on a resource attribute.
+      #
+      # ==== Example
+      #     <% form_for :person, :action => url(:people) do %>
+      #       <%= radio_control :first_name %>
+      #     <% end %>
+      def radio_control(col, attrs = {})
+        errorify_field(attrs, col)
+        attrs.merge!(:id => control_id(col))
+        val = @_obj.send(col)
+        attrs.merge!(:checked => "checked") if val.to_s == attrs[:value]
+        optional_label(attrs) { radio_field(control_name_value(col, attrs)) }
+      end
+
       # Provides a radio group based on a resource attribute.
       # This is generally used within a resource block such as +form_for+.
       #
@@ -449,7 +465,7 @@ module Merb #:nodoc:
             end
           else
             collection.each do |value,text|
-              options = selected.to_a.include?(value) ? {:selected => 'selected'} : {}
+              options = Array(selected).include?(value) ? {:selected => 'selected'} : {}
               ret << tag( 'option', text, {:value => value}.merge(options) )
             end
           end
@@ -557,6 +573,7 @@ module Merb #:nodoc:
       # Generates a delete button inside of a form. 
       # 
       #     <%= delete_button :news_post, @news_post, 'Remove' %>
+      #     <%= delete_button('/posts/24/comments/10') %>
       # 
       # The HTML generated for this would be:
       # 
@@ -564,10 +581,17 @@ module Merb #:nodoc:
       #       <input type="hidden" value="delete" name="_method"/>
       #       <button type="submit">Remove</button>
       #     </form>
-      def delete_button(symbol, obj = instance_variable_get("@#{symbol}"), contents = 'Delete', form_attrs = {}, button_attrs = {})
+      #
+      #     <form method="post" action="/posts/24/comments/10">
+      #       <input type="hidden" value="delete" name="_method"/>
+      #       <button type="submit">Remove</button>
+      #     </form>
+      def delete_button(symbol_or_string, obj = nil, contents = 'Delete', form_attrs = {}, button_attrs = {})
+        obj = instance_variable_get("@#{symbol_or_string}") if symbol_or_string.kind_of?(Symbol)
+        
         button_attrs[:type] = :submit
         
-        form_attrs.merge! :action => url(symbol, obj), :method => :delete
+        form_attrs.merge! :action => symbol_or_string.kind_of?(Symbol) ? url(symbol_or_string, obj) : symbol_or_string, :method => :delete
         
         fake_form_method = set_form_method(form_attrs, obj)
         
@@ -625,6 +649,6 @@ module Merb #:nodoc:
   end
 end
 
-class Merb::Controller #:nodoc:
+class Merb::Controller
   include Merb::Helpers::Form
 end

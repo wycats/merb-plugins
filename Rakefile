@@ -5,9 +5,9 @@ windows = (PLATFORM =~ /win32|cygwin/) rescue nil
 
 SUDO = windows ? "" : "sudo"
 
-gems = %w[merb_activerecord merb_datamapper merb_helpers merb_sequel merb_param_protection merb_test_unit merb_stories]
+gems = %w[merb_activerecord merb_helpers merb_sequel merb_param_protection merb_test_unit merb_stories]
 
-orm_gems = %w[merb_activerecord merb_datamapper merb_sequel]
+orm_gems = %w[merb_activerecord merb_sequel]
 
 desc "Install it all"
 task :install => "install:gems"

@@ -3,6 +3,23 @@ $:.push File.join(File.dirname(__FILE__), '..', 'lib')
 require 'rubygems'
 require 'merb-core'
 
+class FakeDMModel
+  def self.properties
+    [FakeColumn.new(:baz, TrueClass),
+     FakeColumn.new(:bat, TrueClass)
+    ]
+  end
+  
+  def baz?
+    true
+  end
+  
+  def bat?
+    false
+  end
+end
+
+
 class FakeModel
   
   attr_accessor :vin, :make, :model
