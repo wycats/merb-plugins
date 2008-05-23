@@ -106,6 +106,10 @@ module Merb
     def each(&b)
       data.each(&b)
     end
+    
+    def each_with_index(&b)
+      data.each_with_index(&b)
+    end
 
     # Lazy-unmarshal session state.
     def data
