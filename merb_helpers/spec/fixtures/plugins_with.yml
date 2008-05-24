@@ -1,2 +1,0 @@
-:merb_helpers:
-  :include: - date_time_helpers

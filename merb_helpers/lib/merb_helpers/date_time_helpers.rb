@@ -1,53 +1,3 @@
-
-# Everything above here has pretty much been implemented in the assistance gem...
-
-# Time.now.to_ordinalized_s :long
-# => "February 28th, 2006 21:10"
-module OrdinalizedFormatting
-  
-  def self.extended(obj)
-    include Merb::Helpers::DateAndTime
-  end
-  
-  def to_ordinalized_s(format = :default)
-    format = Merb::Helpers::DateAndTime.date_formats[format] 
-    return self.to_s if format.nil?
-    strftime_ordinalized(format)
-  end
-
-  def strftime_ordinalized(fmt)
-    strftime(fmt.gsub(/(^|[^-])%d/, '\1_%d_')).gsub(/_(\d+)_/) { |s| s.to_i.ordinalize }
-  end
-end
-
-class Date
-  include OrdinalizedFormatting
-  # Converts a Date instance to a Time, where the time is set to the beginning of the day.
-  # The timezone can be either :local or :utc (default :utc).
-  #
-  # ==== Examples:
-  #   date = Date.new(2007, 11, 10)
-  #   date.to_s                      # => 2007-11-10
-  #
-  #   date.to_time                   # => Sat Nov 10 00:00:00 UTC 2007
-  #   date.to_time(:utc)             # => Sat Nov 10 00:00:00 UTC 2007
-  #   date.to_time(:local)           # => Sat Nov 10 00:00:00 -0800 2007
-  #
-  def to_time(form = :utc)
-    ::Time.send("#{form}", year, month, day)
-  end
-  def to_date; self; end
-end
-
-class Time
-  include OrdinalizedFormatting
-  # Ruby 1.8-cvs and 1.9 define private Time#to_date
-  %w(to_date to_datetime).each do |method|
-    public method if private_instance_methods.include?(method)
-  end
-  def to_time; self; end
-end
-
 module Merb
   module Helpers
     # Provides a number of methods for displaying and dealing with dates and times
@@ -79,8 +29,14 @@ module Merb
         @@time_class
       end
       
-      def self.time_output
-        @@time_output
+      # ==== Parameters
+      # format<Symbol>:: time format to use
+      # locale<String, Symbol>:: An optional value which can be used by localization plugins
+      #
+      # ==== Returns
+      # String:: a string used to format time using #strftime
+      def self.time_output(format, locale=nil)
+        @@time_output[format]
       end
       
       def date_formats
@@ -91,27 +47,28 @@ module Merb
       #
       # ==== Parameters
       # time<~to_date>:: The Date or Time to test
+      # locale<String, Symbol>:: An optional value which can be used by localization plugins
       #
       # ==== Returns
-      # String:: The sexy relative date
+      # String:: Relative date
       #
       # ==== Examples
       #   relative_date(Time.now.utc) => "today"
       #   relative_date(5.days.ago) => "March 5th"
       #   relative_date(1.year.ago) => "March 10th, 2007"
-      def relative_date(time)
+      def relative_date(time, locale=nil)
         date  = time.to_date
         today = DateAndTime.time_class.now.to_date
         if date == today
-          DateAndTime.time_output[:today]
+          DateAndTime.time_output(:today, locale)
         elsif date == (today - 1)
-          DateAndTime.time_output[:yesterday]
+          DateAndTime.time_output(:yesterday, locale)
         elsif date == (today + 1)
-          DateAndTime.time_output[:tomorrow]
+          DateAndTime.time_output(:tomorrow, locale)
         else
-          fmt  = DateAndTime.time_output[:initial_format].dup
-          fmt << DateAndTime.time_output[:year_format] unless date.year == today.year
-          time.strftime_ordinalized(fmt)
+          fmt  = DateAndTime.time_output(:initial_format, locale).dup
+          fmt << DateAndTime.time_output(:year_format, locale) unless date.year == today.year
+          time.strftime_ordinalized(fmt, locale)
         end
       end
       
@@ -189,6 +146,7 @@ module Merb
       # from_time<~to_time>:: The Date or Time to start from
       # to_time<~to_time>:: The Date or Time to go to, Defaults to Time.now.utc
       # include_seconds<Boolean>:: Count the seconds initially, Defaults to false
+      # locale<String, Symbol>:: An optional value which can be used by localization plugins
       #
       # ==== Returns
       # String:: The time distance
@@ -200,7 +158,7 @@ module Merb
       # time_lost_in_words(Time.now)                     # => less than a minute
       # time_lost_in_words(Time.now, Time.now, true)     # => less than 5 seconds
       #
-      def time_lost_in_words(from_time, to_time = Time.now.utc, include_seconds = false)
+      def time_lost_in_words(from_time, to_time = Time.now.utc, include_seconds = false, locale=nil)
         from_time = from_time.to_time if from_time.respond_to?(:to_time)
         to_time = to_time.to_time if to_time.respond_to?(:to_time)
         distance_in_minutes = (((to_time - from_time).abs)/60).round
@@ -231,7 +189,7 @@ module Merb
       end
       alias :time_ago_in_words :time_lost_in_words
       
-      def prettier_time(time, ampm=true)
+      def prettier_time(time, ampm=true, locale=nil)
         time.strftime("%I:%M#{" %p" if ampm}").sub(/^0/, '')
       end
     end

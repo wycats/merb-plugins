@@ -2,6 +2,25 @@ $TESTING=true
 $:.push File.join(File.dirname(__FILE__), '..', 'lib')
 require 'rubygems'
 require 'merb-core'
+require 'merb_helpers'
+Merb::Helpers.load
+include Merb::Helpers::DateAndTime
+include Merb::ControllerMixin
+include Merb::Helpers::Tag
+include Merb::Helpers::Form
+
+def unload_merb_helpers
+  Merb.class_eval do
+    remove_const("Helpers") if defined?(Merb::Helpers)
+  end
+end
+
+def reload_merb_helpers
+  unload_merb_helpers
+  load(MERB_HELPERS_ROOT + "/lib/merb_helpers.rb") 
+  Merb::Helpers.load
+end
+
 
 class FakeDMModel
   def self.properties

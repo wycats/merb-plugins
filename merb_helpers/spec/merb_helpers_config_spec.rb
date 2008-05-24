@@ -6,18 +6,6 @@ require 'merb_helpers'
 
 describe "loading configuration" do
   
-  def unload_merb_helpers
-    Merb.class_eval do
-      remove_const("Helpers") if defined?(Merb::Helpers)
-    end
-  end
-  
-  def reload_merb_helpers
-    unload_merb_helpers
-    load(MERB_HELPERS_ROOT + "/lib/merb_helpers.rb") 
-    Merb::Helpers.load
-  end
-  
   before :each do
     unload_merb_helpers
   end
@@ -43,22 +31,6 @@ describe "loading configuration" do
     defined?(Merb::Helpers::Form).should_not be_nil
   end
   
-  it "should require only the specified helpers" do
-    Merb::Plugins.stub!(:config).and_return(YAML.load(File.read(FIXTURES_DIR + "/plugins_with.yml"))) 
-    reload_merb_helpers   
-    defined?(Merb::Helpers).should_not be_nil
-    defined?(Merb::Helpers::Form).should be_nil
-    defined?(Merb::Helpers::DateAndTime).should_not be_nil
-  end
-  
-  it "should exclude the specified helpers" do
-    Merb::Plugins.stub!(:config).and_return(YAML.load(File.read(FIXTURES_DIR + "/plugins_without.yml")))
-    reload_merb_helpers
-    defined?(Merb::Helpers).should_not be_nil
-    defined?(Merb::Helpers::Form).should_not be_nil
-    defined?(Merb::Helpers::DateAndTime).should be_nil
-  end
-  
   it "should load all helpers by default" do
     Merb::Plugins.should_receive(:config).and_return({})
     reload_merb_helpers
@@ -67,12 +39,63 @@ describe "loading configuration" do
     defined?(Merb::Helpers::Form)
   end
   
-  it "should raise an error if :with and :without are both configured" do
+  it "should raise an error if :with or :without are configured" do
     Merb::Plugins.stub!(:config).and_return(:merb_helpers => {:with => "form_helpers", :without => "date_format_helpers"})
     lambda do 
       reload_merb_helpers
     end.should raise_error
     
+    Merb::Plugins.stub!(:config).and_return(:merb_helpers => {:with => "form_helpers"})
+    lambda do 
+      reload_merb_helpers
+    end.should raise_error
+    
+    Merb::Plugins.stub!(:config).and_return(:merb_helpers => {:without => "date_format_helpers"})
+    lambda do 
+      reload_merb_helpers
+    end.should raise_error
+  end
+  
+  it "should only load the helpers specified in the config hash (if defined)" do
+    unload_merb_helpers
+    defined?(Merb::Helpers).should be_nil
+    defined?(Merb::Helpers::DateAndTime).should be_nil
+    Merb::Plugins.stub!(:config).and_return(:merb_helpers => {:include => "form_helpers"})
+    reload_merb_helpers
+    defined?(Merb::Helpers).should_not be_nil
+    defined?(Merb::Helpers::Form).should_not be_nil
+    defined?(Merb::Helpers::DateAndTime).should be_nil
+    
+    unload_merb_helpers
+    defined?(Merb::Helpers).should be_nil
+    defined?(Merb::Helpers::DateAndTime).should be_nil
+    Merb::Plugins.stub!(:config).and_return(:merb_helpers => {:include => ["form_helpers", "date_time_helpers"]})
+    reload_merb_helpers
+    defined?(Merb::Helpers).should_not be_nil
+    defined?(Merb::Helpers::Form).should_not be_nil
+    defined?(Merb::Helpers::DateAndTime).should_not be_nil
+  end
+  
+  it "should load all helpers if the include hash is empty" do
+    unload_merb_helpers
+    defined?(Merb::Helpers).should be_nil
+    defined?(Merb::Helpers::DateAndTime).should be_nil
+    Merb::Plugins.stub!(:config).and_return(:merb_helpers => {:include => ""})
+    reload_merb_helpers
+    defined?(Merb::Helpers).should_not be_nil
+    defined?(Merb::Helpers::Form).should_not be_nil
+    defined?(Merb::Helpers::DateAndTime).should_not be_nil
+  end
+  
+  it "should load helpers if the plugin conf is defined but the include pair is missing" do
+    unload_merb_helpers
+    defined?(Merb::Helpers).should be_nil
+    defined?(Merb::Helpers::DateAndTime).should be_nil
+    Merb::Plugins.stub!(:config).and_return(:merb_helpers => {})
+    reload_merb_helpers
+    defined?(Merb::Helpers).should_not be_nil
+    defined?(Merb::Helpers::Form).should_not be_nil
+    defined?(Merb::Helpers::DateAndTime).should_not be_nil
   end
   
 end

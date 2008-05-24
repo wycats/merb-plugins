@@ -20,4 +20,35 @@ module Ordinalize
     end
   end
 end
+
 Integer.send :include, Ordinalize
+
+# Time.now.to_ordinalized_s :long
+# => "February 28th, 2006 21:10"
+module OrdinalizedFormatting
+  
+  def self.extended(obj)
+    include Merb::Helpers::DateAndTime
+  end
+  
+  def to_ordinalized_s(format = :default)
+    format = Merb::Helpers::DateAndTime.date_formats[format] 
+    return self.to_s if format.nil?
+    strftime_ordinalized(format)
+  end
+
+  # Gives you a relative date in an attractive format
+  #
+  # ==== Parameters
+  # format<String>:: strftime string used to formatt a time/date object
+  # locale<String, Symbol>:: An optional value which can be used by localization plugins
+  #
+  # ==== Returns
+  # String:: Ordinalized time/date object
+  #
+  # ==== Examples
+  #    5.days.ago.strftime_ordinalized('%b %d, %Y')     # => 
+  def strftime_ordinalized(fmt, format=nil)
+    strftime(fmt.gsub(/(^|[^-])%d/, '\1_%d_')).gsub(/_(\d+)_/) { |s| s.to_i.ordinalize }
+  end
+end

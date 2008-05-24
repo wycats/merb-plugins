@@ -55,4 +55,5 @@ module TimeDSL
   end
   alias :from_now :since
 end
+
 Numeric.send :include, TimeDSL
