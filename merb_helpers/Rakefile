@@ -2,22 +2,19 @@ require 'rubygems'
 require 'rake/gempackagetask'
 require 'rake/rdoctask'
 require 'spec/rake/spectask'
+require 'merb-core/tasks/merb_rake_helper'
 
-PLUGIN = "merb_helpers"
 NAME = "merb_helpers"
-VERSION = "0.9.4"
+GEM_VERSION = "0.9.4"
 AUTHOR = "Yehuda Katz"
 EMAIL = "wycats@gmail.com"
-HOMEPAGE = "http://merb.rubyforge.org/"
+HOMEPAGE = "http://merbivore.com/"
 SUMMARY = "Helper support for merb (similar to the Rails form helpers)"
 
-windows = (PLATFORM =~ /win32|cygwin/)
-
-SUDO = windows ? "" : "sudo"
-
 spec = Gem::Specification.new do |s|
+  s.rubyforge_project = 'merb'
   s.name = NAME
-  s.version = VERSION
+  s.version = GEM_VERSION
   s.platform = Gem::Platform::RUBY
   s.has_rdoc = true
   s.extra_rdoc_files = ["README", "LICENSE", 'TODO']
@@ -28,10 +25,8 @@ spec = Gem::Specification.new do |s|
   s.homepage = HOMEPAGE
   s.add_dependency("merb-core", ">=0.9.4")
   s.require_path = 'lib'
-  s.autorequire = PLUGIN
   s.files = %w(LICENSE README Rakefile TODO) + Dir.glob("{lib,specs}/**/*")
 end
-
 
 Rake::GemPackageTask.new(spec) do |pkg|
   pkg.gem_spec = spec
@@ -39,7 +34,7 @@ end
 
 desc "Run :package and install resulting .gem"
 task :install => [:package] do
-  sh %{#{SUDO} gem install pkg/#{NAME}-#{VERSION} --no-rdoc --no-ri --no-update-sources}
+  sh %{#{sudo} gem install #{install_home} pkg/#{NAME}-#{GEM_VERSION} --no-rdoc --no-ri --no-update-sources}
 end
 
 Rake::RDocTask.new do |rdoc|
@@ -51,7 +46,6 @@ Rake::RDocTask.new do |rdoc|
       rdoc.rdoc_dir = 'doc/rdoc'
       rdoc.options << '--line-numbers' << '--inline-source'
 end
-
 
 Spec::Rake::SpecTask.new do |t|
    t.spec_opts = ["--format", "specdoc", "--colour"]
@@ -66,5 +60,4 @@ Spec::Rake::SpecTask.new('rcov') do |t|
   t.rcov_dir = 'coverage'
   t.rcov_opts = ['--exclude', 'gems', '--exclude', 'spec']
 end
-
 

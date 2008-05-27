@@ -1,17 +1,18 @@
 require 'rubygems'
 require 'rake/gempackagetask'
+require 'merb-core/tasks/merb_rake_helper'
 
-PLUGIN = "merb_activerecord"
 NAME = "merb_activerecord"
-VERSION = "0.9.4"
+GEM_VERSION = "0.9.4"
 AUTHOR = "Duane Johnson"
 EMAIL = "canadaduane@gmail.com"
-HOMEPAGE = "http://merbivore.com"
+HOMEPAGE = "http://merbivore.com/"
 SUMMARY = "Merb plugin that provides ActiveRecord support for Merb"
 
 spec = Gem::Specification.new do |s|
+  s.rubyforge_project = 'merb'
   s.name = NAME
-  s.version = VERSION
+  s.version = GEM_VERSION
   s.platform = Gem::Platform::RUBY
   s.has_rdoc = true
   s.extra_rdoc_files = ["README", "LICENSE", 'TODO']
@@ -22,13 +23,8 @@ spec = Gem::Specification.new do |s|
   s.homepage = HOMEPAGE
   s.add_dependency("merb-core", ">= 0.9.4")
   s.require_path = "lib"
-  s.autorequire = PLUGIN
   s.files = %w(LICENSE README Rakefile TODO) + Dir.glob("{lib,specs,activerecord_generators}/**/*")
 end
-
-windows = (PLATFORM =~ /win32|cygwin/) rescue nil
-
-SUDO = windows ? "" : "sudo"
 
 Rake::GemPackageTask.new(spec) do |pkg|
   pkg.gem_spec = spec
@@ -36,10 +32,14 @@ end
 
 desc "Install merb_activerecord"
 task :install => :package do
-  sh %{#{SUDO} gem install pkg/#{NAME}-#{VERSION} --no-rdoc --no-ri --no-update-sources}
+  sh %{#{sudo} gem install #{install_home} pkg/#{NAME}-#{GEM_VERSION} --no-rdoc --no-ri --no-update-sources}
 end
 
-desc "Release the current version on rubyforge"
-task :release => :package do
-  sh %{rubyforge add_release merb #{PLUGIN} #{VERSION} pkg/#{NAME}-#{VERSION}.gem}
+namespace :jruby do
+
+  desc "Run :package and install the resulting .gem with jruby"
+  task :install => :package do
+    sh %{#{sudo} jruby -S gem install #{install_home} pkg/#{NAME}-#{GEM_VERSION}.gem --no-rdoc --no-ri}
+  end
+
 end
