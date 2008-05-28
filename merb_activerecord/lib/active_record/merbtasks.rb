@@ -172,7 +172,7 @@ namespace :db do
       ActiveRecord::Base.establish_connection(config)
       test_folder = (Merb.test_framework_generator_scope == :rspec) ? 'spec' : 'test'
       (ENV['FIXTURES'] ? ENV['FIXTURES'].split(/,/) : Dir.glob(File.join(Merb.root, test_folder, 'fixtures', '*.{yml,csv}'))).each do |fixture_file|
-        Fixtures.create_fixtures('test/fixtures', File.basename(fixture_file, '.*'))
+        Fixtures.create_fixtures(File.join(test_folder, 'fixtures'), File.basename(fixture_file, '.*'))
       end
     end
   end
