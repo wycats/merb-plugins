@@ -170,7 +170,8 @@ namespace :db do
       require 'active_record/fixtures'
       config = Merb::Orms::ActiveRecord.configurations[Merb.environment.to_sym]
       ActiveRecord::Base.establish_connection(config)
-      (ENV['FIXTURES'] ? ENV['FIXTURES'].split(/,/) : Dir.glob(File.join(Merb.root, 'test', 'fixtures', '*.{yml,csv}'))).each do |fixture_file|
+      test_folder = (Merb.test_framework_generator_scope == :rspec) ? 'spec' : 'test'
+      (ENV['FIXTURES'] ? ENV['FIXTURES'].split(/,/) : Dir.glob(File.join(Merb.root, test_folder, 'fixtures', '*.{yml,csv}'))).each do |fixture_file|
         Fixtures.create_fixtures('test/fixtures', File.basename(fixture_file, '.*'))
       end
     end
