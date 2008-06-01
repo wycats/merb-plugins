@@ -1,12 +1,8 @@
 require "rake"
 require 'fileutils'
-
-windows = (PLATFORM =~ /win32|cygwin/) rescue nil
-
-SUDO = windows ? "" : "sudo"
+require 'merb-core/tasks/merb_rake_helper'
 
 gems = %w[merb_activerecord merb_helpers merb_sequel merb_param_protection merb_test_unit merb_stories]
-
 orm_gems = %w[merb_activerecord merb_sequel]
 
 desc "Install it all"
@@ -28,13 +24,12 @@ namespace :install do
   end
 end
 
-
 desc "Bundle up all the merb-plugins gems"
 task :bundle do
   mkdir_p "bundle"
   gems.each do |gem|
     File.open("#{gem}/Rakefile") do |rakefile|
-      rakefile.read.detect {|l| l =~ /^VERSION\s*=\s*"(.*)"$/ }
+      rakefile.read.detect {|l| l =~ /^GEM_VERSION\s*=\s*"(.*)"$/ }
       Dir.chdir(gem){ sh "rake package" }
       sh %{cp #{gem}/pkg/#{gem}-#{$1}.gem bundle/}
     end

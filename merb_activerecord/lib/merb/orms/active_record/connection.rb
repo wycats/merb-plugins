@@ -31,7 +31,11 @@ module Merb
         end
 
         def config
-          env_sym = Merb.environment.to_sym
+          #If Merb#runs_like specifies a differnt db env, use it.
+          env_sym = (Merb.environment_info.nil?) ?
+            Merb.environment.to_sym :
+            Merb.environment_info[:db_env].to_sym
+
           raise ArgumentError, "missing environment :#{Merb.environment} in config file #{config_file}" unless configurations.key?(env_sym)
           @config ||= (Merb::Plugins.config[:merb_active_record] = configurations[env_sym])
         end
