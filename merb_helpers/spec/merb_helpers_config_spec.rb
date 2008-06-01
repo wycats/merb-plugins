@@ -32,7 +32,7 @@ describe "loading configuration" do
   end
   
   it "should load all helpers by default" do
-    Merb::Plugins.should_receive(:config).and_return({})
+    Merb::Plugins.should_receive(:config).any_number_of_times.and_return({})
     reload_merb_helpers
     defined?(Merb::Helpers).should_not be_nil
     defined?(Merb::Helpers::DateAndTime).should_not  be_nil

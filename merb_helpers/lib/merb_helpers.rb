@@ -36,6 +36,4 @@ module Merb
   
 end
 
-Merb::BootLoader.before_app_loads do  
-  Merb::Helpers.load
-end
+Merb::Helpers.load
