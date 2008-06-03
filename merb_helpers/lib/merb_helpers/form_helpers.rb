@@ -587,7 +587,7 @@ module Merb
       #       <button type="submit">Remove</button>
       #     </form>
       def delete_button(symbol_or_string, obj = nil, contents = 'Delete', form_attrs = {}, button_attrs = {})
-        obj = instance_variable_get("@#{symbol_or_string}") if symbol_or_string.kind_of?(Symbol)
+        obj ||= instance_variable_get("@#{symbol_or_string}") if symbol_or_string.kind_of?(Symbol)
         
         button_attrs[:type] = :submit
         
