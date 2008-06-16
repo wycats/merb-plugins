@@ -39,9 +39,9 @@ module Merb::Test::Unit::HpricotAsserts
     end
     
     if(equality[:count] != 0)
-      assert ret, "#{ message } \"#{ css_query }\" with \"#{ equality.inspect }\" was not found."
+      assert(ret, "#{ message } \"#{ css_query }\" with \"#{ equality.inspect }\" was not found.")
     else
-      assert ret, "#{ message } \"#{ css_query }\" with \"#{ equality.reject{|k,v| k == :count}.inspect }\" was found, but you specified :count => 0."
+      assert(ret, "#{ message } \"#{ css_query }\" with \"#{ equality.reject{|k,v| k == :count}.inspect }\" was found, but you specified :count => 0.")
     end
     ret
   end
