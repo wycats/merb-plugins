@@ -1,6 +1,5 @@
 require 'rubygems'
 require "merb-core"
-require "merb-test"
 require "test/unit"
 
 Merb.start :environment => 'test', :adapter => 'runner'
