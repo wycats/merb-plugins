@@ -16,8 +16,7 @@ class MigrationGenerator < Merb::GeneratorBase
       
       m.directory "schema/migrations"
       
-      current_migration_number = Dir[Dir.pwd+'/schema/migrations/*'].map{|f| File.basename(f) =~ /^(\d+)/; $1}.max
-      @migration_file_name = format("%03d_%s", (current_migration_number.to_i+1), model_file_name) + "_migration"
+      @migration_file_name = format("%03d_%s", Time.now.utc.strftime("%Y%m%d%H%M%S"), model_file_name) + "_migration"
     
       @assigns = {  :model_file_name  => model_file_name, 
                     :model_attributes => model_attributes,

@@ -10,14 +10,14 @@ describe "error_messages_for" do
 
   it "should build default error messages" do
     errs = error_messages_for(@obj)
-    errs.should include("<h2>Form submittal failed because of 2 problems</h2>")
+    errs.should include("<h2>Form submission failed because of 2 problems</h2>")
     errs.should include("<li>foo bar</li>")
     errs.should include("<li>baz bat</li>")
   end
 
   it "should build default error messages for symbol" do
     errs = error_messages_for(:obj)
-    errs.should include("<h2>Form submittal failed because of 2 problems</h2>")
+    errs.should include("<h2>Form submission failed because of 2 problems</h2>")
     errs.should include("<li>foo bar</li>")
     errs.should include("<li>baz bat</li>")
   end

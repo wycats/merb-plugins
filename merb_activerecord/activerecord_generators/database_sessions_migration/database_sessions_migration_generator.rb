@@ -16,8 +16,7 @@ class DatabaseSessionsMigrationGenerator < Merb::GeneratorBase
     m.directory 'schema/migrations'
 
     # Create stubs
-    highest_migration = Dir[Dir.pwd+'/schema/migrations/*'].map{|f| File.basename(f) =~ /^(\d+)/; $1}.max
-    filename = format("%03d_%s", (highest_migration.to_i+1), @name.snake_case)
+    filename = format("%03d_%s", Time.now.utc.strftime("%Y%m%d%H%M%S"), @name.snake_case)
     m.template "sessions_migration.erb", "schema/migrations/#{filename}.rb"
     puts banner
 
