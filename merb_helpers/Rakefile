@@ -33,7 +33,7 @@ Rake::GemPackageTask.new(spec) do |pkg|
 end
 
 desc "Run :package and install resulting .gem"
-task :install => [:package] do
+task :install => [:spec, :package] do
   sh %{#{sudo} gem install #{install_home} pkg/#{NAME}-#{GEM_VERSION} --no-rdoc --no-ri --no-update-sources}
 end
 

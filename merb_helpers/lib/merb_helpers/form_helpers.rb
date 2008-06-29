@@ -46,7 +46,7 @@ module Merb
       # Provides a HTML formatted display of resource errors in an unordered list with a h2 form submission error
       # ==== Options
       # +build_li+:: Block for generating a list item for an error. It receives an instance of the error.
-      # +html_class+:: Set for custom error div class default is <tt>submittal_failed<tt>
+      # +html_class+:: Set for custom error div class default is <tt>submission_failed<tt>
       #
       # ==== Examples
       #   <%= error_messages_for :person %>
@@ -71,7 +71,7 @@ module Merb
           yield(obj.errors)
         else
           error_plurality = (error_count == 1 ? 'problem' : 'problems')
-          "<h2>Form submittal failed because of #{error_count} #{error_plurality}</h2>"
+          "<h2>Form submission failed because of #{error_count} #{error_plurality}</h2>"
         end
         
         markup = %Q{

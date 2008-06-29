@@ -32,7 +32,7 @@ Rake::GemPackageTask.new(spec) do |pkg|
 end
 
 desc "install merb_param_protection"
-task :install => [:package] do
+task :install => [:specs, :package] do
   sh %{#{sudo} gem install #{install_home} pkg/#{NAME}-#{GEM_VERSION} --no-rdoc --no-ri --no-update-sources}
 end
 
