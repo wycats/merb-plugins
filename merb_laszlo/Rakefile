@@ -5,7 +5,7 @@ require 'date'
 require 'merb-core/tasks/merb_rake_helper'
 
 NAME = "merb-laszlo"
-GEM_GEM_VERSION = "0.5.0"
+GEM_VERSION = "0.5.0"
 AUTHOR = "Yehuda Katz"
 EMAIL = "wycats@gmail.com"
 HOMEPAGE = "http://merbivore.com/"
