@@ -1,0 +1,46 @@
+<html>
+  <head>
+    <%= js_include_tag "jquery-1.2.3", "jquery.fn", "jquery.print", "screw.builder", 
+                       "screw.matchers", "screw.events", "screw.behaviors" %>
+        
+    <%= css_include_tag "screw.css" %>
+  </head>
+  <body>
+    <iframe id="dom" src="<%= @spec_url %>" style="display: none"></iframe>  
+    <script>
+      $.fn.fireEvent = function(event) {
+        runLivequeries();
+        for(var i=0; i<this.length;i++) {
+          var node = this[i];
+          events = iframeWindow.$.cache[iframeWindow.$.data(node)].events;
+          if(events[event]) {
+            for(prop in events[event]) events[event][prop].call(node, {})
+          }
+        }
+        return this;
+      }
+      
+      runLivequeries = function() {
+        queries = iframeWindow.$.livequery.queries;
+        for(var i = 0; i<queries.length;i++) {
+          queries[i].run();
+        }
+      }
+          
+      Screw.Unit(function() {
+        before(function() {
+          iframeWindow = $("#dom").contents()[0].defaultView;
+          old$ = $;
+          $ = function(selector, context) {
+            if(context) { return old$(selector, old$(context, old$("#dom").contents())); }
+            else { return old$(selector, old$("#dom").contents()); }
+          };
+        })
+        <%= catch_content :for_layout %>
+        after(function() {
+          $ = old$;
+        })
+      });
+    </script>
+  </body>
+</html>
