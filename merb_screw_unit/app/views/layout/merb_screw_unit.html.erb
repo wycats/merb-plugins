@@ -6,7 +6,7 @@
     <%= css_include_tag "screw.css" %>
   </head>
   <body>
-    <iframe id="dom" src="<%= @spec_url %>" style="display: block"></iframe>  
+    <iframe id="dom" src="<%= @spec_url %>" style="display: none"></iframe>  
     <script>
       iframeWindow = $("#dom").contents()[0].defaultView;      
       runLivequeries = function() {
