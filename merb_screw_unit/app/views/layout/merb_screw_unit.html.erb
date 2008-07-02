@@ -6,40 +6,35 @@
     <%= css_include_tag "screw.css" %>
   </head>
   <body>
-    <iframe id="dom" src="<%= @spec_url %>" style="display: none"></iframe>  
+    <iframe id="dom" src="<%= @spec_url %>" style="display: block"></iframe>  
     <script>
-      $.fn.fireEvent = function(event) {
-        runLivequeries();
-        for(var i=0; i<this.length;i++) {
-          var node = this[i];
-          events = iframeWindow.$.cache[iframeWindow.$.data(node)].events;
-          if(events[event]) {
-            for(prop in events[event]) events[event][prop].call(node, {})
-          }
-        }
-        return this;
-      }
-      
+      iframeWindow = $("#dom").contents()[0].defaultView;      
       runLivequeries = function() {
-        queries = iframeWindow.$.livequery.queries;
-        for(var i = 0; i<queries.length;i++) {
-          queries[i].run();
+        if(iframeWindow.$.livequery) {
+          queries = iframeWindow.$.livequery.queries;
+          for(var i = 0; i<queries.length;i++) {
+            queries[i].run();
+          }
         }
       }
           
       Screw.Unit(function() {
         before(function() {
-          iframeWindow = $("#dom").contents()[0].defaultView;
-          old$ = $;
-          $ = function(selector, context) {
-            if(context) { return old$(selector, old$(context, old$("#dom").contents())); }
-            else { return old$(selector, old$("#dom").contents()); }
-          };
+          $ = iframeWindow.$;
+          $.fn.fireEvent = function(event) {
+            runLivequeries();
+            for(var i=0; i<this.length;i++) {
+              var node = this[i];
+              var data = iframeWindow.$.cache[iframeWindow.$.data(node)];
+              eventObj = data && data.events && data.events[event];
+              if(eventObj) {
+                for(prop in eventObj) eventObj[prop].call(node, document.createEvent("MouseEvent"))
+              }
+            }
+            return this;
+          }
         })
         <%= catch_content :for_layout %>
-        after(function() {
-          $ = old$;
-        })
       });
     </script>
   </body>
