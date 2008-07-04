@@ -5,6 +5,9 @@ if defined?(Merb::Plugins)
   $:.unshift File.dirname(__FILE__)
 
   load_dependency 'merb-slices'
+  load_dependency 'merb-assets'
+  require 'md5'
+  
   Merb::Plugins.add_rakefiles "merb_screw_unit/merbtasks", "merb_screw_unit/slicetasks"
 
   # Register the Slice for the current host application

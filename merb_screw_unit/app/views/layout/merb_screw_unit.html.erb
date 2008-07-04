@@ -1,38 +1,37 @@
 <html>
   <head>
     <%= js_include_tag "jquery-1.2.3", "jquery.fn", "jquery.print", "screw.builder", 
-                       "screw.matchers", "screw.events", "screw.behaviors" %>
+                       "screw.matchers", "screw.events", "screw.behaviors",
+                       "screw.mock" %>
         
     <%= css_include_tag "screw.css" %>
   </head>
   <body>
-    <iframe id="dom" src="<%= @spec_url %>" style="display: none"></iframe>  
-    <script>
-      iframeWindow = $("#dom").contents()[0].defaultView;      
-      runLivequeries = function() {
-        if(iframeWindow.$.livequery) {
-          queries = iframeWindow.$.livequery.queries;
-          for(var i = 0; i<queries.length;i++) {
-            queries[i].run();
-          }
-        }
-      }
-          
+    <iframe id="dom" src="<%= @spec_url %>?<%= MD5.hexdigest(Time.now.to_s) %>" style="display: none"></iframe>  
+    <script>          
       Screw.Unit(function() {
-        before(function() {
+        iframeWindow = $("#dom").contents()[0].defaultView;
+        iframeWindow.XMLHttpRequest = Screw.XHR;
+        runLivequeries = function() {
+          if(iframeWindow.$.livequery) {
+            queries = iframeWindow.$.livequery.queries;
+            for(var i = 0; i<queries.length;i++) {
+              queries[i].run();
+            }
+          }
+        };          
+        
+        before(function() {          
           $ = iframeWindow.$;
+          $.ajaxSettings.async = false;
           $.fn.fireEvent = function(event) {
             runLivequeries();
-            for(var i=0; i<this.length;i++) {
-              var node = this[i];
-              var data = iframeWindow.$.cache[iframeWindow.$.data(node)];
-              eventObj = data && data.events && data.events[event];
-              if(eventObj) {
-                for(prop in eventObj) eventObj[prop].call(node, document.createEvent("MouseEvent"))
-              }
-            }
+            this.trigger(event);
+            this.each(function() {
+              if($(this).is(":submit")) $(this).parents("form:first").submit();
+            });
             return this;
-          }
+          };
         })
         <%= catch_content :for_layout %>
       });
