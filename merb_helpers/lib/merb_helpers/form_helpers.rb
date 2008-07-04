@@ -212,7 +212,7 @@ module Merb
       def password_control(col, attrs = {})
         attrs.merge!(:name => control_name(col), :id => control_id(col))
         errorify_field(attrs, col)
-        password_field(control_name_value(col, attrs))
+        password_field({:name => control_name(col)}.merge(attrs))
       end
       
       # Provides a generic HTML password input tag.
@@ -221,7 +221,6 @@ module Merb
       #     <%= password_field :name => :password, :label => "Password" %>
       #     # => <label for="password">Password</label><input type="password" name="password" id="password"/>
       def password_field(attrs = {})
-        attrs.delete(:value)
         attrs.merge!(:type => 'password')
         attrs.add_html_class!("password")
         optional_label(attrs) { self_closing_tag("input", attrs) }
