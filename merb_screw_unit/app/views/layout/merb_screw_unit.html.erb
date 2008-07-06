@@ -8,7 +8,7 @@
   </head>
   <body>
     <iframe id="dom" src="<%= @spec_url %>?<%= MD5.hexdigest(Time.now.to_s) %>" style="display: none"></iframe>  
-    <script>          
+    <script type="text/javascript">
       Screw.Unit(function() {
         iframeWindow = $("#dom").contents()[0].defaultView;
         iframeWindow.XMLHttpRequest = Screw.XHR;
@@ -19,17 +19,14 @@
               queries[i].run();
             }
           }
-        };          
+        };
         
         before(function() {          
           $ = iframeWindow.$;
           $.ajaxSettings.async = false;
           $.fn.fireEvent = function(event) {
             runLivequeries();
-            this.trigger(event);
-            this.each(function() {
-              if($(this).is(":submit")) $(this).parents("form:first").submit();
-            });
+           	this.trigger(event);
             return this;
           };
         })

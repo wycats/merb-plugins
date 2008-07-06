@@ -74,7 +74,7 @@ var Screw = (function($) {
       .appendTo('body');
 
     $(screw).dequeue();
-    $("#dom").contents()[0].defaultView.onload = function() {
+    $("#dom")[0].onload = function() {
       setTimeout(function() {
         $(screw).trigger('loaded');
       }, 200);
