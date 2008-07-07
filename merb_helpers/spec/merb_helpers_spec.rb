@@ -1,5 +1,52 @@
 require File.dirname(__FILE__) + '/spec_helper'
 
+describe "tag" do
+  it_should_behave_like "FakeBufferConsumer"
+
+  it %{tag(:div)} do
+    tag(:div).should == %{<div></div>}
+  end
+
+  it %{tag(:div, 'content')} do
+    tag(:div, 'content').should == %{<div>content</div>}
+  end
+
+  it %{tag(:div, :class => "math")} do
+    tag(:div, :class => "math").should == %{<div class="math"></div>}
+  end
+
+  it %{tag(:div, :id => "head")} do
+    tag(:div, :id => "head").should == %{<div id="head"></div>}
+  end
+
+  it %{tag(:div, 'content', :class => "math")} do
+    tag(:div, 'content', :class => "math").should ==
+      %{<div class="math">content</div>}
+  end
+
+  it %{tag(:div) { 'content' }} do
+    o = tag(:div) do
+      _buffer << 'content'
+    end
+    o.should == %{<div>content</div>}
+  end
+
+  it %{tag(:div, :class => "math") { 'content' }} do
+    o = tag(:div, :class => "math") do
+      _buffer << 'content'
+    end
+    o.should == %{<div class="math">content</div>}
+  end
+
+  it %{tag(:div, :id => "head") { 'content' }} do
+    o = tag(:div, :id => "head") do
+      _buffer << 'content'
+    end
+    o.should == %{<div id="head">content</div>}
+  end
+  
+end
+
 describe "error_messages_for" do
   before :each do
     @obj = Object.new

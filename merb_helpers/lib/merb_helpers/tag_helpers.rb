@@ -26,7 +26,7 @@ module Merb
       #   # <div class="class">content</div>
       # 
       def tag(name, contents = nil, attrs = {}, &block)
-        attrs = contents if contents.is_a?(Hash)
+        attrs, contents = contents, nil if contents.is_a?(Hash)
         contents = capture(&block) if block_given?
         open_tag(name, attrs) + contents.to_s + close_tag(name)
       end
