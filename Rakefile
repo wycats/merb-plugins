@@ -35,3 +35,12 @@ task :bundle do
     end
   end
 end
+
+namespace :release do
+  desc "Publish Merb More gem to RubyForge, one by one."
+  task :gems => [ :bundle ] do
+    gems.each do |gem|
+      Dir.chdir(gem){ sh "rake release" }
+    end
+  end
+end
