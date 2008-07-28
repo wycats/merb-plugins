@@ -347,8 +347,10 @@ module Merb
       # ==== Example
       #     <%= radio_field :name => "radio_options", :value => "1", :label => "One" %>
       #     <%= radio_field :name => "radio_options", :value => "2", :label => "Two" %>
+      #     <%= radio_field :name => "radio_options", :value => "3", :label => "Three", :checked => true %>
       def radio_field(attrs = {})
         attrs.merge!(:type => "radio")
+        attrs.delete(:checked) unless attrs[:checked]
         attrs.add_html_class!("radio")
         optional_label(attrs){self_closing_tag("input", attrs)}
       end

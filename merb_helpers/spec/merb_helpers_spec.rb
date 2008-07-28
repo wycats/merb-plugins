@@ -544,6 +544,16 @@ describe "radio button (basic)" do
     res[0].should_not match_tag(:input, :label => "LABEL")
   end
 
+  it "should remove the checked attribute if it is nil or false" do
+    result = radio_field(:name => "foo", :value => "bar", :checked => false)
+    result.should_not match(/<input.*checked.*>/)
+
+    result = radio_field(:name => "foo", :value => "bar", :checked => nil)
+    result.should_not match(/<input.*checked.*>/)
+
+    result = radio_field(:name => "foo", :value => "bar", :checked => true)
+    result.should match(/<input.*checked.*>/)
+  end
 end
 
 describe "radio button groups (data bound)" do
