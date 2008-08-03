@@ -35,3 +35,10 @@ task :bundle do
     end
   end
 end
+
+desc "Release gems in merb-plugins"
+task :release => [:bundle] do
+  gems.each do |dir|
+    Dir.chdir(dir){ sh "rake release" }
+  end
+end
