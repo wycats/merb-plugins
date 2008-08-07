@@ -14,4 +14,10 @@ if defined?(Merb::Plugins)
 
   end
   
+  generators = File.join(File.dirname(__FILE__), 'generators')
+  Merb.add_generators generators / :migration
+  Merb.add_generators generators / :model
+  Merb.add_generators generators / :resource_controller
+  Merb.add_generators generators / :session_migration
+  
 end
