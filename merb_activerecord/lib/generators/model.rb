@@ -2,3 +2,7 @@ Merb::Generators::ModelGenerator.template :model_activerecord, :orm => :activere
   source(File.dirname(__FILE__), "templates/model/app/models/%file_name%.rb")
   destination("app/models", base_path, "#{file_name}.rb")
 end
+    
+Merb::Generators::ModelGenerator.invoke :migration, :orm => :activerecord do |generator|
+  generator.new(destination_root, options.merge(:model => true), file_name, attributes)
+end
