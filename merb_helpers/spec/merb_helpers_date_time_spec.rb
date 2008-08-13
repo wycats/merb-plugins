@@ -1,6 +1,8 @@
 require File.dirname(__FILE__) + '/spec_helper'
 
 describe "relative_date" do
+  include Merb::Helpers::DateAndTime  
+  
   before :each do
     Time.stub!(:now).and_return(Time.utc(2007, 6, 1, 11))
   end
@@ -27,6 +29,8 @@ describe "relative_date" do
 end
 
 describe "relative_date_span" do
+  include Merb::Helpers::DateAndTime  
+  
   before :each do
     Time.stub!(:now).and_return(Time.utc(2007, 6, 1, 11))
   end
@@ -66,6 +70,8 @@ describe "relative_date_span" do
 end
 
 describe "relative_time_span" do
+  include Merb::Helpers::DateAndTime  
+  
   before :each do
     Time.stub!(:now).and_return(Time.utc(2007, 6, 1, 11))
   end
@@ -105,6 +111,8 @@ describe "relative_time_span" do
 end
 
 describe "time_lost_in_words" do
+  include Merb::Helpers::DateAndTime  
+  
   it "Should show seconds" do
     time_lost_in_words(Time.now, Time.now, true).should == "less than 5 seconds"
   end
@@ -151,6 +159,8 @@ describe "time_lost_in_words" do
 end
 
 describe "prettier_time" do
+  include Merb::Helpers::DateAndTime  
+  
   # prettier time"
   it "Should not show leading zero in hour" do
     prettier_time(Time.utc(2007, 11, 15, 14, 0)).should == '2:00 PM'
