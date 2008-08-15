@@ -742,16 +742,12 @@ describe "select_control" do
     end
   end
 
-  # Not sure how this makes any sense
-  # ---------------------------------
-  #
-  # it "should render the text as the value if no text_method is specified" do
-  #   form_for @obj do
-  #     content = select_control( :foo, :collection => [FakeModel] )
-  #     content.should match_tag( :option, :value => "FakeModel" )
-  #   end
-  # end
-
+  it "should render the text as the value if no text_method is specified" do
+    form_for @obj do
+      content = select_control( :foo, :collection => ["FakeModel"] )
+      content.should match_tag( :option, :value => "FakeModel" )
+    end
+  end
 end
 
 describe "option tag generation (data bound)" do
@@ -777,7 +773,7 @@ describe "option tag generation (data bound)" do
 
     form_for @model1 do
       collection = [@model1, @model2, @model3].inject({}) {|s,e| (s[e.make] ||= []) << e; s }
-      content = select_control(:vin, :text_method => "model",
+      content = select_control(:vin, :text_method => "model", :value_method => "vin",
         :collection => collection)
       content.should match_tag( :optgroup, :label => "Ford" )
       content.should match_tag( :option, :selected => "selected", :value => "1", :content => "Mustang" )

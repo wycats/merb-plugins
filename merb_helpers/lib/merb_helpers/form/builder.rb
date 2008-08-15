@@ -59,7 +59,7 @@ module Merb::Helpers::Form::Builder
     # ==== Example
     #   <%= form :action => url(:controller => "foo", :action => "bar", :id => 1) do %>
     #     <%= text_field :name => "first_name", :label => "First Name" %>
-    #     <%= submit_button "Create" %>
+    #     <%= submit "Create" %>
     #   <% end =%>
     #
     #   Generates the HTML:
@@ -120,7 +120,7 @@ module Merb::Helpers::Form::Builder
     end
 
     def update_select_control_field(method, attrs)
-      attrs[:value_method] ||= method
+      attrs[:value_method] ||= :to_s
       attrs[:text_method] ||= attrs[:value_method] || :to_s
       attrs[:selected] ||= @obj.send(attrs[:value_method])
     end
@@ -372,8 +372,8 @@ module Merb::Helpers::Form::Builder
       # yank out the options attrs
       collection = attrs.delete(:collection) || []
       selected = attrs.delete(:selected)
-      text_method = @obj ? attrs.delete(:text_method) : :last
-      value_method = @obj ? attrs.delete(:value_method) : :first
+      text_method = attrs.delete(:text_method) || :last
+      value_method = attrs.delete(:value_method) || :first
 
       # if the collection is a Hash, optgroups are a-coming
       if collection.is_a?(Hash)
