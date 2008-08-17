@@ -167,8 +167,8 @@ module Merb::Helpers::Form::Builder
       update_fields(attrs, "checkbox")
       if attrs.delete(:boolean)
         on, off = attrs.delete(:on), attrs.delete(:off)
-        self_closing_tag(:input, {:type => "checkbox", :value => on}.merge(attrs)) <<
-          hidden_field(:name => attrs[:name], :value => off)
+        hidden_field(:name => attrs[:name], :value => off) <<
+          self_closing_tag(:input, {:type => "checkbox", :value => on}.merge(attrs))
       else
         self_closing_tag(:input, {:type => "checkbox"}.merge(attrs))
       end
