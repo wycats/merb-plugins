@@ -9,30 +9,30 @@
 #     <%= form_for :person, :action => url(:people) do %>
 #       <%= text_control :first_name, :label => 'First Name' %>
 #       <%= text_control :last_name,  :label => 'Last Name' %>
-#       <%= submit 'Create' %>
+#       <%= submit_button 'Create' %>
 #     <% end =%>
 #
 # The HTML generated for this would be:
 #
-#     <form action="/people/" method="post">
+#     <form action="/people/create" method="post">
 #       <label for="person_first_name">First Name</label>
 #       <input id="person_first_name" name="person[first_name]" size="30" type="text" />
 #       <label for="person_last_name">Last Name</label>
 #       <input id="person_last_name" name="person[last_name]" size="30" type="text" />
-#       <input type="submit">Create</button>
+#       <button type="submit">Create</button>
 #     </form>
 #
 # You may also create a normal form using form_tag
 #     <%= form :action => url(:controller => "foo", :action => "bar", :id => 1) do %>
 #       <%= text_field :name => 'first_name', :label => 'First Name' %>
-#       <%= submit 'Create' %>
+#       <%= submit_button 'Create' %>
 #     <% end =%>
 #
 # The HTML generated for this would be:
 #
 #     <form action="/foo/bar/1" method="post">
 #       <label for="first_name">First Name</label><input id="first_name" name="first_name" size="30" type="text" />
-#       <input type="submit">Create</button>
+#       <button type="submit">Create</button>
 #     </form>
 module Merb::Helpers::Form
 
@@ -70,7 +70,7 @@ module Merb::Helpers::Form
   # 
   #     <%= form :action => url(:controller => "foo", :action => "bar", :id => 1) do %>
   #       <%= text_field :name => 'first_name', :label => 'First Name' %>
-  #       <%= submit 'Create' %>
+  #       <%= submit_button 'Create' %>
   #     <% end =%>
   #
   # The HTML generated for this would be:
@@ -87,7 +87,7 @@ module Merb::Helpers::Form
   #     <%= form_for :person, :action => url(:people) do %>
   #       <%= text_control :first_name, :label => 'First Name' %>
   #       <%= text_control :last_name,  :label => 'Last Name' %>
-  #       <%= submit 'Create' %>
+  #       <%= submit_button 'Create' %>
   #     <% end= %>
   #
   # The HTML generated for this would be:
@@ -113,7 +113,7 @@ module Merb::Helpers::Form
   #       <% fields_for :permission do %>
   #         <%= checkbox_control :is_admin, :label => 'Administrator' %>
   #       <% end %>
-  #       <%= submit 'Create' %>
+  #       <%= submit_button 'Create' %>
   #     <% end =%>
   def fields_for(name, attrs = {}, &blk)
     attrs ||= {}

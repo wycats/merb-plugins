@@ -47,7 +47,7 @@ module OrdinalizedFormatting
   # String:: Ordinalized time/date object
   #
   # ==== Examples
-  #    5.days.ago.strftime_ordinalized('%b %d, %Y')     # => Aug 11th, 2008
+  #    5.days.ago.strftime_ordinalized('%b %d, %Y')     # => 
   def strftime_ordinalized(fmt, format=nil)
     strftime(fmt.gsub(/(^|[^-])%d/, '\1_%d_')).gsub(/_(\d+)_/) { |s| s.to_i.ordinalize }
   end
