@@ -825,19 +825,9 @@ describe "option tags generation (basic)" do
     content.should match_tag( :option, :value => '' )
   end
 
-  it "should start with a blank option" do
-    content = select(:collection => @collection, :include_blank => true )
-    content.should match(/<select>#{tag(:option, :value => '')}/)
-  end
-
   it "should provide a prompt option" do
-    content = select( :collection => @collection, :prompt => 'Choose' )
+    content = select( :collection => [], :prompt => 'Choose' )
     content.should match_tag( :option, :value => '', :content => 'Choose' )
-  end
-  
-  it "should start with a prompt option" do
-    content = select(:collection => @collection, :prompt => 'Choose' )
-    content.should match(/<select>#{tag(:option, 'Choose', :value => '')}/)
   end
 
   it "should provide selected options by value" do

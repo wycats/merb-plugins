@@ -279,7 +279,7 @@ module Merb::Helpers::Form::Builder
     # String:: HTML
     def select(attrs = {})
       update_fields(attrs, "select")
-      tag(:select, options_for(attrs), attrs.except(:value))
+      tag(:select, options_for(attrs), attrs)
     end
 
     # Provides a radio group based on a resource attribute.
@@ -388,9 +388,9 @@ module Merb::Helpers::Form::Builder
 
       # if the collection is a Hash, optgroups are a-coming
       if collection.is_a?(Hash)
-        options = [b] + collection.map do |g,col|
+        options = collection.map do |g,col|
           tag(:optgroup, options(col, text_method, value_method, attrs, selected, ""), :label => g)
-        end
+        end + [b]
         options.join
       else
         options(collection, text_method, value_method, attrs, selected, b)
@@ -398,12 +398,12 @@ module Merb::Helpers::Form::Builder
     end
 
     def options(col, text_meth, value_meth, attrs, sel, b)
-      options = [b] + col.map do |item|
+      options = col.map do |item|
         value = item.send(value_meth)
         attrs.merge!(:value => value)
         attrs.merge!(:selected => "selected") if value == sel
         tag(:option, item.send(text_meth), attrs)
-      end
+      end + [b]
       options.join
     end
 
