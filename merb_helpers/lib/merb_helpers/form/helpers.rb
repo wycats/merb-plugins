@@ -1,14 +1,14 @@
 # Provides a number of methods for creating form tags which may be used either with or without the presence of ORM specific models.
 # There are two types of form helpers: those that specifically work with model attributes and those that don't.
-# This helper deals with both model attributes and generic form tags. Model attributes generally end in "_control" such as +text_control+,
+# This helper deals with both model attributes and generic form tags. Model attributes generally end in "_control" such as +bound_text_field+,
 # and generic tags end with "_field", such as +text_field+
 #
 # The core method of this helper, +form_for+, gives you the ability to create a form for a resource.
 # For example, let's say that you have a model <tt>Person</tt> and want to create a new instance of it:
 #
 #     <%= form_for :person, :action => url(:people) do %>
-#       <%= text_control :first_name, :label => 'First Name' %>
-#       <%= text_control :last_name,  :label => 'Last Name' %>
+#       <%= bound_text_field :first_name, :label => 'First Name' %>
+#       <%= bound_text_field :last_name,  :label => 'Last Name' %>
 #       <%= submit_button 'Create' %>
 #     <% end =%>
 #
@@ -85,8 +85,8 @@ module Merb::Helpers::Form
 
   # Generates a resource specific form tag which accepts a block, this also provides automatic resource routing.
   #     <%= form_for :person, :action => url(:people) do %>
-  #       <%= text_control :first_name, :label => 'First Name' %>
-  #       <%= text_control :last_name,  :label => 'Last Name' %>
+  #       <%= bound_text_field :first_name, :label => 'First Name' %>
+  #       <%= bound_text_field :last_name,  :label => 'Last Name' %>
   #       <%= submit_button 'Create' %>
   #     <% end= %>
   #
@@ -108,10 +108,10 @@ module Merb::Helpers::Form
   #
   # ==== Examples
   #     <%= form_for :person, :action => url(:people) do %>
-  #       <%= text_control :first_name, :label => 'First Name' %>
-  #       <%= text_control :last_name,  :label => 'Last Name' %>
+  #       <%= bound_text_field :first_name, :label => 'First Name' %>
+  #       <%= bound_text_field :last_name,  :label => 'Last Name' %>
   #       <% fields_for :permission do %>
-  #         <%= checkbox_control :is_admin, :label => 'Administrator' %>
+  #         <%= bound_check_box :is_admin, :label => 'Administrator' %>
   #       <% end %>
   #       <%= submit_button 'Create' %>
   #     <% end =%>
@@ -143,15 +143,16 @@ module Merb::Helpers::Form
     end
   end
 
-  %w(text radio password hidden checkbox
-  radio_group text_area select file).each do |kind|
+  # @todo radio_group helper still needs to be implemented
+  %w(text_field password_field hidden_field file_field
+  text_area select check_box radio_button radio_group).each do |kind|
     self.class_eval <<-RUBY, __FILE__, __LINE__ + 1
-      def #{kind}_control(*args)
-        current_form_context.#{kind}_control(*args)
+      def #{kind}(*args)
+        _singleton_form_context.#{kind}(*args)
       end
 
-      def #{kind}_field(*args)
-        _singleton_form_context.#{kind}_field(*args)
+      def bound_#{kind}(*args)
+        current_form_context.bound_#{kind}(*args)
       end
     RUBY
   end

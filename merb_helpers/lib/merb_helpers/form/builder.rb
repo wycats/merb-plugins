@@ -102,16 +102,16 @@ module Merb::Helpers::Form::Builder
     def update_control_fields(method, attrs, type)
       case type
       when "checkbox"
-        update_checkbox_control_field(method, attrs)
+        update_bound_check_box_field(method, attrs)
       when "select"
-        update_select_control_field(method, attrs)
+        update_bound_select_field(method, attrs)
       end
     end
 
     def update_fields(attrs, type)
       case type
       when "checkbox"
-        update_checkbox_field(attrs)
+        update_check_box(attrs)
       when "file"
         @multipart = true
       end
@@ -119,14 +119,14 @@ module Merb::Helpers::Form::Builder
       attrs[:disabled] ? attrs[:disabled] = "disabled" : attrs.delete(:disabled)
     end
 
-    def update_select_control_field(method, attrs)
+    def update_bound_select_field(method, attrs)
       attrs[:value_method] ||= method
       attrs[:text_method] ||= attrs[:value_method] || :to_s
       attrs[:selected] ||= @obj.send(attrs[:value_method])
     end
 
-    def update_checkbox_control_field(method, attrs)
-      raise ArgumentError, ":value can't be used with a checkbox_control" if attrs.has_key?(:value)
+    def update_bound_check_box_field(method, attrs)
+      raise ArgumentError, ":value can't be used with a bound_check_box" if attrs.has_key?(:value)
 
       attrs[:boolean] ||= true
 
@@ -134,7 +134,7 @@ module Merb::Helpers::Form::Builder
       attrs[:checked] = attrs.key?(:on) ? val == attrs[:on] : considered_true?(val)
     end
 
-    def update_checkbox_field(attrs)
+    def update_check_box(attrs)
       boolean = attrs[:boolean] || (attrs[:on] && attrs[:off]) ? true : false
 
       case
@@ -157,13 +157,13 @@ module Merb::Helpers::Form::Builder
       end
     end
 
-    def checkbox_control(method, attrs = {})
+    def bound_check_box(method, attrs = {})
       name = control_name(method)
       update_control_fields(method, attrs, "checkbox")
-      checkbox_field({:name => name}.merge(attrs))
+      check_box({:name => name}.merge(attrs))
     end
 
-    def checkbox_field(attrs = {})
+    def check_box(attrs = {})
       update_fields(attrs, "checkbox")
       if attrs.delete(:boolean)
         on, off = attrs.delete(:on), attrs.delete(:off)
@@ -174,19 +174,30 @@ module Merb::Helpers::Form::Builder
       end
     end
 
-    %w(text radio password hidden file).each do |kind|
+    %w(text password hidden file).each do |kind|
       self.class_eval <<-RUBY, __FILE__, __LINE__ + 1
-        def #{kind}_control(method, attrs = {})
-          name = control_name(method)
-          update_control_fields(method, attrs, "#{kind}")
-          #{kind}_field({:name => name, :value => @obj.send(method)}.merge(attrs))
-        end
-
         def #{kind}_field(attrs = {})
           update_fields(attrs, "#{kind}")
           self_closing_tag(:input, {:type => "#{kind}"}.merge(attrs))
         end
+
+        def bound_#{kind}_field(method, attrs = {})
+          name = control_name(method)
+          update_control_fields(method, attrs, "#{kind}")
+          #{kind}_field({:name => name, :value => @obj.send(method)}.merge(attrs))
+        end
       RUBY
+    end
+
+    def bound_radio_button(method, attrs = {})
+      name = control_name(method)
+      update_control_fields(method, attrs, "radio")
+      radio_button({:name => name, :value => @obj.send(method)}.merge(attrs))
+    end
+
+    def radio_button(attrs = {})
+      update_fields(attrs, "radio")
+      self_closing_tag(:input, {:type => "radio"}.merge(attrs))
     end
 
     # Generates a HTML button.
@@ -244,11 +255,11 @@ module Merb::Helpers::Form::Builder
     # String:: HTML
     #
     # ==== Example
-    #   <%= select_control :name, :collection => %w(one two three four) %>
-    def select_control(method, attrs = {})
+    #   <%= bound_select :name, :collection => %w(one two three four) %>
+    def bound_select(method, attrs = {})
       name = control_name(method)
       update_control_fields(method, attrs, "select")
-      select_field({:name => name}.merge(attrs))
+      select({:name => name}.merge(attrs))
     end
 
     # Provides a generic HTML select.
@@ -266,7 +277,7 @@ module Merb::Helpers::Form::Builder
     #
     # ==== Returns
     # String:: HTML
-    def select_field(attrs = {})
+    def select(attrs = {})
       update_fields(attrs, "select")
       tag(:select, options_for(attrs), attrs)
     end
@@ -283,11 +294,11 @@ module Merb::Helpers::Form::Builder
     #
     # ==== Examples
     #   <%# the labels are the options %>
-    #   <%= radio_group_control :my_choice, [5,6,7] %>
+    #   <%= bound_radio_group :my_choice, [5,6,7] %>
     #
     #   <%# custom labels %>
-    #   <%= radio_group_control :my_choice, [{:value => 5, :label => "five"}] %>
-    def radio_group_control(method, arr)
+    #   <%= bound_radio_group :my_choice, [{:value => 5, :label => "five"}] %>
+    def bound_radio_group(method, arr)
       val = @obj.send(method)
       arr.map do |attrs|
         attrs = {:value => attrs} unless attrs.is_a?(Hash)
@@ -306,8 +317,8 @@ module Merb::Helpers::Form::Builder
     # String:: HTML
     #
     # ==== Example
-    #   <%= text_area_field "my comments", :name => "comments" %>
-    def text_area_field(contents, attrs = {})
+    #   <%= text_area "my comments", :name => "comments" %>
+    def text_area(contents, attrs = {})
       update_fields(attrs, "text_area")
       tag(:textarea, contents, attrs)
     end
@@ -323,11 +334,11 @@ module Merb::Helpers::Form::Builder
     # String:: HTML
     #
     # ==== Example
-    #   <%= text_area_control :comments %>
-    def text_area_control(method, attrs = {})
+    #   <%= bound_text_area :comments %>
+    def bound_text_area(method, attrs = {})
       name = "#{@name}[#{method}]"
       update_control_fields(method, attrs, "text_area")
-      text_area_field(@obj.send(method), {:name => name}.merge(attrs))
+      text_area(@obj.send(method), {:name => name}.merge(attrs))
     end
 
     private
@@ -398,7 +409,7 @@ module Merb::Helpers::Form::Builder
 
     def radio_group_item(method, attrs)
       attrs.merge!(:checked => "checked") if attrs[:checked]
-      radio_control(method, attrs)
+      bound_radio_button(method, attrs)
     end
 
     def considered_true?(value)
@@ -457,16 +468,16 @@ module Merb::Helpers::Form::Builder
       label(attrs) + super
     end
 
-    def text_area_field(contents, attrs = {})
+    def text_area(contents, attrs = {})
       label(attrs) + super
     end
 
-    def checkbox_field(attrs = {})
+    def check_box(attrs = {})
       label_text = label(attrs)
       super + label_text
     end
 
-    def radio_field(attrs = {})
+    def radio_button(attrs = {})
       label_text = label(attrs)
       super + label_text
     end
