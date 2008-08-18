@@ -316,13 +316,10 @@ namespace :db do
   end
 
   namespace :sessions do
-  #  desc "Creates a sessions migration for use with CGI::Session::ActiveRecordStore"
-  #  task :create => :environment do
-  #    raise "Task unavailable to this database (no migration support)" unless ActiveRecord::Base.connection.supports_migrations?
-  #    require 'rails_generator'
-  #    require 'rails_generator/scripts/generate'
-  #    Rails::Generator::Scripts::Generate.new.run(["session_migration", ENV["MIGRATION"] || "AddSessions"])
-  #  end
+    desc "Create sessions table"
+    task :create => :merb_start do
+      Merb::ActiveRecordSession.create_table!
+    end
 
     desc "Clear the sessions table"
     task :clear => :merb_start do

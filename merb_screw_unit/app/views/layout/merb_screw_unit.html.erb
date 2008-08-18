@@ -1,0 +1,37 @@
+<html>
+  <head>
+    <%= js_include_tag "jquery-1.2.3", "jquery.fn", "jquery.print", "screw.builder", 
+                       "screw.matchers", "screw.events", "screw.behaviors",
+                       "screw.mock" %>
+        
+    <%= css_include_tag "screw.css" %>
+  </head>
+  <body>
+    <iframe id="dom" src="<%= @spec_url %>?<%= MD5.hexdigest(Time.now.to_s) %>" style="display: none"></iframe>  
+    <script type="text/javascript">
+      Screw.Unit(function() {
+        iframeWindow = $("#dom").contents()[0].defaultView;
+        iframeWindow.XMLHttpRequest = Screw.XHR;
+        runLivequeries = function() {
+          if(iframeWindow.$.livequery) {
+            queries = iframeWindow.$.livequery.queries;
+            for(var i = 0; i<queries.length;i++) {
+              queries[i].run();
+            }
+          }
+        };
+        
+        before(function() {          
+          $ = iframeWindow.$;
+          $.ajaxSettings.async = false;
+          $.fn.fireEvent = function(event) {
+            runLivequeries();
+           	this.trigger(event);
+            return this;
+          };
+        })
+        <%= catch_content :for_layout %>
+      });
+    </script>
+  </body>
+</html>

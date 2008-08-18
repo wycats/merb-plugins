@@ -2,7 +2,7 @@ require "rake"
 require 'fileutils'
 require 'merb-core/tasks/merb_rake_helper'
 
-gems = %w[merb_activerecord merb_helpers merb_sequel merb_param_protection merb_test_unit merb_stories]
+gems = %w[merb_activerecord merb_helpers merb_sequel merb_param_protection merb_test_unit merb_stories merb_screw_unit]
 orm_gems = %w[merb_activerecord merb_sequel]
 
 desc "Install it all"
@@ -33,5 +33,12 @@ task :bundle do
       Dir.chdir(gem){ sh "rake package" }
       sh %{cp #{gem}/pkg/#{gem}-#{$1}.gem bundle/}
     end
+  end
+end
+
+desc "Release gems in merb-plugins"
+task :release do
+  gems.each do |dir|
+    Dir.chdir(dir){ sh "rake release" }
   end
 end

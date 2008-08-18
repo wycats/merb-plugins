@@ -4,10 +4,6 @@ require 'rubygems'
 require 'merb-core'
 require 'merb_helpers'
 Merb::Helpers.load
-include Merb::Helpers::DateAndTime
-include Merb::ControllerMixin
-include Merb::Helpers::Tag
-include Merb::Helpers::Form
 
 def unload_merb_helpers
   Merb.class_eval do
@@ -29,13 +25,23 @@ class FakeDMModel
     ]
   end
   
+  def new_record?
+    false
+  end
+  
+  def errors
+    FakeErrors.new(self)
+  end
+  
   def baz?
     true
   end
+  alias baz baz?
   
   def bat?
     false
   end
+  alias bat bat?
 end
 
 
@@ -341,7 +347,14 @@ module Merb
   end
 end
 
-describe "FakeBufferConsumer", :shared => true do
+describe "FakeController", :shared => true do
+  class_inheritable_accessor :_form_class
+  self._form_class = Merb::Plugins.config[:helpers][:form_class]
+  include Merb::Helpers::DateAndTime
+  include Merb::ControllerMixin
+  include Merb::Helpers::Tag
+  include Merb::Helpers::Form
+  
   before :each do
     @obj = FakeModel.new
     def _buffer(buf = "") @buffer ||= "" end

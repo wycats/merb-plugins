@@ -39,7 +39,7 @@ module Merb
         @@time_output[format]
       end
       
-      def date_formats
+      def self.date_formats
         @@date_formats
       end
       
