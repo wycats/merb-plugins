@@ -102,9 +102,9 @@ module Merb::Helpers::Form::Builder
     def update_control_fields(method, attrs, type)
       case type
       when "checkbox"
-        update_bound_check_box_field(method, attrs)
+        update_bound_check_box(method, attrs)
       when "select"
-        update_bound_select_field(method, attrs)
+        update_bound_select(method, attrs)
       end
     end
 
@@ -119,13 +119,13 @@ module Merb::Helpers::Form::Builder
       attrs[:disabled] ? attrs[:disabled] = "disabled" : attrs.delete(:disabled)
     end
 
-    def update_bound_select_field(method, attrs)
+    def update_bound_select(method, attrs)
       attrs[:value_method] ||= method
       attrs[:text_method] ||= attrs[:value_method] || :to_s
       attrs[:selected] ||= @obj.send(attrs[:value_method])
     end
 
-    def update_bound_check_box_field(method, attrs)
+    def update_bound_check_box(method, attrs)
       raise ArgumentError, ":value can't be used with a bound_check_box" if attrs.has_key?(:value)
 
       attrs[:boolean] ||= true
