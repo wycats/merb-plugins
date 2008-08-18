@@ -155,7 +155,7 @@ describe "fields_for" do
 
   it "should dump the contents in the context of the object" do
     fields_for(:obj) do
-      bound_text_field(:foo).should match_tag(:input, :type => "text", :value => "foowee")
+      text_field(:foo).should match_tag(:input, :type => "text", :value => "foowee")
       _buffer << "Hello"
     end
     _buffer.should == "Hello"
@@ -164,17 +164,17 @@ describe "fields_for" do
   it "should be able to modify the context midstream" do
     @obj2 = FakeModel2.new
     form_for(:obj) do
-      bound_text_field(:foo).should match_tag(:input, :type => "text", :value => "foowee")
+      text_field(:foo).should match_tag(:input, :type => "text", :value => "foowee")
       fields_for(@obj2) do
-        bound_text_field(:foo).should match_tag(:input, :name => "fake_model2[foo]", :type => "text", :value => "foowee2")
+        text_field(:foo).should match_tag(:input, :name => "fake_model2[foo]", :type => "text", :value => "foowee2")
       end
-      bound_text_field(:foo).should match_tag(:input, :type => "text", :value => "foowee")
+      text_field(:foo).should match_tag(:input, :type => "text", :value => "foowee")
     end
   end
 
   it "should handle an explicit nil attribute" do
     fields_for(@obj, nil) do
-      _buffer << bound_text_field(:foo)
+      _buffer << text_field(:foo)
     end
     _buffer.should match_tag(:input, :name => "fake_model[foo]", :value => "foowee", :type => "text")
   end
@@ -182,13 +182,13 @@ describe "fields_for" do
   it "should pass context back to the old object after exiting block" do
     @obj2 = FakeModel2.new
     fields_for(@obj) do
-      bound_text_field(:foo).should match_tag(:input, :id => "fake_model_foo", :name => "fake_model[foo]", :type => "text")
+      text_field(:foo).should match_tag(:input, :id => "fake_model_foo", :name => "fake_model[foo]", :type => "text")
 
       fields_for(@obj2) do
-        bound_text_field(:foo).should match_tag(:input, :id => "fake_model2_foo", :name => "fake_model2[foo]", :type => "text")
+        text_field(:foo).should match_tag(:input, :id => "fake_model2_foo", :name => "fake_model2[foo]", :type => "text")
       end
 
-      bound_text_field(:bar).should match_tag(:input, :id => "fake_model_bar", :name => "fake_model[bar]", :type => "text")
+      text_field(:bar).should match_tag(:input, :id => "fake_model_bar", :name => "fake_model[bar]", :type => "text")
     end
   end
 end
@@ -215,19 +215,19 @@ describe "bound_text_field" do
 
   it "should take a string object and return a useful text control" do
     f = form_for @obj do
-      bound_text_field(:foo).should match_tag(:input, :type => "text", :name => "fake_model[foo]", :value => "foowee")
+      text_field(:foo).should match_tag(:input, :type => "text", :name => "fake_model[foo]", :value => "foowee")
     end
   end
 
   it "should take additional attributes and use them" do
     form_for @obj do
-      bound_text_field(:foo, :bar => "7").should match_tag(:input, :type => "text", :name => "fake_model[foo]", :value => "foowee", :bar => "7")
+      text_field(:foo, :bar => "7").should match_tag(:input, :type => "text", :name => "fake_model[foo]", :value => "foowee", :bar => "7")
     end
   end
 
   it "should provide an additional label tag if the :label option is passed in" do
     form = form_for @obj do
-      _buffer << bound_text_field(:foo, :label => "LABEL")
+      _buffer << text_field(:foo, :label => "LABEL")
     end
     form.should match(/<label.*>LABEL<\/label><input/)
     res = form.scan(/<[^>]*>/)
@@ -236,7 +236,7 @@ describe "bound_text_field" do
 
   it "should not errorify the field for a new object" do
     f = form_for @obj do
-      bound_text_field(:foo, :bar =>"7").should_not match_tag(:input, :type => "text", :name => "fake_model[foo]", :class => "error")
+      text_field(:foo, :bar =>"7").should_not match_tag(:input, :type => "text", :name => "fake_model[foo]", :class => "error")
     end
   end
 
@@ -251,7 +251,7 @@ describe "bound_text_field" do
     model.stub!(:errors).and_return(errors)
 
     f = form_for model do
-      bound_text_field(:foo).should match_tag(:input, :class => "error text")
+      text_field(:foo).should match_tag(:input, :class => "error text")
     end
   end
 end
@@ -261,19 +261,19 @@ describe "bound_radio_button" do
 
   it "should take a string object and return a useful text control" do
     f = form_for @obj do
-      bound_radio_button(:foo).should match_tag(:input, :type => "radio", :name => "fake_model[foo]", :value => "foowee")
+      radio_button(:foo).should match_tag(:input, :type => "radio", :name => "fake_model[foo]", :value => "foowee")
     end
   end
 
   it "should take additional attributes and use them" do
     form_for @obj do
-      bound_radio_button(:foo, :bar => "7").should match_tag(:input, :type => "radio", :name => "fake_model[foo]", :value => "foowee", :bar => "7")
+      radio_button(:foo, :bar => "7").should match_tag(:input, :type => "radio", :name => "fake_model[foo]", :value => "foowee", :bar => "7")
     end
   end
 
   it "should provide an additional label tag if the :label option is passed in" do
     form = form_for @obj do
-      _buffer << bound_radio_button(:foo, :label => "LABEL")
+      _buffer << radio_button(:foo, :label => "LABEL")
     end
     form.should match(/<input.*><label.*>LABEL<\/label>/)
     res = form.scan(/<[^>]*>/)
@@ -282,7 +282,7 @@ describe "bound_radio_button" do
 
   it "should not errorify the field for a new object" do
     f = form_for @obj do
-      bound_radio_button(:foo, :bar =>"7").should_not match_tag(:input, :type => "radio", :name => "fake_model[foo]", :class => "error")
+      radio_button(:foo, :bar =>"7").should_not match_tag(:input, :type => "radio", :name => "fake_model[foo]", :class => "error")
     end
   end
 
@@ -297,7 +297,7 @@ describe "bound_radio_button" do
     model.stub!(:errors).and_return(errors)
 
     f = form_for model do
-      bound_radio_button(:foo).should match_tag(:input, :class => "error radio")
+      radio_button(:foo).should match_tag(:input, :class => "error radio")
     end
   end
 end
@@ -324,19 +324,19 @@ describe "bound_password_field" do
 
   it "should take a string object and return a useful password control, but omit the value" do
     f = form_for @obj do
-      bound_password_field(:foo).should match_tag(:input, :type => "password", :name => "fake_model[foo]")
+      password_field(:foo).should match_tag(:input, :type => "password", :name => "fake_model[foo]")
     end
   end
 
   it "should take additional attributes and use them" do
     form_for @obj do
-      bound_password_field(:foo, :bar => "7").should match_tag(:input, :type => "password", :name => "fake_model[foo]", :bar => "7")
+      password_field(:foo, :bar => "7").should match_tag(:input, :type => "password", :name => "fake_model[foo]", :bar => "7")
     end
   end
 
   it "should provide an additional label tag if the :label option is passed in" do
     form = form_for @obj do
-      _buffer << bound_password_field(:foo, :label => "LABEL")
+      _buffer << password_field(:foo, :label => "LABEL")
     end
     form.should match(/<label.*>LABEL<\/label><input/)
     res = form.scan(/<[^>]*>/)
@@ -345,7 +345,7 @@ describe "bound_password_field" do
 
   it "should not errorify the field for a new object" do
     f = form_for @obj do
-      bound_password_field(:foo, :bar =>"7").should_not match_tag(:input, :class => "error")
+      password_field(:foo, :bar =>"7").should_not match_tag(:input, :class => "error")
     end
   end
 
@@ -360,7 +360,7 @@ describe "bound_password_field" do
     model.stub!(:errors).and_return(errors)
 
     f = form_for model do
-      bound_password_field(:foo).should match_tag(:input, :class => "error password")
+      password_field(:foo).should match_tag(:input, :class => "error password")
     end
   end
 
@@ -440,43 +440,43 @@ describe "bound_check_box" do
 
   it "should take a string and return a useful checkbox control" do
     form_for @obj do
-      bound_check_box(:baz).should match_tag(:input, :type =>"checkbox", :name => "fake_model[baz]", :class => "checkbox", :value => "1", :checked => "checked", :id => "fake_model_baz")
-      bound_check_box(:bat).should match_tag(:input, :type =>"checkbox", :name => "fake_model[bat]", :class => "checkbox", :value => "0")
+      check_box(:baz).should match_tag(:input, :type =>"checkbox", :name => "fake_model[baz]", :class => "checkbox", :value => "1", :checked => "checked", :id => "fake_model_baz")
+      check_box(:bat).should match_tag(:input, :type =>"checkbox", :name => "fake_model[bat]", :class => "checkbox", :value => "0")
     end
   end
 
   it "should support models from datamapper" do
     @dm_obj =  FakeDMModel.new
     form_for @dm_obj do
-      bound_check_box(:baz).should match_tag(:input,
+      check_box(:baz).should match_tag(:input,
                                               :type    =>"checkbox",
                                               :name    => "fake_dm_model[baz]",
                                               :class   => "checkbox",
                                               :value   => "1",
                                               :checked => "checked",
                                               :id      => "fake_dm_model_baz")
-      bound_check_box(:bat).should match_tag(:input, :type =>"checkbox", :name => "fake_dm_model[bat]", :class => "checkbox", :value => "0")
+      check_box(:bat).should match_tag(:input, :type =>"checkbox", :name => "fake_dm_model[bat]", :class => "checkbox", :value => "0")
     end
   end
 
   it "should allow a user to set the :off value" do
     form_for @obj do
-      bound_check_box(:bat, :off => "off", :on => "on").should match_tag(:input, :type =>"checkbox", :name => "fake_model[bat]", :class => "checkbox", :value => "off")
+      check_box(:bat, :off => "off", :on => "on").should match_tag(:input, :type =>"checkbox", :name => "fake_model[bat]", :class => "checkbox", :value => "off")
     end
   end
 
   it "should render controls with errors if their attribute contains an error" do
     form_for @obj do
-      bound_check_box(:bazbad).should match_tag(:input, :type =>"checkbox", :name => "fake_model[bazbad]",
+      check_box(:bazbad).should match_tag(:input, :type =>"checkbox", :name => "fake_model[bazbad]",
         :class => "error checkbox", :value => "1", :checked => "checked")
-      bound_check_box(:batbad).should match_tag(:input, :type =>"checkbox", :name => "fake_model[batbad]",
+      check_box(:batbad).should match_tag(:input, :type =>"checkbox", :name => "fake_model[batbad]",
         :class => "error checkbox", :value => "0")
     end
   end
 
   it "should provide an additional label tag if the :label option is passed in" do
     form = form_for @obj do
-      _buffer << bound_check_box(:foo, :label => "LABEL")
+      _buffer << check_box(:foo, :label => "LABEL")
     end
     form.should match( /<input.*><label.*>LABEL<\/label>/ )
     res = form.scan(/<[^>]*>/)
@@ -485,7 +485,7 @@ describe "bound_check_box" do
 
   it "should not errorify the field for a new object" do
     f = form_for @obj do
-      bound_check_box(:foo, :bar =>"7").should_not match_tag(:input, :type => "checkbox", :class => "error checkbox")
+      check_box(:foo, :bar =>"7").should_not match_tag(:input, :type => "checkbox", :class => "error checkbox")
     end
   end
 
@@ -500,13 +500,13 @@ describe "bound_check_box" do
     model.stub!(:errors).and_return(errors)
 
     f = form_for model do
-      bound_check_box(:foo, :bar =>"7").should match_tag(:input, :type => "checkbox", :class => "error checkbox")
+      check_box(:foo, :bar =>"7").should match_tag(:input, :type => "checkbox", :class => "error checkbox")
     end
   end
   
   it "should be boolean" do
     form_for @obj do
-      html = bound_check_box(:baz)
+      html = check_box(:baz)
       html.should have_tag(:input, :type => "checkbox", :value => "1")
       html.should have_tag(:input, :type => "hidden",   :value => "0")
     end
@@ -514,8 +514,8 @@ describe "bound_check_box" do
   
   it "should be checked if the value of the model's attribute is equal to the value of :on" do
     form_for @obj do
-      bound_check_box(:foo, :on => "foowee", :off => "NO").should match_tag(:input, :type =>"checkbox", :value => "foowee", :checked => "checked")
-      bound_check_box(:foo, :on => "YES",    :off => "NO", :true_if => "zoo").should_not include('checked="')
+      check_box(:foo, :on => "foowee", :off => "NO").should match_tag(:input, :type =>"checkbox", :value => "foowee", :checked => "checked")
+      check_box(:foo, :on => "YES",    :off => "NO", :true_if => "zoo").should_not include('checked="')
     end
   end
 end
@@ -543,19 +543,19 @@ describe "bound_hidden_field" do
 
   it "should take a string and return a useful checkbox control" do
     form_for @obj do
-      bound_hidden_field(:foo).should match_tag(:input, :type =>"hidden", :name => "fake_model[foo]", :value => "foowee")
+      hidden_field(:foo).should match_tag(:input, :type =>"hidden", :name => "fake_model[foo]", :value => "foowee")
     end
   end
 
   it "should render controls with errors if their attribute contains an error" do
     form_for @obj do
-      bound_hidden_field(:foobad).should match_tag(:input, :type =>"hidden", :name => "fake_model[foobad]", :value => "foowee", :class => "error hidden")
+      hidden_field(:foobad).should match_tag(:input, :type =>"hidden", :name => "fake_model[foobad]", :value => "foowee", :class => "error hidden")
     end
   end
 
   it "should not render a label if the :label option is passed in" do
     form_for @obj do
-      res = bound_hidden_field(:foo, :label => "LABEL")
+      res = hidden_field(:foo, :label => "LABEL")
       res.should_not match(/<label>LABEL/)
       res.should_not match_tag(:input, :label=> "LABEL")
     end
@@ -563,7 +563,7 @@ describe "bound_hidden_field" do
 
   it "should not errorify the field for a new object" do
     f = form_for @obj do
-      bound_hidden_field(:foo, :bar =>"7").should_not match_tag(:input, :type => "hidden", :class => "error")
+      hidden_field(:foo, :bar =>"7").should_not match_tag(:input, :type => "hidden", :class => "error")
     end
   end
 
@@ -578,7 +578,7 @@ describe "bound_hidden_field" do
     model.stub!(:errors).and_return(errors)
 
     f = form_for model do
-      bound_hidden_field(:foo, :bar =>"7").should match_tag(:input, :type => "hidden", :name => "my_class[foo]", :class => "error hidden")
+      hidden_field(:foo, :bar =>"7").should match_tag(:input, :type => "hidden", :name => "my_class[foo]", :class => "error hidden")
     end
   end
 
@@ -611,7 +611,7 @@ describe "bound_radio_group" do
 
   it "should return a group of radio buttons" do
     form_for @obj do
-      radio = bound_radio_group(:foo, ["foowee", "baree"]).scan(/<[^>]*>/)
+      radio = radio_group(:foo, ["foowee", "baree"]).scan(/<[^>]*>/)
       radio[0].should match_tag(:input, :type => "radio", :name => "fake_model[foo]", :value => "foowee", :checked => "checked")
       radio[3].should match_tag(:input, :type => "radio", :name => "fake_model[foo]", :value => "baree")
       radio[4].should not_match_tag(:checked => "checked")
@@ -620,7 +620,7 @@ describe "bound_radio_group" do
 
   it "should provide an additional label tag for each option in array-based options" do
     form_for :obj do
-      radio = bound_radio_group(:foo, ["foowee", "baree"])
+      radio = radio_group(:foo, ["foowee", "baree"])
       radio.scan( /<input.*?><label.*?>(foowee|baree)<\/label>/ ).size.should == 2
       radio = radio.scan(/<[^>]*>/)
       radio[0].should_not match_tag(:input, :label => "LABEL")
@@ -630,7 +630,7 @@ describe "bound_radio_group" do
 
   it "should accept array of hashes as options" do
     form_for @obj do
-      radio = bound_radio_group(:foo, [{:value => 5, :label => "Five"}, {:value => 'bar', :label => 'Bar', :id => 'bar_id'}])
+      radio = radio_group(:foo, [{:value => 5, :label => "Five"}, {:value => 'bar', :label => 'Bar', :id => 'bar_id'}])
       radio.scan( /<input.*?><label.*?>(Five|Bar)<\/label>/ ).size.should == 2
       radio = radio.scan(/<[^>]*>/)
       radio.size.should == 6
@@ -645,7 +645,7 @@ describe "bound_radio_group" do
 
   it "should provide autogenerated id for inputs" do
     form_for @obj do
-      [ bound_radio_group(:foo, [:bar]), bound_radio_group(:foo, [{:value => 'bar', :label => 'Bar'}]) ].each do |radio|
+      [ radio_group(:foo, [:bar]), radio_group(:foo, [{:value => 'bar', :label => 'Bar'}]) ].each do |radio|
         radio = radio.scan(/<[^>]*>/)
         radio[0].should match_tag(:input, :id => 'fake_model_foo_bar')
         radio[1].should match_tag(:label, :for => 'fake_model_foo_bar')
@@ -655,7 +655,7 @@ describe "bound_radio_group" do
 
   it "should override autogenerated id for inputs with hash-given id" do
     form_for @obj do
-      radio = bound_radio_group(:foo, [{:value => 'bar', :label => 'Bar', :id => 'bar_id'}]).scan(/<[^>]*>/)
+      radio = radio_group(:foo, [{:value => 'bar', :label => 'Bar', :id => 'bar_id'}]).scan(/<[^>]*>/)
       radio[0].should match_tag(:input, :id => 'bar_id')
       radio[1].should match_tag(:label, :for => 'bar_id')
     end
@@ -698,7 +698,7 @@ describe "bound_text_area" do
 
   it "should provide :id attribute" do
     form_for @obj do
-      bound_text_area( :foo ).should match_tag(:textarea, :id => 'fake_model_foo')
+      text_area( :foo ).should match_tag(:textarea, :id => 'fake_model_foo')
     end
   end
 end
@@ -709,34 +709,34 @@ describe "bound_select" do
 
   it "should render the select tag with the correct id and name" do
     form_for @obj do
-      content = bound_select( :foo )
+      content = select( :foo )
       content.should match_tag( :select, :id => "fake_model_foo", :name => "fake_model[foo]" )
     end
   end
 
   it "should include a blank option" do
     form_for @obj do
-      content = bound_select( :foo, :include_blank => true )
+      content = select( :foo, :include_blank => true )
       content.should match_tag( :option, :value => '')
     end
   end
 
   it "should render a prompt option without a value" do
     form_for @obj do
-      content = bound_select( :foo, :prompt => "Choose" )
+      content = select( :foo, :prompt => "Choose" )
     end
   end
 
   it "should render a select tag with options" do
     form_for @obj do
-      content = bound_select( :foo, :class => 'class1 class2', :title => 'This is the title' )
+      content = select( :foo, :class => 'class1 class2', :title => 'This is the title' )
       content.should match_tag( :select, :class => "class1 class2", :title=> "This is the title" )
     end
   end
 
   it "should render a select tag with options and a blank option" do
     form_for @obj do
-      content = bound_select( :foo, :title => "TITLE", :include_blank => true )
+      content = select( :foo, :title => "TITLE", :include_blank => true )
       content.should match_tag( :select, :title => "TITLE" )
       content.should match_tag( :option, :value => '' )
     end
@@ -747,7 +747,7 @@ describe "bound_select" do
   #
   # it "should render the text as the value if no text_method is specified" do
   #   form_for @obj do
-  #     content = bound_select( :foo, :collection => [FakeModel] )
+  #     content = select( :foo, :collection => [FakeModel] )
   #     content.should match_tag( :option, :value => "FakeModel" )
   #   end
   # end
@@ -759,7 +759,7 @@ describe "option tag generation (data bound)" do
 
   it "should use text_method and value_method for tag generation" do
     form_for @obj do
-      content = bound_select( :foo, :collection => [FakeModel.new, FakeModel2.new],
+      content = select( :foo, :collection => [FakeModel.new, FakeModel2.new],
         :text_method => "foo", :value_method => "bar" )
       content.should match_tag( :option, :content => "foowee", :value => "7" )
       content.should match_tag( :option, :content => "foowee2", :value => "barbar" )
@@ -777,7 +777,7 @@ describe "option tag generation (data bound)" do
 
     form_for @model1 do
       collection = [@model1, @model2, @model3].inject({}) {|s,e| (s[e.make] ||= []) << e; s }
-      content = bound_select(:vin, :text_method => "model",
+      content = select(:vin, :text_method => "model",
         :collection => collection)
       content.should match_tag( :optgroup, :label => "Ford" )
       content.should match_tag( :option, :selected => "selected", :value => "1", :content => "Mustang" )
@@ -797,7 +797,7 @@ describe "option tag generation (data bound)" do
   # it "should humanize and titlize keys in the label for the option group" do
   #   collection = { :some_snake_case_key => [FakeModel.new] }
   #   form_for @obj do
-  #     content = bound_select( :foo, :collection => collection )
+  #     content = select( :foo, :collection => collection )
   #     content.should match_tag( :optgroup, :label => "Some Snake Case Key" )
   #   end
   # end
@@ -882,19 +882,19 @@ describe "bound_file_field" do
 
   it "should take a string object and return a useful file control" do
     f = form_for @obj do
-      bound_file_field(:foo).should match_tag(:input, :type => "file", :name => "fake_model[foo]", :value => "foowee")
+      file_field(:foo).should match_tag(:input, :type => "file", :name => "fake_model[foo]", :value => "foowee")
     end
   end
 
   it "should take additional attributes and use them" do
     form_for @obj do
-      bound_file_field(:foo, :bar => "7").should match_tag(:input, :type => "file", :name => "fake_model[foo]", :value => "foowee", :bar => "7")
+      file_field(:foo, :bar => "7").should match_tag(:input, :type => "file", :name => "fake_model[foo]", :value => "foowee", :bar => "7")
     end
   end
 
-  it "should wrap the bound_file_field in a label if the :label option is passed in" do
+  it "should wrap the file_field in a label if the :label option is passed in" do
     form = form_for @obj do
-      _buffer << bound_text_field(:foo, :label => "LABEL")
+      _buffer << text_field(:foo, :label => "LABEL")
     end
     form.should match(/<label.*>LABEL<\/label><input/)
     res = form.scan(/<[^>]*>/)

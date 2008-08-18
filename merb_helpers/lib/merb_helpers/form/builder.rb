@@ -59,7 +59,7 @@ module Merb::Helpers::Form::Builder
     # ==== Example
     #   <%= form :action => url(:controller => "foo", :action => "bar", :id => 1) do %>
     #     <%= text_field :name => "first_name", :label => "First Name" %>
-    #     <%= submit_button "Create" %>
+    #     <%= submit "Create" %>
     #   <% end =%>
     #
     #   Generates the HTML:
@@ -99,24 +99,13 @@ module Merb::Helpers::Form::Builder
       attrs[:class] = (attrs[:class].to_s.split(" ") + [new_class]).join(" ")
     end
 
-    def update_control_fields(method, attrs, type)
+    def update_bound_controls(method, attrs, type)
       case type
       when "checkbox"
         update_bound_check_box(method, attrs)
       when "select"
         update_bound_select(method, attrs)
       end
-    end
-
-    def update_fields(attrs, type)
-      case type
-      when "checkbox"
-        update_check_box(attrs)
-      when "file"
-        @multipart = true
-      end
-
-      attrs[:disabled] ? attrs[:disabled] = "disabled" : attrs.delete(:disabled)
     end
 
     def update_bound_select(method, attrs)
@@ -134,7 +123,18 @@ module Merb::Helpers::Form::Builder
       attrs[:checked] = attrs.key?(:on) ? val == attrs[:on] : considered_true?(val)
     end
 
-    def update_check_box(attrs)
+    def update_unbound_controls(attrs, type)
+      case type
+      when "checkbox"
+        update_unbound_check_box(attrs)
+      when "file"
+        @multipart = true
+      end
+
+      attrs[:disabled] ? attrs[:disabled] = "disabled" : attrs.delete(:disabled)
+    end
+
+    def update_unbound_check_box(attrs)
       boolean = attrs[:boolean] || (attrs[:on] && attrs[:off]) ? true : false
 
       case
@@ -159,15 +159,15 @@ module Merb::Helpers::Form::Builder
 
     def bound_check_box(method, attrs = {})
       name = control_name(method)
-      update_control_fields(method, attrs, "checkbox")
-      check_box({:name => name}.merge(attrs))
+      update_bound_controls(method, attrs, "checkbox")
+      unbound_check_box({:name => name}.merge(attrs))
     end
 
-    def check_box(attrs = {})
-      update_fields(attrs, "checkbox")
+    def unbound_check_box(attrs = {})
+      update_unbound_controls(attrs, "checkbox")
       if attrs.delete(:boolean)
         on, off = attrs.delete(:on), attrs.delete(:off)
-        hidden_field(:name => attrs[:name], :value => off) <<
+        unbound_hidden_field(:name => attrs[:name], :value => off) <<
           self_closing_tag(:input, {:type => "checkbox", :value => on}.merge(attrs))
       else
         self_closing_tag(:input, {:type => "checkbox"}.merge(attrs))
@@ -176,27 +176,27 @@ module Merb::Helpers::Form::Builder
 
     %w(text password hidden file).each do |kind|
       self.class_eval <<-RUBY, __FILE__, __LINE__ + 1
-        def #{kind}_field(attrs = {})
-          update_fields(attrs, "#{kind}")
+        def unbound_#{kind}_field(attrs = {})
+          update_unbound_controls(attrs, "#{kind}")
           self_closing_tag(:input, {:type => "#{kind}"}.merge(attrs))
         end
 
         def bound_#{kind}_field(method, attrs = {})
           name = control_name(method)
-          update_control_fields(method, attrs, "#{kind}")
-          #{kind}_field({:name => name, :value => @obj.send(method)}.merge(attrs))
+          update_bound_controls(method, attrs, "#{kind}")
+          unbound_#{kind}_field({:name => name, :value => @obj.send(method)}.merge(attrs))
         end
       RUBY
     end
 
     def bound_radio_button(method, attrs = {})
       name = control_name(method)
-      update_control_fields(method, attrs, "radio")
-      radio_button({:name => name, :value => @obj.send(method)}.merge(attrs))
+      update_bound_controls(method, attrs, "radio")
+      unbound_radio_button({:name => name, :value => @obj.send(method)}.merge(attrs))
     end
 
-    def radio_button(attrs = {})
-      update_fields(attrs, "radio")
+    def unbound_radio_button(attrs = {})
+      update_unbound_controls(attrs, "radio")
       self_closing_tag(:input, {:type => "radio"}.merge(attrs))
     end
 
@@ -218,7 +218,7 @@ module Merb::Helpers::Form::Builder
     # ==== Example
     #   <%= button "Initiate Launch Sequence" %>
     def button(contents, attrs)
-      update_fields(attrs, "button")
+      update_unbound_controls(attrs, "button")
       tag(:button, contents, attrs)
     end
 
@@ -237,7 +237,7 @@ module Merb::Helpers::Form::Builder
       attrs[:type]  ||= "submit"
       attrs[:name]  ||= "submit"
       attrs[:value] ||= value
-      update_fields(attrs, "submit")
+      update_unbound_controls(attrs, "submit")
       self_closing_tag(:input, {:type => "submit"}.merge(attrs))
     end
 
@@ -258,8 +258,8 @@ module Merb::Helpers::Form::Builder
     #   <%= bound_select :name, :collection => %w(one two three four) %>
     def bound_select(method, attrs = {})
       name = control_name(method)
-      update_control_fields(method, attrs, "select")
-      select({:name => name}.merge(attrs))
+      update_bound_controls(method, attrs, "select")
+      unbound_select({:name => name}.merge(attrs))
     end
 
     # Provides a generic HTML select.
@@ -277,8 +277,8 @@ module Merb::Helpers::Form::Builder
     #
     # ==== Returns
     # String:: HTML
-    def select(attrs = {})
-      update_fields(attrs, "select")
+    def unbound_select(attrs = {})
+      update_unbound_controls(attrs, "select")
       tag(:select, options_for(attrs), attrs)
     end
 
@@ -318,8 +318,8 @@ module Merb::Helpers::Form::Builder
     #
     # ==== Example
     #   <%= text_area "my comments", :name => "comments" %>
-    def text_area(contents, attrs = {})
-      update_fields(attrs, "text_area")
+    def unbound_text_area(contents, attrs = {})
+      update_unbound_controls(attrs, "text_area")
       tag(:textarea, contents, attrs)
     end
 
@@ -337,8 +337,8 @@ module Merb::Helpers::Form::Builder
     #   <%= bound_text_area :comments %>
     def bound_text_area(method, attrs = {})
       name = "#{@name}[#{method}]"
-      update_control_fields(method, attrs, "text_area")
-      text_area(@obj.send(method), {:name => name}.merge(attrs))
+      update_bound_controls(method, attrs, "text_area")
+      unbound_text_area(@obj.send(method), {:name => name}.merge(attrs))
     end
 
     private
@@ -418,12 +418,12 @@ module Merb::Helpers::Form::Builder
   end
 
   class Form < Base
-    def update_control_fields(method, attrs, type)
+    def update_bound_controls(method, attrs, type)
       attrs.merge!(:id => "#{@name}_#{method}") unless attrs[:id]
       super
     end
 
-    def update_fields(attrs, type)
+    def update_unbound_controls(attrs, type)
       case type
       when "text", "radio", "password", "hidden", "checkbox", "file"
         add_css_class(attrs, type)
@@ -454,7 +454,7 @@ module Merb::Helpers::Form::Builder
 
     %w(text password file).each do |kind|
       self.class_eval <<-RUBY, __FILE__, __LINE__ + 1
-        def #{kind}_field(attrs = {})
+        def unbound_#{kind}_field(attrs = {})
           label(attrs) + super
         end
       RUBY
@@ -468,16 +468,16 @@ module Merb::Helpers::Form::Builder
       label(attrs) + super
     end
 
-    def text_area(contents, attrs = {})
+    def unbound_text_area(contents, attrs = {})
       label(attrs) + super
     end
 
-    def check_box(attrs = {})
+    def unbound_check_box(attrs = {})
       label_text = label(attrs)
       super + label_text
     end
 
-    def radio_button(attrs = {})
+    def unbound_radio_button(attrs = {})
       label_text = label(attrs)
       super + label_text
     end
@@ -501,14 +501,14 @@ module Merb::Helpers::Form::Builder
     #
     # ==== Example
     #   <%= hidden_field :name => "secret", :value => "some secret value" %>
-    def hidden_field(attrs = {})
+    def unbound_hidden_field(attrs = {})
       attrs.delete(:label)
       super
     end
   end
 
   module Errorifier
-    def update_control_fields(method, attrs, type)
+    def update_bound_controls(method, attrs, type)
       if @obj.errors.on(method.to_sym)
         add_css_class(attrs, "error")
       end

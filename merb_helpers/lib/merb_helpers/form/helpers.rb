@@ -1,15 +1,15 @@
 # Provides a number of methods for creating form tags which may be used either with or without the presence of ORM specific models.
 # There are two types of form helpers: those that specifically work with model attributes and those that don't.
-# This helper deals with both model attributes and generic form tags. Model attributes generally end in "_control" such as +bound_text_field+,
+# This helper deals with both model attributes and generic form tags. Model attributes generally end in "_control" such as +text_field+,
 # and generic tags end with "_field", such as +text_field+
 #
 # The core method of this helper, +form_for+, gives you the ability to create a form for a resource.
 # For example, let's say that you have a model <tt>Person</tt> and want to create a new instance of it:
 #
 #     <%= form_for :person, :action => url(:people) do %>
-#       <%= bound_text_field :first_name, :label => 'First Name' %>
-#       <%= bound_text_field :last_name,  :label => 'Last Name' %>
-#       <%= submit_button 'Create' %>
+#       <%= text_field :first_name, :label => 'First Name' %>
+#       <%= text_field :last_name,  :label => 'Last Name' %>
+#       <%= submit 'Create' %>
 #     <% end =%>
 #
 # The HTML generated for this would be:
@@ -25,7 +25,7 @@
 # You may also create a normal form using form_tag
 #     <%= form :action => url(:controller => "foo", :action => "bar", :id => 1) do %>
 #       <%= text_field :name => 'first_name', :label => 'First Name' %>
-#       <%= submit_button 'Create' %>
+#       <%= submit 'Create' %>
 #     <% end =%>
 #
 # The HTML generated for this would be:
@@ -70,7 +70,7 @@ module Merb::Helpers::Form
   # 
   #     <%= form :action => url(:controller => "foo", :action => "bar", :id => 1) do %>
   #       <%= text_field :name => 'first_name', :label => 'First Name' %>
-  #       <%= submit_button 'Create' %>
+  #       <%= submit 'Create' %>
   #     <% end =%>
   #
   # The HTML generated for this would be:
@@ -85,9 +85,9 @@ module Merb::Helpers::Form
 
   # Generates a resource specific form tag which accepts a block, this also provides automatic resource routing.
   #     <%= form_for :person, :action => url(:people) do %>
-  #       <%= bound_text_field :first_name, :label => 'First Name' %>
-  #       <%= bound_text_field :last_name,  :label => 'Last Name' %>
-  #       <%= submit_button 'Create' %>
+  #       <%= text_field :first_name, :label => 'First Name' %>
+  #       <%= text_field :last_name,  :label => 'Last Name' %>
+  #       <%= submit 'Create' %>
   #     <% end= %>
   #
   # The HTML generated for this would be:
@@ -108,12 +108,12 @@ module Merb::Helpers::Form
   #
   # ==== Examples
   #     <%= form_for :person, :action => url(:people) do %>
-  #       <%= bound_text_field :first_name, :label => 'First Name' %>
-  #       <%= bound_text_field :last_name,  :label => 'Last Name' %>
+  #       <%= text_field :first_name, :label => 'First Name' %>
+  #       <%= text_field :last_name,  :label => 'Last Name' %>
   #       <% fields_for :permission do %>
-  #         <%= bound_check_box :is_admin, :label => 'Administrator' %>
+  #         <%= check_box :is_admin, :label => 'Administrator' %>
   #       <% end %>
-  #       <%= submit_button 'Create' %>
+  #       <%= submit 'Create' %>
   #     <% end =%>
   def fields_for(name, attrs = {}, &blk)
     attrs ||= {}
@@ -148,11 +148,11 @@ module Merb::Helpers::Form
   text_area select check_box radio_button radio_group).each do |kind|
     self.class_eval <<-RUBY, __FILE__, __LINE__ + 1
       def #{kind}(*args)
-        _singleton_form_context.#{kind}(*args)
-      end
-
-      def bound_#{kind}(*args)
-        current_form_context.bound_#{kind}(*args)
+        if bound?(*args)
+          current_form_context.bound_#{kind}(*args)
+        else
+          _singleton_form_context.unbound_#{kind}(*args)
+        end
       end
     RUBY
   end
@@ -190,5 +190,11 @@ module Merb::Helpers::Form
       opts.key?(:before) ? opts[:before] : true)
   end
   alias error_messages error_messages_for
+
+  private
+
+  def bound?(*args)
+    args.first.is_a?(Symbol)
+  end
 
 end
