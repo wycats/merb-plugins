@@ -845,6 +845,11 @@ describe "option tags generation (basic)" do
     content.should match_tag( :option, :value => 'banana', :selected => 'selected', :content => 'Banana' )
   end
 
+  it "should accept an array of strings in :collection as the content/value of each option" do
+    content = select(:collection => %w(one two three))
+    content.should match_tag(:option, :content => "one", :value => "one")
+    content.should match_tag(:option, :content => "two", :value => "two")
+  end
 end
 
 describe "fieldset" do
