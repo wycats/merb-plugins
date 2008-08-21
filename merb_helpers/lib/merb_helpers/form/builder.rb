@@ -366,10 +366,10 @@ module Merb::Helpers::Form::Builder
     # String:: HTML
     #
     # ==== Examples
-    #   <%= options_for_select [["apple", "Apple Pie"], ["orange", "Orange Juice"]], :selected => "orange"
+    #   <%= options_for [["apple", "Apple Pie"], ["orange", "Orange Juice"]], :selected => "orange"
     #   => <option value="apple">Apple Pie</option><option value="orange" selected="selected">Orange Juice</option>
     #
-    #   <%= options_for_select [["apple", "Apple Pie"], ["orange", "Orange Juice"]], :selected => ["orange", "apple"], :prompt => "Select One"
+    #   <%= options_for [["apple", "Apple Pie"], ["orange", "Orange Juice"]], :selected => ["orange", "apple"], :prompt => "Select One"
     #   => <option value="">Select One</option><option value="apple" selected="selected">Apple Pie</option><option value="orange" selected="selected">Orange Juice</option>
     def options_for(attrs)
       if attrs.delete(:include_blank)
