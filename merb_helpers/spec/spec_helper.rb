@@ -3,6 +3,7 @@ $:.push File.join(File.dirname(__FILE__), '..', 'lib')
 require 'rubygems'
 require 'merb-core'
 require 'merb_helpers'
+require 'date'
 Merb::Helpers.load
 
 def unload_merb_helpers

@@ -1,3 +1,4 @@
+require "date"
 class Date
   include OrdinalizedFormatting
   
@@ -28,4 +29,5 @@ class Time
   end
   
   def to_time; self; end
+  public :to_date
 end
