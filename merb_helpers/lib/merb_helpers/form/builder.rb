@@ -389,7 +389,7 @@ module Merb::Helpers::Form::Builder
       # if the collection is a Hash, optgroups are a-coming
       if collection.is_a?(Hash)
         options = [b] + collection.map do |g,col|
-          tag(:optgroup, options(col, text_method, value_method, attrs, selected, ""), :label => g)
+          tag(:optgroup, options(col, text_method, value_method, selected, ""), :label => g)
         end
         options.join
       else
@@ -397,11 +397,11 @@ module Merb::Helpers::Form::Builder
           collection.collect! { |i| [i, i] }
           value_method, text_method = :first, :last
         end
-        options(collection, text_method, value_method, attrs, selected, b)
+        options(collection, text_method, value_method, selected, b)
       end
     end
 
-    def options(col, text_meth, value_meth, attrs, sel, b)
+    def options(col, text_meth, value_meth, sel, b)
       options = [b] + col.map do |item|
         value = item.send(value_meth)
         option_attrs = {:value => value}
