@@ -855,6 +855,13 @@ describe "option tags generation (basic)" do
     content.should match_tag(:option, :content => "one", :value => "one")
     content.should match_tag(:option, :content => "two", :value => "two")
   end
+
+  it "should only pass :selected and :value attrs to <option> tags" do
+    content = select(:collection => [["rabbit", "Rabbit"]], :id => "my_id", :name => "my_name", :class => "classy")
+    content = content.slice(/<option[^>]*>[^<]*<\/option>/)
+    content.should match_tag(:option, :value => "rabbit", :content => "Rabbit")
+    content.should_not match_tag(:option, :id => "my_id", :name => "my_name", :class => "classy")
+  end
 end
 
 describe "fieldset" do

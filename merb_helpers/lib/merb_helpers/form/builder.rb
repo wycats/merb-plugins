@@ -406,7 +406,7 @@ module Merb::Helpers::Form::Builder
         value = item.send(value_meth)
         attrs.merge!(:value => value)
         attrs.merge!(:selected => "selected") if value == sel
-        tag(:option, item.send(text_meth), attrs)
+        tag(:option, item.send(text_meth), attrs.reject { |k,v| ![:selected, :value].include?(k) })
       end
       options.join
     end
