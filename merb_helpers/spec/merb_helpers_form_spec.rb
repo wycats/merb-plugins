@@ -397,8 +397,10 @@ describe "check_box" do
     html = check_box(:boolean => true)
     html.should have_tag(:input, :type => "checkbox", :value => "1")
     html.should have_tag(:input, :type => "hidden",   :value => "0")
+    html.should match(/<input.*?type="hidden"[^>]*>[^<]*<input.*?type="checkbox"[^>]*>/)
+    
   end
-  
+
   it "should not allow a :value param if boolean" do
     lambda { check_box(:boolean => true, :value => "woot") }.should raise_error(ArgumentError)
     lambda { check_box(:on => "YES", :off => "NO", :value => "woot") }.should raise_error(ArgumentError)
