@@ -862,6 +862,12 @@ describe "option tags generation (basic)" do
     content.should match_tag(:option, :value => "rabbit", :content => "Rabbit")
     content.should_not match_tag(:option, :id => "my_id", :name => "my_name", :class => "classy")
   end
+
+  it "should not pollute the <select> attributes with <option> attributes" do
+    content = select(:collection => [['orange','Orange'], ['banana','Banana']], :selected => 'banana')
+    content = content.slice(/<select[^>]*>/)
+    content.should_not match_tag(:select, :value => "banana", :selected => "selected")
+  end
 end
 
 describe "fieldset" do

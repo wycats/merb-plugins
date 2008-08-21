@@ -404,9 +404,9 @@ module Merb::Helpers::Form::Builder
     def options(col, text_meth, value_meth, attrs, sel, b)
       options = [b] + col.map do |item|
         value = item.send(value_meth)
-        attrs.merge!(:value => value)
-        attrs.merge!(:selected => "selected") if value == sel
-        tag(:option, item.send(text_meth), attrs.reject { |k,v| ![:selected, :value].include?(k) })
+        option_attrs = {:value => value}
+        option_attrs.merge!(:selected => "selected") if value == sel
+        tag(:option, item.send(text_meth), option_attrs)
       end
       options.join
     end
