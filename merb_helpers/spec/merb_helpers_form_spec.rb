@@ -790,7 +790,16 @@ describe "option tag generation (data bound)" do
 
     # collection = [@model1, @model2, @model3].inject({}) {|s,e| (s[e.make] ||= []) << e; s }
     # content = options_from_collection_for_select(collection, :text_method => 'model', :value_method => 'vin', :selected => '1')
+  end
 
+  it "should render a collection of nested value/content arrays" do
+    form_for @obj do
+      content = select(:foo, :collection => [["small", "Small"], ["medium", "Medium"], ["large", "Large"]])
+      content.should match_tag(:select, :id => "fake_model_foo", :name => "fake_model[foo]")
+      content.should match_tag(:option, :value => "small",  :content => "Small")
+      content.should match_tag(:option, :value => "medium", :content => "Medium")
+      content.should match_tag(:option, :value => "large",  :content => "Large")
+    end
   end
 
   # Is this really worth the extra speed hit? I'm thinking not

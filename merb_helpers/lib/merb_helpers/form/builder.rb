@@ -393,10 +393,14 @@ module Merb::Helpers::Form::Builder
         end
         options.join
       else
-        if collection.first.is_a?(String)
+        case collection.first
+        when String
           collection.collect! { |i| [i, i] }
           value_method, text_method = :first, :last
+        when Array
+          value_method, text_method = :first, :last
         end
+
         options(collection, text_method, value_method, selected, b)
       end
     end
