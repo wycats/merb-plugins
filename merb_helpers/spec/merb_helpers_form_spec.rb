@@ -830,6 +830,11 @@ describe "option tags generation (basic)" do
     content.should match_tag( :option, :value => '', :content => 'Choose' )
   end
 
+  it "should render the prompt option at the top" do
+    content = select( :collection => [["foo", "Foo"]], :prompt => 'Choose' )
+    content.should match(/<option[^>]*>Choose<\/option>[^<]*<option[^>]*>Foo<\/option>/)
+  end
+
   it "should provide selected options by value" do
     content = select( :collection => [['rabbit','Rabbit'],['chicken','Chicken']], 
       :selected => 'rabbit' )
