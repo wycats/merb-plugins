@@ -6,8 +6,8 @@ describe "Date" do
   end
 
   it "Should do to_time conversion and return a Time class" do
-    @date.is_a?Date
-    @date.to_time.is_a?Time
+    @date.is_a?(Date)
+    @date.to_time.is_a?(Time)
   end
 
   it "Should do to_time conversion to utc by default" do
