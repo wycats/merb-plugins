@@ -1,8 +1,5 @@
 # Form helpers provide a number of methods to simplify the creation of HTML forms.
 # They can work directly with models (bound) or standalone (unbound).
-#
-# The core method of this helper, +form_for+, gives you the ability to create a form for a resource.
-# For example, let's say that you have a model <tt>Person</tt> and want to create a new instance of it:
 module Merb::Helpers::Form
 
   def _singleton_form_context
