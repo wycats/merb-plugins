@@ -318,6 +318,10 @@ module Merb::Helpers::Form::Builder
       label(attrs) + super
     end
 
+    def unbound_select(attrs = {})
+      label(attrs) + super
+    end
+
     def unbound_check_box(attrs = {})
       label_text = label(attrs)
       super + label_text
