@@ -45,7 +45,7 @@ describe "error_messages_for" do
     errs = error_messages_for(@dm_obj, :error_class => "foo")
     errs.should include("<div class='foo'>")
   end
-
+  
   it "should accept a custom header block" do
     errs = error_messages_for(@dm_obj, :header => "<h3>Failure: %s issue%s</h3>")
     errs.should include("<h3>Failure: 2 issues</h3>")
@@ -74,16 +74,14 @@ describe "form" do
     ret = form :method => :get do
       _buffer << "CONTENT"
     end
-    ret.should match_tag(:form, :method => "get")
-    ret.should include("CONTENT")
+    ret.should == "<form method=\"get\">CONTENT</form>"
   end
   
   it "should fake out the put method if set" do
     ret = form :method => :put do
       _buffer << "CONTENT"
     end
-    ret.should match_tag(:form, :method => "post")
-    ret.should match_tag(:input, :type => "hidden", :name => "_method", :value => "put")
+    ret.should =~ %r{<form method="post"><input type="hidden" value="put" name="_method"/>CONTENT</form>}
   end
   
   it "should fake out the delete method if set" do
@@ -154,6 +152,7 @@ describe "fields_for" do
   it_should_behave_like "FakeController"
 
   it "should dump the contents in the context of the object" do
+    _buffer = ""
     fields_for(:obj) do
       text_field(:foo).should match_tag(:input, :type => "text", :value => "foowee")
       _buffer << "Hello"
@@ -204,9 +203,22 @@ describe "text_field" do
     result = text_field(:label => "LABEL" )
     result.should match(/<label>LABEL<\/label><input type="text" class="text"\s*\/>/)
   end
+
+  it "should update an existing :class with a new class" do
+    result = text_field(:class => "awesome foobar")
+    result.should == "<input type=\"text\" class=\"awesome foobar text\"/>"
+  end
   
   it "should be disabled if :disabled => true is passed in" do
     text_field(:disabled => true).should match_tag(:input, :type => "text", :disabled => "disabled")
+  end
+  
+  it "should not be disabled if :disabled => false is passed in" do
+    text_field(:disabled => false).should_not match_tag(:input, :type => "text", :disabled => "false")
+  end
+
+  it "should not be disabled if :disabled => nil is passed in" do
+    text_field(:disabled => false).should_not match_tag(:input, :type => "text", :disabled => "nil")
   end
 end
 
@@ -330,7 +342,9 @@ describe "bound_password_field" do
 
   it "should take additional attributes and use them" do
     form_for @obj do
-      password_field(:foo, :bar => "7").should match_tag(:input, :type => "password", :name => "fake_model[foo]", :bar => "7")
+      password_field(:foo, :bar => "7").should match_tag(
+        :input, :type => "password", :name => "fake_model[foo]", :bar => "7", :value => @obj.foo
+      )
     end
   end
 
@@ -402,13 +416,16 @@ describe "check_box" do
   end
 
   it "should not allow a :value param if boolean" do
-    lambda { check_box(:boolean => true, :value => "woot") }.should raise_error(ArgumentError)
+    lambda { check_box(:boolean => true, :value => "woot") }.
+      should raise_error(ArgumentError, /can't be used with a boolean checkbox/)
     lambda { check_box(:on => "YES", :off => "NO", :value => "woot") }.should raise_error(ArgumentError)
   end
 
   it "should not allow :boolean => false if :on and :off are specified" do
-    lambda { check_box(:boolean => false, :on => "YES", :off => "NO") }.should raise_error(ArgumentError)
-    lambda { check_box(:boolean => true,  :on => "YES", :off => "NO") }.should_not raise_error(ArgumentError)
+    lambda { check_box(:boolean => false, :on => "YES", :off => "NO") }.
+      should raise_error(ArgumentError, /cannot be used/)
+    lambda { check_box(:boolean => true,  :on => "YES", :off => "NO") }.
+      should_not raise_error(ArgumentError)
   end
 
   it "should be boolean if :on and :off are specified" do
@@ -418,8 +435,8 @@ describe "check_box" do
   end
 
   it "should have both :on and :off specified or neither" do
-    lambda { check_box(:name => "foo", :on  => "YES") }.should raise_error(ArgumentError)
-    lambda { check_box(:name => "foo", :off => "NO")  }.should raise_error(ArgumentError)
+    lambda { check_box(:name => "foo", :on  => "YES") }.should raise_error(ArgumentError, /must be specified/)
+    lambda { check_box(:name => "foo", :off => "NO")  }.should raise_error(ArgumentError, /must be specified/)
   end
   
   it "should convert :value to a string on a non-boolean checkbox" do
@@ -435,6 +452,10 @@ describe "check_box" do
   it "should be disabled if :disabled => true is passed in" do
     check_box(:disabled => true).should match_tag(:input, :type => "checkbox", :disabled => "disabled")
   end
+  
+  it "should be possible to call with just check_box" do
+    check_box.should match_tag(:input, :type => "checkbox", :class => "checkbox")
+  end
 end
 
 describe "bound_check_box" do
@@ -444,6 +465,13 @@ describe "bound_check_box" do
     form_for @obj do
       check_box(:baz).should match_tag(:input, :type =>"checkbox", :name => "fake_model[baz]", :class => "checkbox", :value => "1", :checked => "checked", :id => "fake_model_baz")
       check_box(:bat).should match_tag(:input, :type =>"checkbox", :name => "fake_model[bat]", :class => "checkbox", :value => "0")
+    end
+  end
+
+  it "should raise an error if you try to use :value" do
+    form_for @obj do
+      lambda { check_box(:baz, :value => "Awesome") }.
+        should raise_error(ArgumentError, /:value can't be used with a bound_check_box/)
     end
   end
 
@@ -700,8 +728,19 @@ describe "bound_text_area" do
 
   it "should provide :id attribute" do
     form_for @obj do
-      text_area( :foo ).should match_tag(:textarea, :id => 'fake_model_foo')
+      ret = text_area( :foo )
+      ret.should match_tag(:textarea, :id => 'fake_model_foo', :name => "fake_model[foo]")
+      ret.should =~ />\s*#{@obj.foo}\s*</
     end
+  end
+end
+
+describe "unbound_select" do
+  it_should_behave_like "FakeController"
+  
+  it "should provide a blank option if you :include_blank" do
+    content = select(:include_blank => true)
+    content.should =~ /<option.*>\s*<\/option>/
   end
 end
 
@@ -719,7 +758,8 @@ describe "bound_select" do
   it "should include a blank option" do
     form_for @obj do
       content = select( :foo, :include_blank => true )
-      content.should match_tag( :option, :value => '')
+      content.should match_tag(:option, :value => '')
+      content.should =~ /<option.*>\s*<\/option>/
     end
   end
 
@@ -733,6 +773,7 @@ describe "bound_select" do
     form_for @obj do
       content = select( :foo, :class => 'class1 class2', :title => 'This is the title' )
       content.should match_tag( :select, :class => "class1 class2", :title=> "This is the title" )
+      content.should =~ /<select.*>\s*<\/select>/
     end
   end
 
@@ -741,6 +782,7 @@ describe "bound_select" do
       content = select( :foo, :title => "TITLE", :include_blank => true )
       content.should match_tag( :select, :title => "TITLE" )
       content.should match_tag( :option, :value => '' )
+      content.should =~ /<option.*>\s*<\/option>/
     end
   end
 
@@ -781,6 +823,10 @@ describe "option tag generation (data bound)" do
       collection = [@model1, @model2, @model3].inject({}) {|s,e| (s[e.make] ||= []) << e; s }
       content = select(:vin, :text_method => "model",
         :collection => collection)
+      
+      # Blank actually defaults to ""
+      content.should =~ /<optgroup label=\"Ford\"><option/
+      
       content.should match_tag( :optgroup, :label => "Ford" )
       content.should match_tag( :option, :selected => "selected", :value => "1", :content => "Mustang" )
       content.should match_tag( :option, :value => "2", :content => "Falcon" )
@@ -909,6 +955,13 @@ describe "file_field" do
   it "should be disabled if :disabled => true is passed in" do
     file_field(:disabled => true).should match_tag(:input, :type => "file", :disabled => "disabled")
   end
+  
+  it "should make the surrounding form multipart" do
+    ret = form_for @obj do
+      file_field(:baz)
+    end
+    ret.should match_tag(:form, :enctype => "multipart/form-data")
+  end
 end
 
 describe "bound_file_field" do
@@ -953,7 +1006,7 @@ describe "submit" do
   
   it "should be disabled if :disabled => true is passed in" do
     submit("Done", :disabled => true).should match_tag(:input, :type => "submit", :value => "Done", :disabled => "disabled")
-  end
+  end  
 end
 
 describe "button" do
@@ -972,6 +1025,43 @@ describe "button" do
 
   it "should be disabled if :disabled => true is passed in" do
     button("Done", :disabled => true).should match_tag(:button, :disabled => "disabled")
+  end
+end
+
+class MyBuilder < Merb::Helpers::Form::Builder::Base
+  
+  def update_bound_controls(method, attrs, type)
+    super
+    attrs[:bound] = type
+  end
+
+  def update_unbound_controls(attrs, type)
+    super
+    attrs[:unbound] = type
+  end
+  
+end
+
+describe "your own builder" do
+  it_should_behave_like "FakeController"
+  
+  it "should let you override update_bound_controls" do
+    form_for @obj, :builder => MyBuilder do
+      file_field(:foo).should =~ / bound="file"/
+      text_field(:foo).should =~ / bound="text"/
+      hidden_field(:foo).should =~ / bound="hidden"/
+      password_field(:foo).should =~ / bound="password"/
+      radio_button(:foo).should =~ / bound="radio"/
+      text_area(:foo).should =~ / bound="text_area"/
+    end
+  end
+  
+  it "should let you override update_unbound_controls" do
+    form_for @obj, :builder => MyBuilder do
+      button("Click").should match_tag(:button, :unbound => "button")
+      submit("Awesome").should match_tag(:input, :unbound => "submit")
+      text_area(:foo).should match_tag(:textarea, :unbound => "text_area")
+    end
   end
 end
 
