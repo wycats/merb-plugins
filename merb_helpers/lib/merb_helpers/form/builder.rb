@@ -377,7 +377,7 @@ module Merb::Helpers::Form::Builder
 
   module Resourceful
     def process_form_attrs(attrs)
-      attrs[:action] ||= url(@name, @obj) if @origin
+      attrs[:action] ||= @origin.url(@name, @obj) if @origin
       super
     end
   end
