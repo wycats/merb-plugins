@@ -3,6 +3,7 @@
 module Merb::Helpers::Form
 
   def _singleton_form_context
+    self._form_class = Merb::Helpers::Form::Builder::ResourcefulFormWithErrors unless self._form_class
     @_singleton_form_context ||=
       self._form_class.new(nil, nil, self)
   end
