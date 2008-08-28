@@ -59,7 +59,7 @@ module Merb
           if File.exists?(config_file)
             Merb.logger.info!("Connecting to database...")
 
-            Thread.new{ loop{ sleep(60*60); ::ActiveRecord::Base.verify_active_connections! } }.priority = -10
+            Thread.new{ loop{ sleep(60*60); ::ActiveRecord::Base.verify_active_connections! } }
 
             ::ActiveRecord::Base.verification_timeout = 14400
             ::ActiveRecord::Base.logger = Merb.logger
