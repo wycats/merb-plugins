@@ -62,6 +62,18 @@ end
 describe "form" do
   it_should_behave_like "FakeController"
 
+  describe "when _form_class is Merb::Helpers::Form::Builder::ResourcefulFormWithErrors" do
+    before(:each) do
+      @obj = FakeModel2.new
+    end
+    it "should not explode when #form is called" do
+      txt = form_for @obj, :builder => Merb::Helpers::Form::Builder::ResourcefulFormWithErrors do
+        text_field :foo
+      end
+      txt.should =~ /action="fake_model2\/#{@obj.id}"/
+    end
+  end
+
   it "should use the post method by default" do
     ret = form do
       _buffer << "CONTENT"
