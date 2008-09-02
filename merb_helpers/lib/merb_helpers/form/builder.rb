@@ -182,6 +182,15 @@ module Merb::Helpers::Form::Builder
       end.join
     end
 
+    def unbound_radio_group(arr, attrs = {})
+      arr.map do |ind_attrs|
+        ind_attrs = {:value => ind_attrs} unless ind_attrs.is_a?(Hash)
+        joined = attrs.merge(ind_attrs)
+        joined.merge!(:label => joined[:label] || joined[:value])
+        unbound_radio_button(joined)
+      end.join
+    end
+
     def unbound_text_area(contents, attrs)
       update_unbound_controls(attrs, "text_area")
       tag(:textarea, contents, attrs)
