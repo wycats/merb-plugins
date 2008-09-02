@@ -33,8 +33,8 @@ module Merb::Helpers::Form::Builder
       # Unless the method is :get, fake out the method using :post
       attrs[:method] = :post unless attrs[:method] == :get
       # Use a fake PUT if the object is not new, otherwise use the method
-      # passed in.
-      method ||= (@obj && !@obj.new_record? ? :put : :post)
+      # passed in. Defaults to :post if no method is set.
+      method ||= (@obj.respond_to?(:new_record?) && !@obj.new_record?) || (@obj.respond_to?(:new?) && !@obj.new?) ? :put : :post
 
       attrs[:enctype] = "multipart/form-data" if attrs.delete(:multipart) || @multipart
 
@@ -377,7 +377,7 @@ module Merb::Helpers::Form::Builder
 
   module Resourceful
     def process_form_attrs(attrs)
-      attrs[:action] ||= url(@name, @obj) if @origin
+      attrs[:action] ||= @origin.url(@name, @obj) if @origin
       super
     end
   end
