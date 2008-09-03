@@ -68,7 +68,7 @@ module Merb::Helpers::Form::Builder
     def update_bound_check_box(method, attrs)
       raise ArgumentError, ":value can't be used with a bound_check_box" if attrs.has_key?(:value)
 
-      attrs[:boolean] ||= true
+      attrs[:boolean] = attrs.fetch(:boolean, true)
 
       val = @obj.send(method)
       attrs[:checked] = attrs.key?(:on) ? val == attrs[:on] : considered_true?(val)
