@@ -168,7 +168,9 @@ module Merb::Helpers::Form::Builder
 
     def unbound_select(attrs = {})
       update_unbound_controls(attrs, "select")
-      tag(:select, options_for(attrs), attrs)
+      name = attrs[:name]
+      name += '[]' if name and attrs[:multiple] == true and !(name =~ /\[\]$/)
+      tag(:select, options_for(attrs), attrs.merge({:name => name}))
     end
 
     def bound_radio_group(method, arr)

@@ -754,6 +754,13 @@ describe "unbound_select" do
     content = select(:include_blank => true)
     content.should =~ /<option.*>\s*<\/option>/
   end
+
+  it "should render the select tag with suffix '[]' to name when :multiple => true" do
+    form_for @obj do
+      content = select( :name => 'foo', :multiple => true )
+      content.should match_tag( :select, :name => "foo[]" )
+    end
+  end
 end
 
 describe "bound_select" do
@@ -764,6 +771,13 @@ describe "bound_select" do
     form_for @obj do
       content = select( :foo )
       content.should match_tag( :select, :id => "fake_model_foo", :name => "fake_model[foo]" )
+    end
+  end
+
+  it "should render the select tag with suffix '[]' to name when :multiple => true" do
+    form_for @obj do
+      content = select( :foo, :multiple => true )
+      content.should match_tag( :select, :id => "fake_model_foo", :name => "fake_model[foo][]" )
     end
   end
 
