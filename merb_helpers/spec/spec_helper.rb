@@ -102,6 +102,10 @@ end
 
 class FakeModel2 < FakeModel
   
+  def id
+    1
+  end
+  
   def foo
     "foowee2"
   end
@@ -358,6 +362,11 @@ describe "FakeController", :shared => true do
   
   before :each do
     @obj = FakeModel.new
+    
+    def url(name, obj)
+      "#{name}/#{obj.id}"
+    end
+    
     def _buffer(buf = "") @buffer ||= "" end
     def concat(text, binding) _buffer << text end
     def capture(*args, &block)

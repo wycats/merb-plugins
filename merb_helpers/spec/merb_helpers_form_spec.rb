@@ -62,6 +62,18 @@ end
 describe "form" do
   it_should_behave_like "FakeController"
 
+  describe "when _form_class is Merb::Helpers::Form::Builder::ResourcefulFormWithErrors" do
+    before(:each) do
+      @obj = FakeModel2.new
+    end
+    it "should not explode when #form is called" do
+      txt = form_for @obj, :builder => Merb::Helpers::Form::Builder::ResourcefulFormWithErrors do
+        text_field :foo
+      end
+      txt.should =~ /action="fake_model2\/#{@obj.id}"/
+    end
+  end
+
   it "should use the post method by default" do
     ret = form do
       _buffer << "CONTENT"
@@ -636,6 +648,51 @@ describe "radio_button" do
   end
 end
 
+describe "unbound_radio_group" do
+  it_should_behave_like "FakeController"
+
+  it "should return a group of radio buttons" do
+    radio = radio_group(["foowee", "baree"]).scan(/<[^>]*>/)
+    radio[0].should match_tag(:input, :type => "radio", :value => "foowee")
+    radio[3].should match_tag(:input, :type => "radio", :value => "baree")
+  end
+
+  it "should provide an additional label tag for each option in array-based options" do
+    radio = radio_group(["foowee", "baree"])
+    radio.scan( /<input.*?><label.*?>(foowee|baree)<\/label>/ ).size.should == 2
+    radio = radio.scan(/<[^>]*>/)
+    radio[0].should_not match_tag(:input, :label => "LABEL")
+    radio[3].should_not match_tag(:input, :label => "LABEL")
+  end
+
+  it "should accept array of hashes as options" do
+    radio = radio_group([{:value => 5, :label => "Five"}, {:value => 'bar', :label => 'Bar', :id => 'bar_id'}])
+    radio.scan( /<input.*?><label.*?>(Five|Bar)<\/label>/ ).size.should == 2
+    radio = radio.scan(/<[^>]*>/)
+    radio.size.should == 6
+    radio[0].should match_tag(:input, :value => 5)
+    radio[1].should match_tag(:label)
+    radio[2].should match_tag('/label')
+    radio[3].should match_tag(:input, :value => 'bar', :id => 'bar_id')
+    radio[4].should match_tag(:label, :for => 'bar_id')
+    radio[5].should match_tag('/label')
+  end
+
+  it "should apply attributes to each element" do
+    radio = radio_group(["foowee", "baree"], :class => "CLASS")
+    radio = radio.scan(/<[^>]*>/)
+    radio[0].should match_tag(:input, :type => "radio", :value => "foowee", :class => "CLASS radio")
+    radio[3].should match_tag(:input, :type => "radio", :value => "baree", :class => "CLASS radio")
+  end
+
+  it "should override universal attributes with specific ones" do
+    radio = radio_group(["foowee", {:value => "baree", :class => 'BAREE'}], :class => "CLASS")
+    radio = radio.scan(/<[^>]*>/)
+    radio[0].should match_tag(:input, :type => "radio", :value => "foowee", :class => "CLASS radio")
+    radio[3].should match_tag(:input, :type => "radio", :value => "baree", :class => "BAREE radio")
+  end
+end
+
 describe "bound_radio_group" do
   it_should_behave_like "FakeController"
 
@@ -742,6 +799,13 @@ describe "unbound_select" do
     content = select(:include_blank => true)
     content.should =~ /<option.*>\s*<\/option>/
   end
+
+  it "should render the select tag with suffix '[]' to name when :multiple => true" do
+    form_for @obj do
+      content = select( :name => 'foo', :multiple => true )
+      content.should match_tag( :select, :name => "foo[]" )
+    end
+  end
 end
 
 describe "bound_select" do
@@ -752,6 +816,13 @@ describe "bound_select" do
     form_for @obj do
       content = select( :foo )
       content.should match_tag( :select, :id => "fake_model_foo", :name => "fake_model[foo]" )
+    end
+  end
+
+  it "should render the select tag with suffix '[]' to name when :multiple => true" do
+    form_for @obj do
+      content = select( :foo, :multiple => true )
+      content.should match_tag( :select, :id => "fake_model_foo", :name => "fake_model[foo][]" )
     end
   end
 

@@ -68,7 +68,7 @@ module Merb::Helpers::Form::Builder
     def update_bound_check_box(method, attrs)
       raise ArgumentError, ":value can't be used with a bound_check_box" if attrs.has_key?(:value)
 
-      attrs[:boolean] ||= true
+      attrs[:boolean] = attrs.fetch(:boolean, true)
 
       val = @obj.send(method)
       attrs[:checked] = attrs.key?(:on) ? val == attrs[:on] : considered_true?(val)
@@ -168,6 +168,7 @@ module Merb::Helpers::Form::Builder
 
     def unbound_select(attrs = {})
       update_unbound_controls(attrs, "select")
+      attrs[:name] << "[]" if attrs[:multiple] && !(attrs[:name] =~ /\[\]$/)
       tag(:select, options_for(attrs), attrs)
     end
 
@@ -177,6 +178,15 @@ module Merb::Helpers::Form::Builder
         attrs = {:value => attrs} unless attrs.is_a?(Hash)
         attrs[:checked] ||= (val == attrs[:value])
         radio_group_item(method, attrs)
+      end.join
+    end
+
+    def unbound_radio_group(arr, attrs = {})
+      arr.map do |ind_attrs|
+        ind_attrs = {:value => ind_attrs} unless ind_attrs.is_a?(Hash)
+        joined = attrs.merge(ind_attrs)
+        joined.merge!(:label => joined[:label] || joined[:value])
+        unbound_radio_button(joined)
       end.join
     end
 
