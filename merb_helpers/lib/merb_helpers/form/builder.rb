@@ -287,22 +287,14 @@ module Merb::Helpers::Form::Builder
       super
     end
 
-    # Provides a generic HTML label.
-    #
-    # ==== Parameters
-    # attrs<Hash>:: HTML attributes
-    #
-    # ==== Returns
-    # String:: HTML
-    #
-    # ==== Example
-    #   <%= label :for => "name", :label => "Full Name" %> 
-    #   => <label for="name">Full Name</label>
-    def label(attrs)
-      attrs ||= {}
-      for_attr = attrs[:id] ? {:for => attrs[:id]} : {}
-      if label_text = attrs.delete(:label)
-        tag(:label, label_text, for_attr)
+    def label(contents, attrs = {})
+      if contents.is_a?(Hash)
+        attrs    = contents
+        contents = attrs.delete(:label)
+      end
+      if contents
+        for_attr = attrs[:id] ? {:for => attrs[:id]} : {}
+        tag(:label, contents, for_attr)
       else
         ""
       end

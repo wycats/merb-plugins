@@ -150,6 +150,21 @@ module Merb::Helpers::Form
     end
   end
 
+  # Provides a generic HTML label.
+  #
+  # ==== Parameters
+  # attrs<Hash>:: HTML attributes
+  #
+  # ==== Returns
+  # String:: HTML
+  #
+  # ==== Example
+  #   <%= label "Full Name", :for => "name" %> 
+  #   => <label for="name">Full Name</label>
+  def label(*args)
+    current_form_context.label(*args)
+  end
+
   # Provides a HTML text input tag
   #
   # ==== Parameters

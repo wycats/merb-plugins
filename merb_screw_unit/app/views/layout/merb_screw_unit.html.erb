@@ -24,10 +24,13 @@
         before(function() {          
           $ = iframeWindow.$;
           $.ajaxSettings.async = false;
-          $.fn.fireEvent = function(event) {
-            runLivequeries();
-           	this.trigger(event);
-            return this;
+          $.fn.fireEvent = function(event, obj) {
+            return this.each(function() {
+              runLivequeries();
+              var basic = {type: event, target: this, preventDefault: true}
+              $.extend(basic, obj || {});
+             	$(this).trigger(event, [basic]);
+            })
           };
         })
         <%= catch_content :for_layout %>

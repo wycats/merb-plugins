@@ -3,12 +3,12 @@ class <%= class_name %> < ActiveRecord::Migration
 <% if model -%>
     create_table :<%= table_name %> do |t|
 <% attributes.each do |name, type| -%>
-      t.<%= name %> :<%= type %> 
+      t.<%= name %> :<%= type %>
 <% end -%>
-  
+
       t.timestamps
     end
-<% end -%> 
+<% end -%>
   end
 
   def self.down
