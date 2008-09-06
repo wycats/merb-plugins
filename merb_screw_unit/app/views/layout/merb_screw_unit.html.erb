@@ -29,7 +29,7 @@
               runLivequeries();
               var basic = {type: event, target: this, preventDefault: true}
               $.extend(basic, obj || {});
-             	this.trigger(event, basic);
+             	this.trigger(event, [basic]);
             })
           };
         })
