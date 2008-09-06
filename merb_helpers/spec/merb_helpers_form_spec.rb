@@ -1011,6 +1011,15 @@ describe "fieldset" do
   end
 end
 
+describe "label" do
+  it_should_behave_like "FakeController"
+
+  it "should render a label tag" do
+    result = label("First Name", :id => "user_first_name")
+    result.should match_tag(:label, :for => "user_first_name", :content => "First Name")
+  end
+end
+
 describe "file_field" do
   it_should_behave_like "FakeController"
 
