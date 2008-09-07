@@ -9,7 +9,10 @@ if defined?(Merb::Plugins)
 
     def self.run
       Merb::Orms::Sequel.connect
-      Merb::Orms::Sequel.register_session_type
+      if Merb::Config.session_stores.include?(:sequel)
+        Merb.logger.debug "Using Sequel sessions"
+        require File.join(File.dirname(__FILE__) / "merb" / "session" / "sequel_session")
+      end
     end
 
   end

@@ -10,14 +10,12 @@ describe Merb::Orms::ActiveRecord::Connect do
   end
 end
 
-
-
 describe "Merb ActiveRecord extension" do
   before :all do
     @wd = Dir.pwd
     Merb.stub!(:dir_for).with(:config).and_return(@wd)
-    @config_file_path = @wd / "database.yml"
-    @sample_file_path = @wd / "database.yml.sample"
+    @config_file_path = @wd / "config" / "database.yml"
+    @sample_file_path = @wd / "config" / "database.yml.sample"
 
     @sample_source = Merb::Orms::ActiveRecord.sample_source
     @config_sample = Erubis.load_yaml_file(@sample_source)
@@ -50,11 +48,6 @@ describe "Merb ActiveRecord extension" do
   it "uses Unicode and localhost in sample" do
     @config_sample[:development][:host].should == "localhost"
     @config_sample[:development][:encoding].should == "utf8"
-  end
-
-  it "stores configurations from config file" do
-    Erubis.should_receive(:load_yaml_file).with(@config_file_path).and_return(@config_sample)
-    Merb::Orms::ActiveRecord.configurations[:development][:database].should == "sample_development"
   end
 
   it "provides Rack with a way to start a transcantion" do
