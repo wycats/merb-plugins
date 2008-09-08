@@ -1,5 +1,7 @@
 if defined?(Merb::Plugins)  
+  
   dependency "activerecord"
+  
   require File.join(File.dirname(__FILE__) / "merb" / "orms" / "active_record" / "connection")
   Merb::Plugins.add_rakefiles(File.join(File.dirname(__FILE__) / "active_record" / "merbtasks"))
   
@@ -9,7 +11,10 @@ if defined?(Merb::Plugins)
 
     def self.run
       Merb::Orms::ActiveRecord.connect
-      Merb::Orms::ActiveRecord.register_session_type
+      if Merb::Config.session_stores.include?(:activerecord)
+        Merb.logger.debug "Using ActiveRecord sessions"
+        require File.join(File.dirname(__FILE__) / "merb" / "session" / "active_record_session")
+      end
     end
 
   end

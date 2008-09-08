@@ -316,11 +316,6 @@ namespace :db do
   end
 
   namespace :sessions do
-    desc "Create sessions table"
-    task :create => :merb_start do
-      Merb::ActiveRecordSession.create_table!
-    end
-
     desc "Clear the sessions table"
     task :clear => :merb_start do
       session_table = 'session'
@@ -328,10 +323,6 @@ namespace :db do
       ActiveRecord::Base.connection.execute "DELETE FROM #{session_table}"
     end
   end
-end
-
-def session_table_name
-  ActiveRecord::Base.pluralize_table_names ? :sessions : :session
 end
 
 def set_firebird_env(config)

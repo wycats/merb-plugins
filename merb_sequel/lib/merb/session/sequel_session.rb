@@ -1,156 +1,106 @@
-require "base64"
+require 'sequel'
+require 'merb-core/dispatch/session'
+require 'base64'
 
 module Merb
 
-  module SessionMixin
-    def setup_session
-      before = cookies[_session_id_key]
-      request.session, cookies[_session_id_key] = Merb::SequelSession.persist(cookies[_session_id_key])
-      @_fingerprint = Marshal.dump(request.session.data).hash
-      @_new_cookie = cookies[_session_id_key] != before
-    end
-
-    def finalize_session
-      request.session.save if @_fingerprint != Marshal.dump(request.session.data).hash
-      set_cookie(_session_id_key, request.session.values[:session_id], Time.now + _session_expiry) if (@_new_cookie || request.session.needs_new_cookie)
-    end
-    
-    def session_store_type
-      "sequel"
-    end
-
-  end
-
   table_name = (Merb::Plugins.config[:merb_sequel][:session_table_name] || "sessions")
 
-  class SequelSession < Sequel::Model(table_name.to_sym)
+  # Sessions stored in Sequel model.
+  #
+  # To use Sequel based sessions add the following to config/init.rb:
+  #
+  # Merb::Config[:session_store] = 'sequel'
+
+  class SequelSessionStore < Sequel::Model(table_name.to_sym)
     
     set_schema do
       primary_key :id
       varchar :session_id
-      varchar :data
+      text :data
       timestamp :created_at
     end
 
-    attr_accessor :needs_new_cookie
-
     class << self
-      # Generates a new session ID and creates a row for the new session in the database.
-      def generate
-        create(:session_id => Merb::SessionMixin::rand_uuid,
-        :data => marshal({}), :created_at => Time.now)
-      end
-
-      # Gets the existing session based on the <tt>session_id</tt> available in cookies.
-      # If none is found, generates a new session.
-      def persist(session_id)
-        if session_id
-          session = find(:session_id => session_id)
+      
+      # ==== Parameters
+      # session_id<String>:: ID of the session to retrieve.
+      #
+      # ==== Returns
+      # ContainerSession:: The session corresponding to the ID.
+      def retrieve_session(session_id)
+        if item = find(:session_id => session_id)
+          item.data
         end
-        unless session
-          session = generate
+      end
+
+      # ==== Parameters
+      # session_id<String>:: ID of the session to set.
+      # data<ContainerSession>:: The session to set.
+      def store_session(session_id, data)
+        if item = find(:session_id => session_id)
+          item.update(:data => data)
+        else
+          create(:session_id => session_id, :data => data, :created_at => Time.now)
         end
-        [session, session.values[:session_id]]
       end
 
-      # Don't try to reload ARStore::Session in dev mode.
-      def reloadable?
-        false
+      # ==== Parameters
+      # session_id<String>:: ID of the session to delete.
+      def delete_session(session_id)
+        if item = find(:session_id => session_id)
+          item.delete
+        end
       end
-
+    
+      # ==== Returns
+      # Integer:: The maximum length of the 'data' column.
       def data_column_size_limit
-        255
-      end
-
-      def marshal(data)
-        Base64.encode64(Marshal.dump(data)) if data
-      end
-
-      def unmarshal(data)
-        Marshal.load(Base64.decode64(data)) if data
+        512 # TODO - figure out how much space we actually have
       end
 
       alias :create_table! :create_table
       alias :drop_table! :drop_table
     end
 
-    # Regenerate the Session ID
-    def regenerate
-      update_attributes(:session_id => Merb::SessionMixin::rand_uuid)
-      self.needs_new_cookie = true
-    end 
-
-    # Recreates the cookie with the default expiration time 
-    # Useful during log in for pushing back the expiration date 
-    def refresh_expiration
-      self.needs_new_cookie = true
-    end
-
-    # Lazy-delete of session data 
-    def delete(key = nil)
-      key ? self.data.delete(key) : self.data.clear
-    end
-
-    def [](key)
-      data[key]
-    end
-
-    def []=(key, val)
-      data[key] = val
-    end
-
-    def empty?
-      data.empty?
-    end
-
-    def each(&b)
-      data.each(&b)
+    # Lazy-unserialize session state.
+    def data
+      @data ||= (@values[:data] ? Marshal.load(@values[:data]) : {})
     end
     
-    def each_with_index(&b)
-      data.each_with_index(&b)
-    end
-
-    # Lazy-unmarshal session state.
-    def data
-      @data ||= self.class.unmarshal(@values[:data]) || {}
+    # Virtual attribute writer - override.
+    def data=(hsh)
+      @data = hsh if hsh.is_a?(Hash)
     end
 
     # Has the session been loaded yet?
     def loaded?
-      !! @data
+      !!@data
     end
 
-    private
-
-    attr_writer :data
-
-    before_save do # marshal_data!
-      # return false if !loaded?
-      @values[:data] = self.class.marshal(self.data)
+    before_save do 
+      @values[:data] = Marshal.dump(self.data)
+      if @values[:data].size > self.class.data_column_size_limit
+        raise Merb::SessionMixin::SessionOverflow
+      end    
     end
-
-    # Ensures that the data about to be stored in the database is not
-    # larger than the data storage column. Raises
-    # ActionController::SessionOverflowError.
-    # before_save do # raise_on_session_data_overflow!
-    # return false if !loaded?
-    # limit = self.class.data_column_size_limit
-    # if loaded? and limit and read_attribute(@@data_column_name).size > limit
-    # raise MerbController::SessionOverflowError
-    # end
-    # end
     
   end
 
   unless Sequel::Model.db.table_exists?(table_name.to_sym)
     puts "Warning: The database did not contain a '#{table_name}' table for sessions."
-
-    SequelSession.class_eval do
-      create_table unless table_exists?
-    end
-
+    SequelSessionStore.class_eval { create_table unless table_exists? }
     puts "Created sessions table."
+  end
+  
+  class SequelSession < SessionStoreContainer
+    
+    # The session store type
+    self.session_store_type = :sequel
+    
+    # The store object is the model class itself
+    self.store = SequelSessionStore
+    
   end
 
 end
