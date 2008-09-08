@@ -19,7 +19,7 @@ GEM_EMAIL  = "ykatz@engineyard.com"
 
 GEM_NAME    = "merb_laszlo"
 PKG_BUILD   = ENV['PKG_BUILD'] ? '.' + ENV['PKG_BUILD'] : ''
-GEM_VERSION = "0.5.0" + PKG_BUILD
+GEM_VERSION = "0.9.6" + PKG_BUILD
 
 RELEASE_NAME    = "REL #{GEM_VERSION}"
 
@@ -37,7 +37,7 @@ spec = Gem::Specification.new do |s|
   s.author = GEM_AUTHOR
   s.email = GEM_EMAIL
   s.homepage = PROJECT_URL
-  s.add_dependency('merb-core', '>= 0.9.5')
+  s.add_dependency('merb-core', '>= 0.9.6')
   s.require_path = 'lib'
   s.files = %w(LICENSE README Rakefile) + Dir.glob("{lib,specs}/**/*")
 end
@@ -58,13 +58,13 @@ end
 ##############################################################################
 
 task :install => [:package] do
-  sh %{#{sudo} gem install #{install_home} pkg/#{GEM_NAME}-#{GEM_VERSION} --no-update-sources}
+  sh install_command(GEM_NAME, GEM_VERSION)
 end
 
 namespace :jruby do
 "Run :package and install the resulting .gem with jruby"
   task :install => :package do
-    sh %{#{sudo} jruby -S gem install #{install_home} pkg/#{GEM_NAME}-#{GEM_VERSION}.gem --no-rdoc --no-ri}
+    sh jinstall_command(GEM_NAME, GEM_VERSION)
   end
 end
 

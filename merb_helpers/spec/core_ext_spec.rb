@@ -6,8 +6,8 @@ describe "Date" do
   end
 
   it "Should do to_time conversion and return a Time class" do
-    @date.is_a?Date
-    @date.to_time.is_a?Time
+    @date.is_a?(Date)
+    @date.to_time.is_a?(Time)
   end
 
   it "Should do to_time conversion to utc by default" do
@@ -25,5 +25,23 @@ describe "Date" do
 
   it "Should return itself when to_date is called" do
     @date.to_date.should == @date
+  end
+end
+
+describe "String" do
+  before :each do
+    @str = "This is a fairly long string to test with!"
+  end
+
+  it "should default to appending ..." do
+    @str.truncate(5).should == "Th..."
+  end
+
+  it "should default to a length of 30" do
+    @str.truncate().should == "This is a fairly long strin..."
+  end
+
+  it "should truncate to a given length with a given suffix" do
+    @str.truncate(15, "--more").should == "This is a--more"
   end
 end

@@ -3,6 +3,7 @@ $:.push File.join(File.dirname(__FILE__), '..', 'lib')
 require 'rubygems'
 require 'merb-core'
 require 'merb_helpers'
+require 'date'
 Merb::Helpers.load
 
 def unload_merb_helpers
@@ -100,6 +101,10 @@ class FakeModel
 end
 
 class FakeModel2 < FakeModel
+  
+  def id
+    1
+  end
   
   def foo
     "foowee2"
@@ -357,6 +362,11 @@ describe "FakeController", :shared => true do
   
   before :each do
     @obj = FakeModel.new
+    
+    def url(name, obj)
+      "#{name}/#{obj.id}"
+    end
+    
     def _buffer(buf = "") @buffer ||= "" end
     def concat(text, binding) _buffer << text end
     def capture(*args, &block)

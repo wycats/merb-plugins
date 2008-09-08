@@ -1,3 +1,4 @@
+require "date"
 class Date
   include OrdinalizedFormatting
   
@@ -28,4 +29,18 @@ class Time
   end
   
   def to_time; self; end
+  public :to_date
+end
+
+# Truncates a string to the given length and appends the given suffix if the string is, in fact, truncated.
+#
+# ==== Examples:
+#  "This is a long string right here".truncate(10, "...")  #=> "This is..."
+
+class String
+  def truncate(length = 30, truncate_string = "...")
+    return self unless self.length > length
+    length = length - truncate_string.split(//).length
+    self[0...length] + truncate_string
+  end
 end

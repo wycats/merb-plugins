@@ -1,4 +1,5 @@
 require "fileutils"
+require "sequel"
 
 module Merb
   module Orms
@@ -15,9 +16,7 @@ module Merb
         end
       
         def config
-
-          @config ||=
-          begin
+          @config ||= begin
             # Convert string keys to symbols
             full_config = Erubis.load_yaml_file(config_file)
             config = (Merb::Plugins.config[:merb_sequel] = {})
@@ -26,14 +25,10 @@ module Merb
             end
             config
           end
-
         end
       
         # Database connects as soon as the gem is loaded
         def connect
-          
-          require "sequel"
-
           if File.exists?(config_file)
             Merb.logger.info!("Connecting to the '#{config[:database]}' database on '#{config[:host]}' using '#{config[:adapter]}' ...")
             connection = ::Sequel.connect(config_options(config))
@@ -46,11 +41,9 @@ module Merb
             Merb.logger.error! "A sample file was created called config/database.yml.sample for you to copy and edit."
             exit(1)
           end
-          
         end
         
         def config_options(config = {})
-          
           options = {}
           options[:adapter]  = (config[:adapter]  || "sqlite")
           options[:host]     = (config[:host]     || "localhost")
@@ -62,16 +55,6 @@ module Merb
           options[:database] = config[:database]  if config[:database]
           options[:logger]   = Merb.logger
           options
-        end
-        
-        # Registering this ORM lets the user choose sequel as a session store
-        # in merb.yml's session_store: option.
-        def register_session_type
-          Merb.register_session_type(
-          "sequel",
-          "merb/session/sequel_session",
-          "Using Sequel database sessions"
-          )
         end
 
       end

@@ -59,7 +59,7 @@ module Merb
           if File.exists?(config_file)
             Merb.logger.info!("Connecting to database...")
 
-            Thread.new{ loop{ sleep(60*60); ::ActiveRecord::Base.verify_active_connections! } }.priority = -10
+            Thread.new{ loop{ sleep(60*60); ::ActiveRecord::Base.verify_active_connections! } }
 
             ::ActiveRecord::Base.verification_timeout = 14400
             ::ActiveRecord::Base.logger = Merb.logger
@@ -73,13 +73,6 @@ module Merb
           end
         end
 
-        # Registering this ORM lets the user choose active_record as a session
-        # in merb.yml's session_store: option.
-        def register_session_type
-          Merb.register_session_type("activerecord",
-          "merb/session/active_record_session",
-          "Using ActiveRecord database sessions")
-        end
       end
     end
   end
