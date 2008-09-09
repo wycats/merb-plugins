@@ -970,6 +970,13 @@ describe "option tags generation (basic)" do
     content.should_not match_tag( :option, :value => 'chicken', :selected => nil, :content => 'Chicken' )
   end
 
+  it "should handle arrays for selected when :multiple is true" do
+    content = select( :collection => [['minutes','Time'],['dollars','Money'],['grapes','Fruit']],
+      :selected => ['minutes', 'dollars'] )
+    content.should match_tag( :option, :value => 'minutes', :selected => 'selected', :content => 'Time' )
+    content.should match_tag( :option, :value => 'dollars', :selected => 'selected', :content => 'Money' )
+  end
+
   it "should render a hash of options as optgroup" do
     collection = { "Fruit" => [['orange','Orange'],['banana','Banana']], "Vegetables" => [['corn','Corn']]}
     content = select(:collection => collection, :selected => 'banana')
