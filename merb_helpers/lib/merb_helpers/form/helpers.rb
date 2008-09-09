@@ -150,132 +150,6 @@ module Merb::Helpers::Form
     end
   end
 
-  # Provides a generic HTML label.
-  #
-  # ==== Parameters
-  # attrs<Hash>:: HTML attributes
-  #
-  # ==== Returns
-  # String:: HTML
-  #
-  # ==== Example
-  #   <%= label "Full Name", :for => "name" %> 
-  #   => <label for="name">Full Name</label>
-  def label(*args)
-    current_form_context.label(*args)
-  end
-
-  # Provides a HTML text input tag
-  #
-  # ==== Parameters
-  # name<Symbol>:: Model or Resource
-  # attrs<Hash>:: HTML attributes
-  #
-  # ==== Returns
-  # String:: HTML
-  #
-  # ==== Example
-  #   <%= text_field :name => :fav_color, :label => "Your Favorite Color" %>
-  #   # => <label for="fav_color">Your Favorite Color</label><input type="text" id="fav_color" name="fav_color" />
-  #
-  # Used with a model:
-  #
-  #   <%= form_for @person do %>
-  #     <%= text_field :first_name, :label => "First Name" %>
-  #   <% end =%>
-  def text_field; end
-
-  # Provides a HTML password input.
-  #
-  # ==== Parameters
-  # name<Symbol>:: Model or Resource
-  # attrs<Hash>:: HTML attributes
-  #
-  # ==== Returns
-  # String:: HTML
-  #
-  # ==== Example
-  #   <%= password_field :name => :password, :label => "Password" %>
-  #   # => <label for="password">Password</label><input type="password" id="password" name="password" />
-  #
-  # Used with a model:
-  #
-  #   <%= password_field :password, :label => 'New Password' %>
-  def password_field; end
-
-  # Provides a HTML hidden input field
-  #
-  # ==== Parameters
-  # name<Symbol>:: Model or Resource
-  # attrs<Hash>:: HTML attributes
-  #
-  # ==== Returns
-  # String:: HTML
-  #
-  # ==== Example
-  #   <%= hidden_field :name => "secret", :value => "some secret value" %>
-  #
-  # Used with a model:
-  #
-  #   <%= hidden_field :identifier %>
-  #   # => <input type="hidden" id="person_identifier" name="person[identifier]" value="#{@person.identifier}" />
-  def hidden_field; end
-
-  # Provides a HTML file input
-  #
-  # ==== Parameters
-  # name<Symbol>:: Model or Resource
-  # attrs<Hash>:: HTML attributes
-  #
-  # ==== Returns
-  # String:: HTML
-  #
-  # ==== Example
-  #   <%= file_field :name => "file", :label => "File" %>
-  #
-  # Used with a model:
-  #
-  #   <%= file_field :file, :label => "Choose a file" %>
-  def file_field; end
-
-  # Provides a HTML textarea tag
-  #
-  # ==== Parameters
-  # contents<String>:: Contents of the text area
-  # attrs<Hash>:: HTML attributes
-  #
-  # ==== Returns
-  # String:: HTML
-  #
-  # ==== Example
-  #   <%= text_area "my comments", :name => "comments" %>
-  #
-  # Used with a model:
-  #
-  #   <%= text_area :comments %>
-  def text_area; end
-
-  # Provides a HTML select
-  #
-  # ==== Parameters
-  # method<Symbol>:: Resource attribute
-  # attrs<Hash>:: HTML attributes and options
-  #
-  # ==== Options
-  # +prompt+:: Adds an additional option tag with the provided string with no value.
-  # +selected+:: The value of a selected object, which may be either a string or an array.
-  # +include_blank+:: Adds an additional blank option tag with no value.
-  # +collection+:: The collection for the select options
-  # +text_method+:: Method to determine text of an option (as a symbol). Ex: :text_method => :name  will call .name on your record object for what text to display.
-  # +value_method+:: Method to determine value of an option (as a symbol).
-  #
-  # ==== Returns
-  # String:: HTML
-  #
-  # ==== Example
-  #   <%= select :name, :collection => %w(one two three) %>
-  def select; end
-
   # Provides a generic HTML checkbox input tag.
   # There are two ways this tag can be generated, based on the
   # option :boolean. If not set to true, a "magic" input is generated.
@@ -299,6 +173,74 @@ module Merb::Helpers::Form
   #
   #   <%= check_box :is_activated, :label => "Activated?" %>
   def check_box; end
+
+  # Provides a HTML file input
+  #
+  # ==== Parameters
+  # name<Symbol>:: Model or Resource
+  # attrs<Hash>:: HTML attributes
+  #
+  # ==== Returns
+  # String:: HTML
+  #
+  # ==== Example
+  #   <%= file_field :name => "file", :label => "File" %>
+  #
+  # Used with a model:
+  #
+  #   <%= file_field :file, :label => "Choose a file" %>
+  def file_field; end
+
+  # Provides a HTML hidden input field
+  #
+  # ==== Parameters
+  # name<Symbol>:: Model or Resource
+  # attrs<Hash>:: HTML attributes
+  #
+  # ==== Returns
+  # String:: HTML
+  #
+  # ==== Example
+  #   <%= hidden_field :name => "secret", :value => "some secret value" %>
+  #
+  # Used with a model:
+  #
+  #   <%= hidden_field :identifier %>
+  #   # => <input type="hidden" id="person_identifier" name="person[identifier]" value="#{@person.identifier}" />
+  def hidden_field; end
+
+  # Provides a generic HTML label.
+  #
+  # ==== Parameters
+  # attrs<Hash>:: HTML attributes
+  #
+  # ==== Returns
+  # String:: HTML
+  #
+  # ==== Example
+  #   <%= label "Full Name", :for => "name" %> 
+  #   => <label for="name">Full Name</label>
+  def label(*args)
+    current_form_context.label(*args)
+  end
+
+  # Provides a HTML password input.
+  #
+  # ==== Parameters
+  # name<Symbol>:: Model or Resource
+  # attrs<Hash>:: HTML attributes
+  #
+  # ==== Returns
+  # String:: HTML
+  #
+  # ==== Example
+  #   <%= password_field :name => :password, :label => "Password" %>
+  #   # => <label for="password">Password</label><input type="password" id="password" name="password" />
+  #
+  # Used with a model:
+  #
+  #   <%= password_field :password, :label => 'New Password' %>
+  def password_field; end
 
   # Provides a HTML radio input tag
   #
@@ -338,6 +280,64 @@ module Merb::Helpers::Form
   #   <%# custom labels %>
   #   <%= radio_group :my_choice, [{:value => 5, :label => "five"}] %>
   def radio_group; end
+
+  # Provides a HTML select
+  #
+  # ==== Parameters
+  # method<Symbol>:: Resource attribute
+  # attrs<Hash>:: HTML attributes and options
+  #
+  # ==== Options
+  # +prompt+:: Adds an additional option tag with the provided string with no value.
+  # +selected+:: The value of a selected object, which may be either a string or an array.
+  # +include_blank+:: Adds an additional blank option tag with no value.
+  # +collection+:: The collection for the select options
+  # +text_method+:: Method to determine text of an option (as a symbol). Ex: :text_method => :name  will call .name on your record object for what text to display.
+  # +value_method+:: Method to determine value of an option (as a symbol).
+  #
+  # ==== Returns
+  # String:: HTML
+  #
+  # ==== Example
+  #   <%= select :name, :collection => %w(one two three) %>
+  def select; end
+
+  # Provides a HTML textarea tag
+  #
+  # ==== Parameters
+  # contents<String>:: Contents of the text area
+  # attrs<Hash>:: HTML attributes
+  #
+  # ==== Returns
+  # String:: HTML
+  #
+  # ==== Example
+  #   <%= text_area "my comments", :name => "comments" %>
+  #
+  # Used with a model:
+  #
+  #   <%= text_area :comments %>
+  def text_area; end
+
+  # Provides a HTML text input tag
+  #
+  # ==== Parameters
+  # name<Symbol>:: Model or Resource
+  # attrs<Hash>:: HTML attributes
+  #
+  # ==== Returns
+  # String:: HTML
+  #
+  # ==== Example
+  #   <%= text_field :name => :fav_color, :label => "Your Favorite Color" %>
+  #   # => <label for="fav_color">Your Favorite Color</label><input type="text" id="fav_color" name="fav_color" />
+  #
+  # Used with a model:
+  #
+  #   <%= form_for @person do %>
+  #     <%= text_field :first_name, :label => "First Name" %>
+  #   <% end =%>
+  def text_field; end
 
   # @todo radio_group helper still needs to be implemented
   %w(text_field password_field hidden_field file_field

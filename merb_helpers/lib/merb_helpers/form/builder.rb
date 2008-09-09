@@ -14,18 +14,116 @@ module Merb::Helpers::Form::Builder
       @origin.concat(@origin.capture(&blk), blk.binding)
     end
 
+    def form(attrs = {}, &blk)
+      captured = @origin.capture(&blk)
+      fake_method_tag = process_form_attrs(attrs)
+      tag(:form, fake_method_tag + captured, attrs)
+    end
+
     def fieldset(attrs, &blk)
       legend = (l_attr = attrs.delete(:legend)) ? tag(:legend, l_attr) : ""
       tag(:fieldset, legend + @origin.capture(&blk), attrs)
       # @origin.concat(contents, blk.binding)
     end
 
-    def form(attrs = {}, &blk)
-      captured = @origin.capture(&blk)
-      fake_method_tag = process_form_attrs(attrs)
+    %w(text password hidden file).each do |kind|
+      self.class_eval <<-RUBY, __FILE__, __LINE__ + 1
+        def bound_#{kind}_field(method, attrs = {})
+          name = control_name(method)
+          update_bound_controls(method, attrs, "#{kind}")
+          unbound_#{kind}_field({:name => name, :value => @obj.send(method)}.merge(attrs))
+        end
 
-      tag(:form, fake_method_tag + captured, attrs)
+        def unbound_#{kind}_field(attrs)
+          update_unbound_controls(attrs, "#{kind}")
+          self_closing_tag(:input, {:type => "#{kind}"}.merge(attrs))
+        end
+      RUBY
     end
+
+    def bound_check_box(method, attrs = {})
+      name = control_name(method)
+      update_bound_controls(method, attrs, "checkbox")
+      unbound_check_box({:name => name}.merge(attrs))
+    end
+
+    def unbound_check_box(attrs)
+      update_unbound_controls(attrs, "checkbox")
+      if attrs.delete(:boolean)
+        on, off = attrs.delete(:on), attrs.delete(:off)
+        unbound_hidden_field(:name => attrs[:name], :value => off) <<
+          self_closing_tag(:input, {:type => "checkbox", :value => on}.merge(attrs))
+      else
+        self_closing_tag(:input, {:type => "checkbox"}.merge(attrs))
+      end
+    end
+
+    def bound_radio_button(method, attrs = {})
+      name = control_name(method)
+      update_bound_controls(method, attrs, "radio")
+      unbound_radio_button({:name => name, :value => @obj.send(method)}.merge(attrs))
+    end
+
+    def unbound_radio_button(attrs)
+      update_unbound_controls(attrs, "radio")
+      self_closing_tag(:input, {:type => "radio"}.merge(attrs))
+    end
+
+    def bound_radio_group(method, arr)
+      val = @obj.send(method)
+      arr.map do |attrs|
+        attrs = {:value => attrs} unless attrs.is_a?(Hash)
+        attrs[:checked] ||= (val == attrs[:value])
+        radio_group_item(method, attrs)
+      end.join
+    end
+
+    def unbound_radio_group(arr, attrs = {})
+      arr.map do |ind_attrs|
+        ind_attrs = {:value => ind_attrs} unless ind_attrs.is_a?(Hash)
+        joined = attrs.merge(ind_attrs)
+        joined.merge!(:label => joined[:label] || joined[:value])
+        unbound_radio_button(joined)
+      end.join
+    end
+
+    def bound_select(method, attrs = {})
+      name = control_name(method)
+      update_bound_controls(method, attrs, "select")
+      unbound_select({:name => name}.merge(attrs))
+    end
+
+    def unbound_select(attrs = {})
+      update_unbound_controls(attrs, "select")
+      attrs[:name] << "[]" if attrs[:multiple] && !(attrs[:name] =~ /\[\]$/)
+      tag(:select, options_for(attrs), attrs)
+    end
+
+    def bound_text_area(method, attrs = {})
+      name = "#{@name}[#{method}]"
+      update_bound_controls(method, attrs, "text_area")
+      unbound_text_area(@obj.send(method), {:name => name}.merge(attrs))
+    end
+
+    def unbound_text_area(contents, attrs)
+      update_unbound_controls(attrs, "text_area")
+      tag(:textarea, contents, attrs)
+    end
+
+    def button(contents, attrs)
+      update_unbound_controls(attrs, "button")
+      tag(:button, contents, attrs)
+    end
+
+    def submit(value, attrs)
+      attrs[:type]  ||= "submit"
+      attrs[:name]  ||= "submit"
+      attrs[:value] ||= value
+      update_unbound_controls(attrs, "submit")
+      self_closing_tag(:input, attrs)
+    end
+
+    private
 
     def process_form_attrs(attrs)
       method = attrs[:method]
@@ -46,10 +144,6 @@ module Merb::Helpers::Form::Builder
       self_closing_tag(:input, :type => "hidden", :name => "_method", :value => method)
     end
 
-    def add_css_class(attrs, new_class)
-      attrs[:class] = attrs[:class] ? "#{attrs[:class]} #{new_class}" : new_class
-    end
-
     def update_bound_controls(method, attrs, type)
       case type
       when "checkbox"
@@ -59,12 +153,6 @@ module Merb::Helpers::Form::Builder
       end
     end
 
-    def update_bound_select(method, attrs)
-      attrs[:value_method] ||= method
-      attrs[:text_method] ||= attrs[:value_method] || :to_s
-      attrs[:selected] ||= @obj.send(attrs[:value_method])
-    end
-
     def update_bound_check_box(method, attrs)
       raise ArgumentError, ":value can't be used with a bound_check_box" if attrs.has_key?(:value)
 
@@ -72,6 +160,12 @@ module Merb::Helpers::Form::Builder
 
       val = @obj.send(method)
       attrs[:checked] = attrs.key?(:on) ? val == attrs[:on] : considered_true?(val)
+    end
+
+    def update_bound_select(method, attrs)
+      attrs[:value_method] ||= method
+      attrs[:text_method] ||= attrs[:value_method] || :to_s
+      attrs[:selected] ||= @obj.send(attrs[:value_method])
     end
 
     def update_unbound_controls(attrs, type)
@@ -102,109 +196,6 @@ module Merb::Helpers::Form::Builder
       end
 
       attrs[:checked] = "checked" if attrs.delete(:checked)
-    end
-
-    def bound_check_box(method, attrs = {})
-      name = control_name(method)
-      update_bound_controls(method, attrs, "checkbox")
-      unbound_check_box({:name => name}.merge(attrs))
-    end
-
-    def unbound_check_box(attrs)
-      update_unbound_controls(attrs, "checkbox")
-      if attrs.delete(:boolean)
-        on, off = attrs.delete(:on), attrs.delete(:off)
-        unbound_hidden_field(:name => attrs[:name], :value => off) <<
-          self_closing_tag(:input, {:type => "checkbox", :value => on}.merge(attrs))
-      else
-        self_closing_tag(:input, {:type => "checkbox"}.merge(attrs))
-      end
-    end
-
-    %w(text password hidden file).each do |kind|
-      self.class_eval <<-RUBY, __FILE__, __LINE__ + 1
-        def unbound_#{kind}_field(attrs)
-          update_unbound_controls(attrs, "#{kind}")
-          self_closing_tag(:input, {:type => "#{kind}"}.merge(attrs))
-        end
-
-        def bound_#{kind}_field(method, attrs = {})
-          name = control_name(method)
-          update_bound_controls(method, attrs, "#{kind}")
-          unbound_#{kind}_field({:name => name, :value => @obj.send(method)}.merge(attrs))
-        end
-      RUBY
-    end
-
-    def bound_radio_button(method, attrs = {})
-      name = control_name(method)
-      update_bound_controls(method, attrs, "radio")
-      unbound_radio_button({:name => name, :value => @obj.send(method)}.merge(attrs))
-    end
-
-    def unbound_radio_button(attrs)
-      update_unbound_controls(attrs, "radio")
-      self_closing_tag(:input, {:type => "radio"}.merge(attrs))
-    end
-
-    def button(contents, attrs)
-      update_unbound_controls(attrs, "button")
-      tag(:button, contents, attrs)
-    end
-
-    def submit(value, attrs)
-      attrs[:type]  ||= "submit"
-      attrs[:name]  ||= "submit"
-      attrs[:value] ||= value
-      update_unbound_controls(attrs, "submit")
-      self_closing_tag(:input, attrs)
-    end
-
-    def bound_select(method, attrs = {})
-      name = control_name(method)
-      update_bound_controls(method, attrs, "select")
-      unbound_select({:name => name}.merge(attrs))
-    end
-
-    def unbound_select(attrs = {})
-      update_unbound_controls(attrs, "select")
-      attrs[:name] << "[]" if attrs[:multiple] && !(attrs[:name] =~ /\[\]$/)
-      tag(:select, options_for(attrs), attrs)
-    end
-
-    def bound_radio_group(method, arr)
-      val = @obj.send(method)
-      arr.map do |attrs|
-        attrs = {:value => attrs} unless attrs.is_a?(Hash)
-        attrs[:checked] ||= (val == attrs[:value])
-        radio_group_item(method, attrs)
-      end.join
-    end
-
-    def unbound_radio_group(arr, attrs = {})
-      arr.map do |ind_attrs|
-        ind_attrs = {:value => ind_attrs} unless ind_attrs.is_a?(Hash)
-        joined = attrs.merge(ind_attrs)
-        joined.merge!(:label => joined[:label] || joined[:value])
-        unbound_radio_button(joined)
-      end.join
-    end
-
-    def unbound_text_area(contents, attrs)
-      update_unbound_controls(attrs, "text_area")
-      tag(:textarea, contents, attrs)
-    end
-
-    def bound_text_area(method, attrs = {})
-      name = "#{@name}[#{method}]"
-      update_bound_controls(method, attrs, "text_area")
-      unbound_text_area(@obj.send(method), {:name => name}.merge(attrs))
-    end
-
-    private
-
-    def control_name(method)
-      "#{@name}[#{method}]"
     end
 
     # Accepts a collection (hash, array, enumerable, your type) and returns a string of option tags. 
@@ -271,22 +262,17 @@ module Merb::Helpers::Form::Builder
     def considered_true?(value)
       value && value != "0" && value != 0
     end
+
+    def control_name(method)
+      "#{@name}[#{method}]"
+    end
+
+    def add_css_class(attrs, new_class)
+      attrs[:class] = attrs[:class] ? "#{attrs[:class]} #{new_class}" : new_class
+    end
   end
 
   class Form < Base
-    def update_bound_controls(method, attrs, type)
-      attrs.merge!(:id => "#{@name}_#{method}") unless attrs[:id]
-      super
-    end
-
-    def update_unbound_controls(attrs, type)
-      case type
-      when "text", "radio", "password", "hidden", "checkbox", "file"
-        add_css_class(attrs, type)
-      end
-      super
-    end
-
     def label(contents, attrs = {})
       if contents.is_a?(Hash)
         attrs    = contents
@@ -308,6 +294,29 @@ module Merb::Helpers::Form::Builder
       RUBY
     end
 
+    def unbound_check_box(attrs = {})
+      label_text = label(attrs)
+      super + label_text
+    end
+
+    def unbound_hidden_field(attrs = {})
+      attrs.delete(:label)
+      super
+    end
+
+    def unbound_radio_button(attrs = {})
+      label_text = label(attrs)
+      super + label_text
+    end
+
+    def unbound_select(attrs = {})
+      label(attrs) + super
+    end
+
+    def unbound_text_area(contents, attrs = {})
+      label(attrs) + super
+    end
+
     def button(contents, attrs = {})
       label(attrs) + super
     end
@@ -316,22 +325,19 @@ module Merb::Helpers::Form::Builder
       label(attrs) + super
     end
 
-    def unbound_text_area(contents, attrs = {})
-      label(attrs) + super
+    private
+
+    def update_bound_controls(method, attrs, type)
+      attrs.merge!(:id => "#{@name}_#{method}") unless attrs[:id]
+      super
     end
 
-    def unbound_select(attrs = {})
-      label(attrs) + super
-    end
-
-    def unbound_check_box(attrs = {})
-      label_text = label(attrs)
-      super + label_text
-    end
-
-    def unbound_radio_button(attrs = {})
-      label_text = label(attrs)
-      super + label_text
+    def update_unbound_controls(attrs, type)
+      case type
+      when "text", "radio", "password", "hidden", "checkbox", "file"
+        add_css_class(attrs, type)
+      end
+      super
     end
 
     def radio_group_item(method, attrs)
@@ -342,21 +348,9 @@ module Merb::Helpers::Form::Builder
       attrs.merge!(:label => attrs[:label] || attrs[:value])
       super
     end
-
-    def unbound_hidden_field(attrs = {})
-      attrs.delete(:label)
-      super
-    end
   end
 
   module Errorifier
-    def update_bound_controls(method, attrs, type)
-      if @obj.errors.on(method.to_sym)
-        add_css_class(attrs, "error")
-      end
-      super
-    end
-
     def error_messages_for(obj, error_class, build_li, header, before)
       obj ||= @obj
       return "" unless obj.respond_to?(:errors)
@@ -371,6 +365,15 @@ module Merb::Helpers::Form::Builder
       errors.each {|err| markup << (build_li % (sequel ? err : err.join(" ")))}
       markup << %Q{</ul></div>}
     end
+
+    private
+
+    def update_bound_controls(method, attrs, type)
+      if @obj.errors.on(method.to_sym)
+        add_css_class(attrs, "error")
+      end
+      super
+    end
   end
 
   class FormWithErrors < Form
@@ -378,6 +381,8 @@ module Merb::Helpers::Form::Builder
   end
 
   module Resourceful
+    private
+
     def process_form_attrs(attrs)
       attrs[:action] ||= @origin.url(@name, @obj) if @origin
       super
