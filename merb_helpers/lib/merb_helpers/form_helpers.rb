@@ -6,8 +6,18 @@ class Merb::Controller
   include Merb::Helpers::Form
 end
 
+class Merb::PartController
+  class_inheritable_accessor :_form_class
+  include Merb::Helpers::Form
+end
+
 Merb::BootLoader.after_app_loads do
   class Merb::Controller
+    self._form_class =
+      Object.full_const_get(Merb::Plugins.config[:helpers][:form_class]) rescue Merb::Helpers::Form::Builder::ResourcefulFormWithErrors
+  end
+  
+  class Merb::PartController
     self._form_class =
       Object.full_const_get(Merb::Plugins.config[:helpers][:form_class]) rescue Merb::Helpers::Form::Builder::ResourcefulFormWithErrors
   end
