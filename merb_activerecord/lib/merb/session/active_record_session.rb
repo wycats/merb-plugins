@@ -1,5 +1,5 @@
-require 'active_record'
 require 'merb-core/dispatch/session'
+require 'active_record'
 require 'base64'
 
 module Merb

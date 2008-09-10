@@ -1,5 +1,4 @@
 require 'fileutils'
-require 'active_record'
 
 module Merb
   module Orms

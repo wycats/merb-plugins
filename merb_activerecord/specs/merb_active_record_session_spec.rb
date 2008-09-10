@@ -27,7 +27,7 @@ ActiveRecord::Schema.define do
 end
 
 # Load up the shared specs from merb-core
-if (gem_spec = Gem.source_index.search('merb-core').last) && 
+if (gem_spec = Gem.source_index.search(Gem::Dependency.new('merb-core', '>=0.9.6')).last) && 
   gem_spec.files.include?('spec/public/session/controllers/sessions.rb')
   require gem_spec.full_gem_path / 'spec/public/session/controllers/sessions.rb'
   require gem_spec.full_gem_path / 'spec/public/session/session_spec.rb' 
