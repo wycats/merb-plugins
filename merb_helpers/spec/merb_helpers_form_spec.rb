@@ -1,7 +1,7 @@
 require File.dirname(__FILE__) + '/spec_helper'
 
 Merb::Plugins.config[:helpers] = {
-  :form_class => Merb::Helpers::Form::Builder::FormWithErrors
+  :default_builder => Merb::Helpers::Form::Builder::FormWithErrors
 }
 
 # @todo - error_messages_for needs more complete specs
@@ -62,7 +62,7 @@ end
 describe "form" do
   it_should_behave_like "FakeController"
 
-  describe "when _form_class is Merb::Helpers::Form::Builder::ResourcefulFormWithErrors" do
+  describe "when _default_builder is Merb::Helpers::Form::Builder::ResourcefulFormWithErrors" do
     before(:each) do
       @obj = FakeModel2.new
     end

@@ -353,8 +353,8 @@ module Merb
 end
 
 describe "FakeController", :shared => true do
-  class_inheritable_accessor :_form_class
-  self._form_class = Merb::Plugins.config[:helpers][:form_class]
+  class_inheritable_accessor :_default_builder
+  self._default_builder = Merb::Plugins.config[:helpers][:default_builder]
   include Merb::Helpers::DateAndTime
   include Merb::ControllerMixin
   include Merb::Helpers::Tag

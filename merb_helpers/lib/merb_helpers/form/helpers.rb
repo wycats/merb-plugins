@@ -3,9 +3,9 @@
 module Merb::Helpers::Form
 
   def _singleton_form_context
-    self._form_class = Merb::Helpers::Form::Builder::ResourcefulFormWithErrors unless self._form_class
+    self._default_builder = Merb::Helpers::Form::Builder::ResourcefulFormWithErrors unless self._default_builder
     @_singleton_form_context ||=
-      self._form_class.new(nil, nil, self)
+      self._default_builder.new(nil, nil, self)
   end
 
   def form_contexts
@@ -23,7 +23,7 @@ module Merb::Helpers::Form
       ivar, name = name, name.class.to_s.snake_case
     end
     builder ||= current_form_context.class if current_form_context
-    (builder || self._form_class).new(ivar, name, self)
+    (builder || self._default_builder).new(ivar, name, self)
   end
 
   def with_form_context(name, builder)
