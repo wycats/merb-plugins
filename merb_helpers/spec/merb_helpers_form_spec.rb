@@ -1152,47 +1152,48 @@ describe "your own builder" do
   end
 end
 
-# describe 'delete_button' do
-#   before :each do
-#     @obj = mock 'a model'
-#     @obj.stub!(:object_id).and_return("1")
-#     
-#     Merb::Router.prepare do |r|
-#       r.resources :objs
-#       r.resources :foos
-#     end
-#     def url(sym, obj)
-#       "/objs/#{obj.object_id}"
-#     end
-#   end
-# 
-#   it 'should return a button inside of a form for the object' do
-#     result = delete_button(:obj, @obj)
-#     result.should match_tag(:form, :action => "/objs/#{@obj.object_id}", :method => "post")
-#     result.should match_tag(:input, :type => "hidden", :value => "delete", :name => "_method")
-#     result.should match_tag(:button, :type => "submit")
-#     result.should match(/<button.*>Delete<\/button>/)
-#   end
-# 
-#   it 'should allow you to modify the label' do
-#     delete_button(:obj, @obj, 'Remove').should match(/<button.*>Remove<\/button>/)
-#   end
-# 
-#   it 'should allow you to omit the ivar reference if its name is the same as the attribute' do
-#     delete_button(:obj).should == delete_button(:obj, @obj)
-#   end
-#   
-#   it "should allow you to use a local variable as is common in a .each loop" do
-#     foo = @obj
-#     delete_button(:foo, foo).should == delete_button(:obj)
-#   end
-#   
-#   it 'should allow you to modify the action so you can use routes with multiple params' do
-#     result = delete_button('/objs/2/subobjs/1')
-#     result.should match_tag(:form, :action => "/objs/2/subobjs/1", :method => "post")
-#   end
-# end
-# 
+describe 'delete_button' do
+  it_should_behave_like "FakeController"
+  
+  before :each do
+    @obj = mock 'a model'
+    @obj.stub!(:object_id).and_return("1")
+    
+    Merb::Router.prepare do |r|
+      r.resources :objs
+      r.resources :foos
+    end
+    def url(sym, obj)
+      "/objs/#{obj.object_id}"
+    end
+  end
+
+  it 'should return a button inside of a form for the object' do
+    result = delete_button(:obj, url(:obj, @obj), "Delete moi!")
+    result.should match_tag(:form, :action => "/objs/#{@obj.object_id}", :method => "post")
+    result.should match_tag(:input, :type => "hidden", :value => "delete", :name => "_method")
+    result.should match_tag(:input, :type => "submit")
+  end
+
+  # it 'should allow you to modify the label' do
+  #   delete_button(:obj, @obj, 'Remove').should match(/<button.*>Remove<\/button>/)
+  # end
+  # 
+  # it 'should allow you to omit the ivar reference if its name is the same as the attribute' do
+  #   delete_button(:obj).should == delete_button(:obj, @obj)
+  # end
+  # 
+  # it "should allow you to use a local variable as is common in a .each loop" do
+  #   foo = @obj
+  #   delete_button(:foo, foo).should == delete_button(:obj)
+  # end
+  # 
+  # it 'should allow you to modify the action so you can use routes with multiple params' do
+  #   result = delete_button('/objs/2/subobjs/1')
+  #   result.should match_tag(:form, :action => "/objs/2/subobjs/1", :method => "post")
+  # end
+end
+
 # describe "control_value" do
 #   it_should_behave_like "FakeController"
 # 

@@ -373,6 +373,26 @@ module Merb::Helpers::Form
   def button(contents, attrs = {})
     current_form_context.button(contents, attrs)
   end
+  
+  # Generates a HTML delete button.
+  #
+  # ==== Parameters
+  # name<Symbol>:: Model or Resource
+  # url<String>:: URL to send the request to
+  # attrs<Hash>:: HTML attributes
+  # contents<String>:: HTML contained within the button tag
+  # attrs<Hash>:: HTML attributes
+  #
+  # ==== Returns
+  # String:: HTML
+  #
+  # ==== Example
+  #   <%= delete_button :article, url(:article, @article), "Delete article now", :class => 'delete-btn' %>
+  def delete_button(name, url, contents="Delete", attrs = {})
+    form_for(name, :action => url, :method => :delete) do
+        current_form_context.submit(contents, attrs)
+    end
+  end
 
   # Generates a HTML submit button.
   #
