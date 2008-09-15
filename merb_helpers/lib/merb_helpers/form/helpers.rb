@@ -389,9 +389,14 @@ module Merb::Helpers::Form
   # ==== Example
   #   <%= delete_button :article, url(:article, @article), "Delete article now", :class => 'delete-btn' %>
   def delete_button(name, url, contents="Delete", attrs = {})
-    form_for(name, :action => url, :method => :delete) do
-        current_form_context.submit(contents, attrs)
+    attrs[:action] = url
+    attrs[:method] = :delete
+    with_form_context(name, attrs.delete(:builder)) do
+      current_form_context.form(attrs) do
+          current_form_context.submit(contents, attrs)
+      end
     end
+    
   end
 
   # Generates a HTML submit button.

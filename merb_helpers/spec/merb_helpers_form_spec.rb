@@ -1172,7 +1172,7 @@ describe 'delete_button' do
     result = delete_button(:obj, url(:obj, @obj), "Delete moi!")
     result.should match_tag(:form, :action => "/objs/#{@obj.object_id}", :method => "post")
     result.should match_tag(:input, :type => "hidden", :value => "delete", :name => "_method")
-    result.should match_tag(:input, :type => "submit")
+    result.should match_tag(:input, :type => "submit", :value => "Delete moi!")
   end
 
   # it 'should allow you to modify the label' do
