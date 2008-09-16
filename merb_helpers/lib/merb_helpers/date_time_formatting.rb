@@ -24,12 +24,13 @@ module DateAndTimeFormatting
   module ClassMethods
     
     @@formats = {
-      :db           => "%Y-%m-%d %H:%M:%S",
-      :time         => "%H:%M",
-      :short        => "%d %b %H:%M",
-      :long         => "%B %d, %Y %H:%M",
-      :long_ordinal => lambda { |time| time.strftime("%B #{time.day.ordinalize}, %Y %H:%M") },
-      :rfc822       => "%a, %d %b %Y %H:%M:%S %z"
+      :db             => "%Y-%m-%d %H:%M:%S", 
+      :time           => "%H:%M", # 21:12
+      :date           => "%Y-%m-%d", # 2008-12-04
+      :short          => "%d %b %H:%M", # 01 Sep 21:12
+      :long           => "%B %d, %Y %H:%M",
+      :long_ordinal   => lambda { |time| time.strftime("%B #{time.day.ordinalize}, %Y %H:%M") },
+      :rfc822         => "%a, %d %b %Y %H:%M:%S %z"
     }
     
     # ==== Returns
@@ -49,7 +50,7 @@ module DateAndTimeFormatting
     end
     
     def reset_formats
-      original_formats = [:db, :time, :short, :long, :long_ordinal, :rfc822]
+      original_formats = [:db, :time, :short, :date, :long, :long_ordinal, :rfc822]
       @@formats = @@formats.delete_if{|format, v| !original_formats.include?(format)}
     end
 

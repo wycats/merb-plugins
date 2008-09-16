@@ -23,6 +23,10 @@ shared_examples_for "Date, DateTime, Time formatting" do
     @date.formatted(:short).should == "02 Nov 00:00"
   end
   
+  it "should support to be date formatted" do
+    @date.formatted(:date).should == "2007-11-02"
+  end
+  
   it "should support to be long formatted" do
     @date.formatted(:long).should == "November 02, 2007 00:00"
   end
