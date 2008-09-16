@@ -47,6 +47,12 @@ module DateAndTimeFormatting
     def add_format(key, format)
       @@formats.merge!({key => format})
     end
+    
+    def reset_formats
+      original_formats = [:db, :time, :short, :long, :long_ordinal, :rfc822]
+      @@formats = @@formats.delete_if{|format, v| !original_formats.include?(format)}
+    end
+
   end
   
 end
