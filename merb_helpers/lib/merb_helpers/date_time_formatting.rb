@@ -1,3 +1,56 @@
+module DateAndTimeFormatting
+  
+  def self.included(base)
+    base.class_eval do
+      include DateAndTimeFormatting::InstanceMethods
+      include OrdinalizedFormatting
+      extend DateAndTimeFormatting::ClassMethods
+    end
+  end
+  
+  module InstanceMethods
+    
+    # ==== Parameters
+    # format<Symbol>:: of the format key from Date.date_formats
+    #
+    # ==== Returns
+    # String:: formattred string
+    def formatted(format = :default)
+      self.strftime(Date.formats[format])
+    end
+  
+  end
+  
+  module ClassMethods
+    
+    @@formats = {
+      :db           => "%Y-%m-%d %H:%M:%S",
+      :time         => "%H:%M",
+      :short        => "%d %b %H:%M",
+      :long         => "%B %d, %Y %H:%M",
+      :long_ordinal => lambda { |time| time.strftime("%B #{time.day.ordinalize}, %Y %H:%M") },
+      :rfc822       => "%a, %d %b %Y %H:%M:%S %z"
+    }
+    
+    # ==== Returns
+    # Hash:: a hash with all formats available
+    def formats
+      @@formats
+    end
+    
+    # ==== Parameters
+    # key<Symbol>:: name of the format
+    # format<Hash>:: time format to use
+    #
+    # ==== Returns
+    # Hash:: a hash with all formats available
+    def add_format(key, format)
+      @@formats.merge!({key => format})
+    end
+  end
+  
+end
+
 module Ordinalize
   # Ordinalize turns a number into an ordinal string used to denote the
   # position in an ordered sequence such as 1st, 2nd, 3rd, 4th.
@@ -27,12 +80,8 @@ Integer.send :include, Ordinalize
 # => "February 28th, 2006 21:10"
 module OrdinalizedFormatting
   
-  def self.extended(obj)
-    include Merb::Helpers::DateAndTime
-  end
-  
   def to_ordinalized_s(format = :default)
-    format = Merb::Helpers::DateAndTime.date_formats[format] 
+    format = Date.formats[format] 
     return self.to_s if format.nil?
     strftime_ordinalized(format)
   end

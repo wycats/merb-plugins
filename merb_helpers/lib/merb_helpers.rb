@@ -7,7 +7,6 @@ module Merb
     
     def self.load
       require @@helpers_dir + '/time_dsl'
-      require @@helpers_dir + '/ordinalize'
       require @@helpers_dir + '/core_ext'
        
       if Merb::Plugins.config[:merb_helpers]

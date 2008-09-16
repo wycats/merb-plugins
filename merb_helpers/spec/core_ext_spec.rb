@@ -26,6 +26,38 @@ describe "Date" do
   it "Should return itself when to_date is called" do
     @date.to_date.should == @date
   end
+  
+  describe "Date formatting" do
+    
+    it "should list the available formats" do
+      Date.formats.should be_an_instance_of(Hash)
+      Date.formats.keys.length.should > 1
+    end
+  
+    it "should support to be db formatted" do
+      @date.formatted(:db).should == "2007-11-10 00:00:00"
+    end
+    
+    it "should support to be time formatted" do
+      @date.formatted(:time).should == "00:00"
+    end
+  
+    it "should support to be short formatted" do
+      @date.formatted(:short).should == "10 Nov 00:00"
+    end
+    
+    it "should support to be long formatted" do
+      @date.formatted(:long).should == "November 10, 2007 00:00"
+    end
+    
+    it "should support a new date format" do
+      @date.formatted(:matt).should == @date.to_s
+      Date.add_format(:matt, "%H:%M:%S %Y-%m-%d")
+      @date.formatted(:matt).should == "00:00:00 2007-11-10"
+    end
+    
+  end
+  
 end
 
 describe "String" do

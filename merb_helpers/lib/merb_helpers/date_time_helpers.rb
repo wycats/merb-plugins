@@ -16,14 +16,6 @@ module Merb
         :initial_format => '%b %d',
         :year_format    => ', %Y'
       }
-      @@date_formats = {
-        :db           => "%Y-%m-%d %H:%M:%S",
-        :time         => "%H:%M",
-        :short        => "%d %b %H:%M",
-        :long         => "%B %d, %Y %H:%M",
-        :long_ordinal => lambda { |time| time.strftime("%B #{time.day.ordinalize}, %Y %H:%M") },
-        :rfc822       => "%a, %d %b %Y %H:%M:%S %z"
-      }
       
       def self.time_class
         @@time_class
@@ -37,10 +29,6 @@ module Merb
       # String:: a string used to format time using #strftime
       def self.time_output(format, locale=nil)
         @@time_output[format]
-      end
-      
-      def self.date_formats
-        @@date_formats
       end
       
       # Gives you a relative date in an attractive format
