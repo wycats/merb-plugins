@@ -8,6 +8,7 @@ module Merb
     def self.load
       require @@helpers_dir + '/time_dsl'
       require @@helpers_dir + '/core_ext'
+      require @@helpers_dir + '/core_ext/numeric'
        
       if Merb::Plugins.config[:merb_helpers]
         config = Merb::Plugins.config[:merb_helpers]
