@@ -15,6 +15,7 @@ if defined?(Merb::Plugins)
         Merb.logger.debug "Using ActiveRecord sessions"
         require File.join(File.dirname(__FILE__) / "merb" / "session" / "active_record_session")
       end
+      Merb::Router.root_behavior = Merb::Router.root_behavior.identify(ActiveRecord::Base => :to_param)
     end
 
   end
