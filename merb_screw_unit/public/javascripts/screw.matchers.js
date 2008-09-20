@@ -1,4 +1,9 @@
 Screw.Matchers = (function($) {
+  var jquerize = function(obj) {
+    if(typeof obj == "string") return iframeWindow.$(obj);
+    else return obj;
+  }
+
   return matchers = {
     expect: function(actual) {
       return {
@@ -15,12 +20,39 @@ Screw.Matchers = (function($) {
       }
     },
     
-    have: {
+    exist: {
       match: function(expected, actual) {
-        return actual.find(expected).length > 0;
+        return actual.length > 0;
       },
       failure_message: function(expected, actual, not) {
-        return 'expected ' + $.print(actual) + (not ? ' to not have ' : ' to have ') + $.print(expected);
+        return 'expected ' + $.print(actual) + (not ? ' to not ' : ' to ') + "exist";
+      }
+    },
+
+    contain_text: {
+      match: function(expected, actual) {
+        return jquerize(actual).filter(":contains(\"" + expected + "\")").length > 0;
+      },
+      failure_message: function(expected, actual, not) {
+        return 'expected ' + $.print(jquerize(actual)) + (not ? ' to not have ' : ' to have ') + $.print(expected);
+      }
+    },
+
+    have: {
+      match: function(expected, actual) {
+        return jquerize(actual).find(expected).length > 0;
+      },
+      failure_message: function(expected, actual, not) {
+        return 'expected ' + $.print(jquerize(actual)) + (not ? ' to not have ' : ' to have ') + $.print(expected);
+      }
+    },
+
+    be_visible: {
+      match: function(expected, actual) {
+        return jquerize(actual).is(":visible");
+      },
+      failure_message: function(expected, actual, not) {
+        return 'expected ' + $.print(jquerize(actual)) + (not ? ' to not ' : ' to ') + "be visible";
       }
     },
     
@@ -61,13 +93,14 @@ Screw.Matchers = (function($) {
     
     be_empty: {
       match: function(expected, actual) {
-        if (actual.length == undefined) throw(actual.toString() + " does not respond to length");
+        if (jquerize(actual).length == undefined)
+          throw($.print(jquerize(actual)) + " does not respond to length");
         
         return actual.length == 0;
       },
       
       failure_message: function(expected, actual, not) {
-        return 'expected ' + $.print(actual) + (not ? ' to not be empty' : ' to be empty');
+        return 'expected ' + $.print(jquerize(actual)) + (not ? ' to not be empty' : ' to be empty');
       }
     }
   }
