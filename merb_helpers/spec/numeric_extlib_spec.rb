@@ -41,7 +41,7 @@ describe "Numeric helpers" do
    end
    
    
-   describe "number_to_concurrency" do
+   describe "to_concurrency" do
      
      before(:each) do
        @number = 1234567890.50
