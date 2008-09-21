@@ -110,3 +110,37 @@ After adding a custom format, you can set it as the default format:
 You can set this things up in your before/after app load block in the config/init.rb file.
 
 
+Formating a Date or Time instance
+---------------
+
+Usage examples: spec/merb_helpers_date_time_spec.rb
+
+    Time.now.formatted(:db)   # => "2008-09-21 02:07:31"
+    Time.now.formatted(:long) # => "September 21, 2008 02:08"
+    
+You can also add your own format:
+
+    Date.add_format(:matt, "%H:%M:%S %Y-%m-%d")
+
+And use is as a default format:
+
+  Time.now.formatted(:matt)    # => "02:09:18 2008-09-21"
+
+
+
+Representation of time difference
+-------------------
+
+Usage examples: spec/merb_helpers_date_time_spec.rb
+
+* Relative time:
+
+Let's imagine that we are the June 1st 2007 at 11am UTC
+
+
+    relative_date(Time.now.utc)       # => "today"
+    relative_date(1.day.ago.utc)      # => 'yesterday'
+    relative_date(1.day.from_now.utc) # => 'tomorrow'
+    relative_date(Time.utc(2005, 11, 15)) # => 'Nov 15th, 2005' (date with the year since it's not this year)
+    relative_date(Time.utc(2007, 11, 15)) # => 'Nov 15th' (date without the year this the passed date is this year)
+    

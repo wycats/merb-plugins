@@ -10,11 +10,17 @@ module DateAndTimeFormatting
   
   module InstanceMethods
     
+    
+    # Format a date/time instance using a defined format
+    #
     # ==== Parameters
     # format<Symbol>:: of the format key from Date.date_formats
     #
     # ==== Returns
     # String:: formattred string
+    # 
+    #--
+    # @public
     def formatted(format = :default)
       self.strftime(Date.formats[format])
     end
@@ -29,29 +35,40 @@ module DateAndTimeFormatting
       :date           => "%Y-%m-%d", # 2008-12-04
       :short          => "%d %b %H:%M", # 01 Sep 21:12
       :long           => "%B %d, %Y %H:%M",
-      :long_ordinal   => lambda { |time| time.strftime("%B #{time.day.ordinalize}, %Y %H:%M") },
       :rfc822         => "%a, %d %b %Y %H:%M:%S %z"
     }
     
+    # Lists the date and time formats
+    #
     # ==== Returns
     # Hash:: a hash with all formats available
+    # --
+    # @public
     def formats
       @@formats
     end
     
+    # Adds a date and time format
+    #
     # ==== Parameters
     # key<Symbol>:: name of the format
     # format<Hash>:: time format to use
     #
     # ==== Returns
     # Hash:: a hash with all formats available
+    # --
+    # @public
     def add_format(key, format)
-      @@formats.merge!({key => format})
+      formats.merge!({key => format})
     end
     
+    
+    # Resets the date and time formats
+    # --
+    # @private
     def reset_formats
       original_formats = [:db, :time, :short, :date, :long, :long_ordinal, :rfc822]
-      @@formats = @@formats.delete_if{|format, v| !original_formats.include?(format)}
+      formats = @@formats.delete_if{|format, v| !original_formats.include?(format)}
     end
 
   end
