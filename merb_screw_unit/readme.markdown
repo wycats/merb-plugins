@@ -79,7 +79,7 @@ file: config/init.rb
 
 	Merb::Plugins.config[:merb_slices] = { :queue => ["MerbScrewUnit", ...] }
 
-### optionally configure the plugins in a before_app_loads callback
+### optionally configure the plugins in a before\_app\_loads callback
 
 	Merb::BootLoader.before_app_loads do
 
@@ -122,7 +122,7 @@ host-app/slices/merb\_screw\_unit/app - controllers, models, views ...
 3. host-app/app/views/*
 
 You can use the host application's layout by configuring the
-merb\_screw\_unit slice in a before_app_loads block:
+merb\_screw\_unit slice in a before\_app\_loads block:
 
 	Merb::Slices.config[:merb_screw_unit] = { :layout => :application }
 
