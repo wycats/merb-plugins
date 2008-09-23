@@ -2,7 +2,7 @@ class <%= class_name %> < ActiveRecord::Migration
   def self.up
 <% if model -%>
     create_table :<%= table_name %> do |t|
-<% attributes.each do |name, type| -%>
+<% attributes.each do |type, name| -%>
       t.<%= name %> :<%= type %>
 <% end -%>
 
