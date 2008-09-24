@@ -104,5 +104,9 @@ describe "merb_param_protection" do
       request.trashed_params.should == {"status"=>"published", "author_id"=>"1"}
     end
   end
+  
+  it "should not have any plugin methods accidently exposed as actions" do
+    Merb::Controller.callable_actions.should be_empty
+  end
 
 end
