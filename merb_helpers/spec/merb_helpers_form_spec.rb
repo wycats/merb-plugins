@@ -216,6 +216,11 @@ describe "text_field" do
     result.should match(/<label>LABEL<\/label><input type="text" class="text"\s*\/>/)
   end
 
+  it "should provide an additional label tag with additional options if the :label option is a hash" do
+    result = text_field(:label => {:title => "LABEL", :class => "cool"} )
+    result.should match(/<label class="cool">LABEL<\/label><input type="text" class="text"\s*\/>/)
+  end
+
   it "should update an existing :class with a new class" do
     result = text_field(:class => "awesome foobar")
     result.should == "<input type=\"text\" class=\"awesome foobar text\"/>"

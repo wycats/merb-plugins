@@ -283,8 +283,12 @@ module Merb::Helpers::Form::Builder
         contents = attrs.delete(:label)
       end
       if contents
+        if contents.is_a?(Hash)
+          attrs = attrs.merge(contents)
+          contents = attrs.delete(:title)
+        end
         for_attr = attrs[:id] ? {:for => attrs[:id]} : {}
-        tag(:label, contents, for_attr)
+        tag(:label, contents, attrs.merge(for_attr))
       else
         ""
       end
