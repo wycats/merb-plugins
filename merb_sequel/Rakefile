@@ -45,35 +45,21 @@ Rake::GemPackageTask.new(spec) do |pkg|
   pkg.gem_spec = spec
 end
 
-##############################################################################
-# Installation
-##############################################################################
 desc "Install the gem"
-task :install => [:package] do
-  sh install_command(GEM_NAME, GEM_VERSION)
+task :install do
+  Merb::RakeHelper.install(GEM_NAME, :version => GEM_VERSION)
 end
 
-namespace :jruby do
-  desc "Run :package and install the resulting .gem with jruby"
-  task :install => :package do
-    sh jinstall_command(GEM_NAME, GEM_VERSION)
-  end
+desc "Uninstall the gem"
+task :uninstall do
+  Merb::RakeHelper.uninstall(GEM_NAME, :version => GEM_VERSION)
 end
 
-##############################################################################
-# Specs
-##############################################################################
-desc "Run all specs"
-Spec::Rake::SpecTask.new("specs") do |t|
-  t.spec_opts = ["--format", "specdoc", "--colour"]
-  t.spec_files = Dir["spec/**/*_spec.rb"].sort
-end
-
-desc "Run all specs and generate an rcov report"
-Spec::Rake::SpecTask.new('rcov') do |t|
+desc "Run all examples"
+Spec::Rake::SpecTask.new('spec') do |t|
+  t.spec_opts  = ["-cfs"]
   t.spec_files = FileList['spec/**/*_spec.rb']
-  t.spec_opts = ["--format", "specdoc", "--colour"]
-  t.rcov = true
-  t.rcov_dir = 'coverage'
-  t.rcov_opts = ['--exclude', 'gems', '--exclude', 'spec']
 end
+
+desc 'Default: run spec examples.'
+task :default => 'spec'

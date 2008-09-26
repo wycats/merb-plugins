@@ -19,7 +19,7 @@ GEM_NAME    = "merb_activerecord"
 PKG_BUILD   = ENV['PKG_BUILD'] ? '.' + ENV['PKG_BUILD'] : ''
 GEM_VERSION = (Merb::MORE_VERSION rescue "0.9.8") + PKG_BUILD
 
-RELEASE_NAME    = "REL #{GEM_VERSION}"
+RELEASE_NAME  = "REL #{GEM_VERSION}"
 
 require "extlib/tasks/release"
 
@@ -37,28 +37,28 @@ spec = Gem::Specification.new do |s|
   s.homepage = PROJECT_URL
   s.add_dependency('merb-core', '>= 0.9.8')
   s.require_path = 'lib'
-  s.files = %w(LICENSE README Rakefile TODO) + Dir.glob("{lib,specs}/**/*")  end
+  s.files = %w(LICENSE README Rakefile TODO) + Dir.glob("{lib,specs}/**/*")  
+end
 
 Rake::GemPackageTask.new(spec) do |pkg|
   pkg.gem_spec = spec
 end
 
 desc "Install the gem"
-task :install => [:package] do
-  sh install_command(GEM_NAME, GEM_VERSION)
+task :install do
+  Merb::RakeHelper.install(GEM_NAME, :version => GEM_VERSION)
 end
 
-namespace :jruby do
-
-  desc "Run :package and install the resulting .gem with jruby"
-  task :install => :package do
-    sh jinstall_command(GEM_NAME, GEM_VERSION)
-  end
-
+desc "Uninstall the gem"
+task :uninstall do
+  Merb::RakeHelper.uninstall(GEM_NAME, :version => GEM_VERSION)
 end
 
-desc "Run all specs"
-Spec::Rake::SpecTask.new("specs") do |t|
-  t.spec_opts = ["--format", "specdoc", "--colour"]
-  t.spec_files = Dir["spec/**/*_spec.rb"].sort
+desc "Run all examples"
+Spec::Rake::SpecTask.new('spec') do |t|
+  t.spec_opts  = ["-cfs"]
+  t.spec_files = FileList['spec/**/*_spec.rb']
 end
+
+desc 'Default: run spec examples.'
+task :default => 'spec'
