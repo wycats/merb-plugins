@@ -2,7 +2,7 @@ require "rake"
 require "fileutils"
 require "merb-core/tasks/merb_rake_helper"
 
-gems = %w[merb_activerecord merb_helpers merb_sequel merb_param_protection merb_test_unit merb_stories merb_screw_unit]
+gems = %w[merb_activerecord merb_sequel merb_param_protection merb_test_unit merb_stories merb_screw_unit]
 
 # Implement standard Rake::GemPackageTask tasks - see merb.thor
 task :clobber_package do; FileUtils.rm_rf('pkg'); end
@@ -62,3 +62,13 @@ task :release do
     Dir.chdir(dir){ sh "#{Gem.ruby} -S rake release" }
   end
 end
+
+desc "Run spec examples for Merb More gems, one by one."
+task :spec do
+  gems.each do |gem|
+    Dir.chdir(gem) { sh "#{Gem.ruby} -S rake spec" }
+  end
+end
+
+desc 'Default: run spec examples for all the gems.'
+task :default => 'spec'
