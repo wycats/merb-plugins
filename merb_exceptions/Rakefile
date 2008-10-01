@@ -5,7 +5,7 @@ require 'merb-core/tasks/merb_rake_helper'
 require "spec/rake/spectask"
 
 PLUGIN = "merb_exceptions"
-NAME = "merb_exceptions"
+GEM_NAME = "merb_exceptions"
 AUTHOR = 'Andy Kent'
 EMAIL = "andy@new-bamboo.co.uk"
 HOMEPAGE = "http://merb-plugins.rubyforge.org/me/"
@@ -17,7 +17,7 @@ GEM_VERSION = (Merb::MORE_VERSION rescue "0.9.8") + PKG_BUILD
 require "extlib/tasks/release"
 
 spec = Gem::Specification.new do |s|
-  s.name = NAME
+  s.name = GEM_NAME
   s.version = GEM_VERSION
   s.platform = Gem::Platform::RUBY
   s.has_rdoc = true
@@ -29,7 +29,7 @@ spec = Gem::Specification.new do |s|
   s.homepage = HOMEPAGE
   s.require_path = 'lib'
   s.autorequire = PLUGIN
-  s.files = %w(LICENSE README.markdown Rakefile TODO) + Dir.glob("{lib,spec}/**/*")
+  s.files = %w(LICENSE README.markdown Rakefile) + Dir.glob("{lib,spec}/**/*")
 end
 
 Rake::GemPackageTask.new(spec) do |pkg|
@@ -40,15 +40,13 @@ end
 # Installation
 ##############################################################################
 desc "Install the gem"
-task :install => [:package] do
-  sh install_command(GEM_NAME, GEM_VERSION)
+task :install do
+  Merb::RakeHelper.install(GEM_NAME, :version => GEM_VERSION)
 end
 
-namespace :jruby do
-  desc "Run :package and install the resulting .gem with jruby"
-  task :install => :package do
-    sh jinstall_command(GEM_NAME, GEM_VERSION)
-  end
+desc "Uninstall the gem"
+task :uninstall do
+  Merb::RakeHelper.uninstall(GEM_NAME, :version => GEM_VERSION)
 end
 
 ##############################################################################
