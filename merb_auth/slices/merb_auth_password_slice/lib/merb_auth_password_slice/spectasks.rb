@@ -1,5 +1,5 @@
 namespace :slices do
-  namespace :mauth_password_slice do
+  namespace :merb_auth_password_slice do
       
     desc "Run slice specs within the host application context"
     task :spec => [ "spec:explain", "spec:default" ]

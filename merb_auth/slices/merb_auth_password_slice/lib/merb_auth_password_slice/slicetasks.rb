@@ -1,7 +1,7 @@
 namespace :slices do
-  namespace :mauth_password_slice do 
+  namespace :merb_auth_password_slice do 
     
-    # add your own mauth_password_slice tasks here
+    # add your own merb_auth_password_slice tasks here
     
     # implement this to test for structural/code dependencies
     # like certain directories or availability of other files

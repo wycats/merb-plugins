@@ -1,5 +1,5 @@
 namespace :slices do
-  namespace :mauth_password_slice do
+  namespace :merb_auth_password_slice do
   
     desc "Install MerbAuthPasswordSlice"
     task :install => [:preflight, :setup_directories, :copy_assets, :migrate]
@@ -47,7 +47,7 @@ namespace :slices do
     task :migrate do # see slicetasks.rb
     end
     
-    desc "Freeze MerbAuthPasswordSlice into your app (only mauth_password_slice/app)" 
+    desc "Freeze MerbAuthPasswordSlice into your app (only merb_auth_password_slice/app)" 
     task :freeze => [ "freeze:app" ]
 
     namespace :freeze do
@@ -55,15 +55,15 @@ namespace :slices do
       desc "Freezes MerbAuthPasswordSlice by installing the gem into application/gems using merb-freezer"
       task :gem do
         begin
-          Object.const_get(:Freezer).freeze(ENV["GEM"] || "mauth_password_slice", ENV["UPDATE"], ENV["MODE"] || 'rubygems')
+          Object.const_get(:Freezer).freeze(ENV["GEM"] || "merb_auth_password_slice", ENV["UPDATE"], ENV["MODE"] || 'rubygems')
         rescue NameError
           puts "! dependency 'merb-freezer' missing"
         end
       end
       
-      desc "Freezes MerbAuthPasswordSlice by copying all files from mauth_password_slice/app to your application"
+      desc "Freezes MerbAuthPasswordSlice by copying all files from merb_auth_password_slice/app to your application"
       task :app do
-        puts "Copying all mauth_password_slice/app files to your application - resolves any collisions"
+        puts "Copying all merb_auth_password_slice/app files to your application - resolves any collisions"
         copied, preserved = MerbAuthPasswordSlice.mirror_app!
         puts "- no files to copy" if copied.empty? && preserved.empty?
         copied.each { |f| puts "- copied #{f}" }
@@ -88,7 +88,7 @@ namespace :slices do
         preserved.each { |f| puts "! preserved override as #{f}" }
       end
       
-      desc "Freezes MerbAuthPasswordSlice as a gem and copies over mauth_password_slice/app"
+      desc "Freezes MerbAuthPasswordSlice as a gem and copies over merb_auth_password_slice/app"
       task :app_with_gem => [:gem, :app]
       
       desc "Freezes MerbAuthPasswordSlice by unpacking all files into your application"
