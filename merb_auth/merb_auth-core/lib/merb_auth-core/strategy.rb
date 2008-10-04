@@ -94,6 +94,36 @@ class Authentication
       request.session
     end
     
+    # Redirects causes the strategy to signal a redirect
+    # to the provided url.
+    # 
+    # ====Parameters
+    # url<String>:: The url to redirect to
+    # options<Hash>:: An options hash with the following keys:
+    #   +:permanent+ Set this to true to make the redirect permanent
+    #   +:status+ Set this to an integer for the status to return
+    def redirect!(url, opts = {})
+      @redirect_url = url
+      @redirect_opts = opts
+      return true
+    end
+    
+    # Returns ture if the strategy redirected
+    def redirected?
+      !!@redirect_url
+    end
+    
+    # Returns the redirect_url if it's ben set
+    def redirect_url
+      @redirect_url
+    end
+    
+    # Returns the redirect options set in the strategy
+    # or a blank hash
+    def redirect_options
+      @redirect_opts ||= {}
+    end
+    
     # This is the method that is called as the test for authentication and is where
     # you put your code.
     # 

@@ -113,7 +113,7 @@ Merb::BootLoader.before_app_loads do
 end
 
 Merb::BootLoader.after_app_loads do
-  raise "You must specify a valid openid in Merb.root/config/openid to use this example app" unless File.exists?(Merb.root / "config" / "open_id")
+  raise "You must specify a valid openid in Merb.root/config/open_id to use this example app" unless File.exists?(Merb.root / "config" / "open_id")
   DataMapper.auto_migrate!
   User.create(:login => "admin", 
               :password => "password", :password_confirmation => "password", 

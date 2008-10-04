@@ -168,4 +168,62 @@ describe "Authentication::Strategy" do
     
   end
   
+  describe "#redirect!" do
+    
+    before(:all) do
+      class FooController < Merb::Controller
+        def index; "FooController#index" end
+      end
+    end
+    
+    before(:each) do
+      class MyStrategy < Authentication::Strategy
+        def run!
+          if params[:url]
+            params[:status] ? redirect!(params[:url], :status => params[:status]) : redirect!(params[:url])
+          else
+            "WINNA"
+          end
+        end
+      end # MyStrategy
+      
+      Merb::Router.reset!
+      Merb::Router.prepare{ match("/").to(:controller => "foo_controller")}
+      @request = mock_request("/")
+      @s = MyStrategy.new(@request)
+    end
+    
+    it "allow for a redirect!" do
+      @s.redirect!("/somewhere")
+      @s.redirect_url.should == "/somewhere"
+    end
+    
+    it "should set redirect_options as an empty hash" do
+      @s.redirect!("/somewhere")
+      @s.redirect_options.should == {}
+    end
+    
+    it "should return nil for the redirect_url if it is not redirected" do
+      @s.should_not be_redirected
+      @s.redirect_url.should be_nil
+    end
+      
+    it "should pass through the options to the redirect options" do
+      @s.redirect!("/somewhere", :status => 401)
+      @s.redirect_options.should == {:status => 401}
+    end
+    
+    it "should set a redirect with a permanent true" do
+      @s.redirect!("/somewhere", :permanent => true)
+      @s.redirect_options.should == {:permanent => true}
+    end
+    
+    it "should be redirected?" do
+      @s.should_not be_redirected
+      @s.redirect!("/somewhere")
+      @s.should be_redirected
+    end
+    
+  end
+  
 end

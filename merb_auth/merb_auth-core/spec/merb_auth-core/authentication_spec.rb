@@ -191,6 +191,8 @@ describe "Authentication Session" do
       Stwo.should_receive(:new).with(@request).and_return(s2)
       s1.should_receive(:run!).ordered.and_return(nil)
       s2.should_receive(:run!).ordered.and_return("WIN")
+      s1.should_receive(:redirected?).and_return false
+      s2.should_receive(:redirected?).and_return false
       @auth.authenticate!(@request)
     end
     
@@ -204,6 +206,7 @@ describe "Authentication Session" do
       s1.should_receive(:run!).ordered.and_return(nil)
       s2.should_receive(:run!).ordered.and_return(false)
       s3.should_receive(:run!).ordered.and_return("WIN")
+      [s1,s2,s3].each{|s| s.should_receive(:redirected?).and_return(false)}
       @auth.authenticate!(@request)
     end
     
@@ -211,6 +214,7 @@ describe "Authentication Session" do
       s3 = mock("s3")
       Sthree.stub!(:new).and_return(s3)
       s3.should_receive(:run!).and_return(nil)
+      s3.should_receive(:redirected?).and_return(false)
       lambda do
         @auth.authenticate!(@request)
       end.should raise_error(Merb::Controller::Unauthenticated)
@@ -225,6 +229,7 @@ describe "Authentication Session" do
       @auth.should_receive(:error_message).and_return("BAD BAD BAD")
       s3 = mock("s3", :null_object => true)
       s3.stub!(:run!).and_return(false)
+      s3.stub!(:redirected?).and_return(false)
       Sthree.stub!(:new).and_return(s3)
       lambda do
         @auth.authenticate!(@request)
@@ -232,14 +237,16 @@ describe "Authentication Session" do
     end
     
     it "should execute the strategies as passed into the authenticate! method" do
-      m1 = mock("strategy 1", :null_object => true)
-      m2 = mock("strategy 2", :null_object => true)
+      m1 = mock("strategy 1")
+      m2 = mock("strategy 2")
       m1.stub!(:abstract?).and_return(false)
       m2.stub!(:abstract?).and_return(false)
       m1.should_receive(:new).and_return(m1)
       m2.should_receive(:new).and_return(m2)
       m2.should_receive(:run!).ordered
       m1.should_receive(:run!).ordered.and_return("WINNA")
+      m1.stub!(:redirected?).and_return(false)
+      m2.stub!(:redirected?).and_return(false)
       @auth.authenticate!(@request, m2, m1)
     end
     
@@ -249,6 +256,74 @@ describe "Authentication Session" do
     it "should have User as the default user class if requested" do
       Authentication.user_class.should == User
     end  
+  end
+  
+  describe "redirection" do
+    
+    before(:all) do
+      class FooController < Merb::Controller
+        def index; "FooController#index" end
+      end
+    end
+    
+    before(:each) do
+      class MyStrategy < Authentication::Strategy
+        def run!
+          if params[:url]
+            params[:status] ? redirect!(params[:url], :status => params[:status]) : redirect!(params[:url])
+          else
+            "WINNA"
+          end
+        end
+      end # MyStrategy
+      
+      class FailStrategy < Authentication::Strategy
+        def run!
+          request.params[:should_not_be_here] = true
+        end
+      end
+      
+      Merb::Router.reset!
+      Merb::Router.prepare{ match("/").to(:controller => "foo_controller")}
+      @request = mock_request("/")
+      @s = MyStrategy.new(@request)
+      @a = Authentication.new(@request.session)
+    end
+    
+    it "should answer redirected false if the strategy did not redirect" do
+      @a.authenticate! @request
+      @a.should_not be_redirected
+    end
+    
+    it "should answer redirected true if the strategy did redirect" do
+      @request.params[:url] = "/some/url"
+      @a.authenticate! @request
+      @a.should be_redirected
+    end
+    
+    it "should provide access to the redirect_url" do
+      @request.params[:url] = "/some/url"
+      @a.authenticate! @request
+      @a.should be_redirected
+      @a.redirect_url.should == "/some/url"
+    end
+    
+    it "should provide access to the redirect_options" do
+      @request.params[:url] = "/some/url"
+      @request.params[:status] = 401
+      @a.authenticate! @request
+      @a.should be_redirected
+      @a.redirect_options.should == {:status => 401}
+    end
+    
+    it "should stop processing the strategies if one redirects" do
+      @request.params[:url] = "/some/url"
+      lambda do
+        @a.authenticate! @request, MyStrategy, FailStrategy
+      end.should_not raise_error(Merb::Controller::NotFound)
+      @a.should be_redirected
+      @request.params[:should_not_be_here].should be_nil
+    end
   end
 
 end

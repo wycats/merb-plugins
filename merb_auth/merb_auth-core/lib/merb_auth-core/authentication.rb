@@ -75,7 +75,15 @@ class Authentication
     user = nil    
     # This one should find the first one that matches.  It should not run antother
     strategies.detect do |s|
-      user = s.new(request).run! unless s.abstract?
+      unless s.abstract?
+        strategy = s.new(request)
+        user = strategy.run! 
+        if strategy.redirected?
+          redirect!(strategy.redirect_url, strategy.redirect_options)
+          return
+        end
+        user
+      end
     end
     raise Merb::Controller::Unauthenticated, msg unless user
     session.user = user
