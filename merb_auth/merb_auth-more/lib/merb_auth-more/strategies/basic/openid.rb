@@ -45,7 +45,8 @@ class Authentication
               openid_reg = ::OpenID::SReg::Request.new
               openid_reg.request_fields(required_reg_fields)
               openid_request.add_extension(openid_reg)
-              throw(:halt, lambda{ redirect(openid_request.redirect_url("#{request.protocol}://#{request.host}", absolute_url(:openid)) )})
+              redirect_to = "#{request.protocol}://#{request.host}#{Merb::Router.url(:openid)}"
+              redirect!(openid_request.redirect_url("#{request.protocol}://#{request.host}", redirect_to))
             rescue ::OpenID::OpenIDError => e
               request.session.authentication.errors.clear!
               request.session.authentication.errors.add(:openid, 'The OpenID verification failed')
@@ -56,6 +57,8 @@ class Authentication
         
         
         # Overwrite the on_success! method with the required behavior for successful logins
+        #
+        # @api overwritable
         def on_success!(response, sreg_response)
           if user = find_user_by_identity_url(response.identity_url)
             user
@@ -64,44 +67,56 @@ class Authentication
             required_reg_fields.each do |f|
               session[:"openid.#{f}"] = sreg_response.data[f] if sreg_response.data[f]
             end if sreg_response
-            throw(:halt, lambda{ request.redirect(request.generate_url(:signup))} )
+            redirect!(Merb::Router.url(:signup))
           end
         end
         
         # Overwrite the on_failure! method with the required behavior for failed logins
+        #
+        # @api overwritable
         def on_failure!(response)
           session.authentication.errors.clear!
           session.authentication.errors.add(:openid, 'OpenID verification failed, maybe the provider is down? Or the session timed out')
           nil
         end
         
+        #
+        # @api overwritable
         def on_setup_needed!(response)
           request.session.authentication.errors.clear!
           request.session.authentication.errors.add(:openid, 'OpenID does not seem to be configured correctly')
           nil
         end
         
+         #
+         # @api overwritable
         def on_cancel!(response)
           request.session.authentication.errors.clear!
           request.session.authentication.errors.add(:openid, 'OpenID rejected our request')
           nil
         end
         
+        #
+        # @api overwritable
         def required_reg_fields
           ['nickname', 'email']
         end
         
         # Overwrite this to support an ORM other than DataMapper
+        #
+        # @api overwritable
         def find_user_by_identity_url(url)
           user_class.first(:identity_url => url)
         end
         
         # Overwrite this method to set your store
+        #
+        # @api overwritable
         def openid_store
           ::OpenID::Store::Filesystem.new("#{Merb.root}/tmp/openid")
         end
         
-        private 
+        private
         def consumer
           @consumer ||= ::OpenID::Consumer.new(request.session, openid_store)
         end
