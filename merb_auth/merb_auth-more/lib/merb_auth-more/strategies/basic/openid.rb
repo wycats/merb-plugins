@@ -27,16 +27,17 @@ class Authentication
         def run!
           if params[:'openid.mode']
             response = consumer.complete(request.send(:query_params), "#{request.protocol}://#{request.host}" + request.path)
-            if response.status.to_s == 'success'
+            case response.status.to_s
+            when 'success'
               sreg_response = ::OpenID::SReg::Response.from_success_response(response)
               result = on_success!(response, sreg_response)
               Merb.logger.info "\n\n#{result.inspect}\n\n"
               result
-            elsif response.status.to_s == 'failure'
+            when 'failure'
               on_failure!(response)
-            elsif response.status.to_s == 'setup_needed'
+            when  'setup_needed'
               on_setup_needed!(response)
-            elsif response.status.to_s == 'cancel'
+            when 'cancel'
               on_cancel!(response)
             end
           elsif identity_url = params[:openid_url]
