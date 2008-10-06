@@ -11,6 +11,11 @@ EMAIL = "andy@new-bamboo.co.uk"
 HOMEPAGE = "http://merb-plugins.rubyforge.org/me/"
 SUMMARY = "Allows Merb to forward exceptions to emails or web hooks"
 
+RUBY_FORGE_PROJECT  = "merb"
+PROJECT_URL         = "http://merbivore.com"
+PROJECT_SUMMARY     = "Allows Merb to forward exceptions to emails or web hooks"
+PROJECT_DESCRIPTION = PROJECT_SUMMARY
+
 
 GEM_AUTHOR = 'Andy Kent'
 GEM_EMAIL  = "andy@new-bamboo.co.uk"
