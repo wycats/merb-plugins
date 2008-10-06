@@ -40,6 +40,11 @@ task :install_gems do
   end
 end
 
+desc "Install all gems"
+task :install do
+  Merb::RakeHelper.install('merb-plugins')
+end
+
 desc "Uninstall the merb-plugins sub-gems"
 task :uninstall_gems do
   gems.each do |dir|
