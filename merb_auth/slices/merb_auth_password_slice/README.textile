@@ -93,13 +93,19 @@ dependency 'merb_auth_password_slice'
 Merb::Plugins.config[:merb_slices] = { :queue => ["MerbAuthPasswordSlice", ...] }
 
 # Setup your application to use MerbAuthPasswordSlice in an after_app_loads block
-# Note MaPS is given as an alias for MerbAuthPasswordSlice
+
+# To change the login or password field to a field of your choice
+  update the Authentication::Strategies::Basic::Base.login_param and password_param
 
 <pre><code>
-Merb::BootLoader.after_app_loads do
-  MaPS[:user_class] = User # Set your user class here 
-  MaPS[:login_field] = {:label => "Login",    :method => :login} 
-  MaPS[:password_field] = {:label => "Password", :method => :password} 
+class Authentication::Strategies::Basic::Base < Authentication::Strategy
+  def self.login_param
+    :email
+  end
+  
+  def self.password_param
+    :mot_de_passe
+  end
 end
 </code></pre>
 
@@ -109,6 +115,7 @@ shown.  The defaults are shown
 
 file: config/router.rb
 
+# Any of the options can be left out for the defaults
 slice(:MerbAuthPasswordSlice, :name_prefix => nil, :path_prefix => "auth", :default_routes => false )
 
 Normally you should also run the following rake task:
