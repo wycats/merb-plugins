@@ -30,6 +30,9 @@ class Authentication
           elsif defined?(ActiveRecord) && ancestors.include?(ActiveRecord::Base)
             require path / "ar_salted_user"
             extend(Authentication::Mixins::SaltedUser::ARClassMethods)
+          elsif defined?(Sequel) && ancestors.include?(Sequel::Model)
+            require path / "sq_salted_user"
+            extend(Authentication::Mixins::SaltedUser::SQClassMethods)
           end
           
         end # base.class_eval
