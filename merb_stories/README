@@ -1,11 +1,11 @@
-merb-rspec
+merb_stories
 =========
 
-A plugin for the Merb framework that provides helper functionality for the rSpec testing framework.
+A plugin for the Merb framework that provides helper functionality for running stories in the rSpec testing framework.
 
 
 == Stories
-  merb-rspec supports rSpec story generation for regular Merb apps.  See http://rspec.info for more information 
+  merb_stories supports rSpec story generation for regular Merb apps.  See http://rspec.info for more information 
   on using rSpec plain text stories.
   
   When using the generators for the first time, a few extra helper files will be generated.
@@ -33,10 +33,10 @@ A plugin for the Merb framework that provides helper functionality for the rSpec
     - stories/complex/story_group/story_file.rb
 
 === Usage Examples
-  merb-rspec has a rake task for running your stories.  To include it you need to make merb-rspec a dependency in your app.
+  merb_stories has a rake task for running your stories.  To include it you need to make merb_stories a dependency in your app.
   
   To make the rake file available, in config/init.rb include the following line:
-  {{{dependency "merb-rspec" if Merb.environment == "test"}}}
+  {{{dependency "merb_stories" if Merb.environment == "test"}}}
 
   Once you have the rake file available you can run the stories:
   

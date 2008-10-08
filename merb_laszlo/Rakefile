@@ -21,7 +21,7 @@ GEM_NAME    = "merb_laszlo"
 PKG_BUILD   = ENV['PKG_BUILD'] ? '.' + ENV['PKG_BUILD'] : ''
 GEM_VERSION = "0.9.8" + PKG_BUILD
 
-RELEASE_NAME    = "REL #{GEM_VERSION}"
+RELEASE_NAME = "REL #{GEM_VERSION}"
 
 require "extlib/tasks/release"
 
@@ -46,42 +46,34 @@ Rake::GemPackageTask.new(spec) do |pkg|
   pkg.gem_spec = spec
 end
 
-desc "create a gemspec file"
-task :make_spec do
-  File.open("#{NAME}.gemspec", "w") do |file|
+desc "Install the gem"
+task :install do
+  Merb::RakeHelper.install(GEM_NAME, :version => GEM_VERSION)
+end
+
+desc "Uninstall the gem"
+task :uninstall do
+  Merb::RakeHelper.uninstall(GEM_NAME, :version => GEM_VERSION)
+end
+
+desc "Create a gemspec file"
+task :gemspec do
+  File.open("#{GEM_NAME}.gemspec", "w") do |file|
     file.puts spec.to_ruby
   end
 end
 
-##############################################################################
-# Installation
-##############################################################################
-
-task :install => [:package] do
-  sh install_command(GEM_NAME, GEM_VERSION)
-end
-
-namespace :jruby do
-"Run :package and install the resulting .gem with jruby"
-  task :install => :package do
-    sh jinstall_command(GEM_NAME, GEM_VERSION)
+desc "Run all examples (or a specific spec with TASK=xxxx)"
+Spec::Rake::SpecTask.new('spec') do |t|
+  t.spec_opts  = ["-cfs"]
+  t.spec_files = begin
+    if ENV["TASK"] 
+      ENV["TASK"].split(',').map { |task| "spec/**/#{task}_spec.rb" }
+    else
+      FileList['spec/**/*_spec.rb']
+    end
   end
 end
 
-##############################################################################
-# Specs
-##############################################################################
-desc "Run all specs"
-Spec::Rake::SpecTask.new("specs") do |t|
-  t.spec_opts = ["--format", "specdoc", "--colour"]
-  t.spec_files = Dir["spec/**/*_spec.rb"].sort
-end
-
-desc "Run all specs and generate an rcov report"
-Spec::Rake::SpecTask.new('rcov') do |t|
-  t.spec_files = FileList['spec/**/*_spec.rb']
-  t.spec_opts = ["--format", "specdoc", "--colour"]
-  t.rcov = true
-  t.rcov_dir = 'coverage'
-  t.rcov_opts = ['--exclude', 'gems', '--exclude', 'spec']
-end
+desc 'Default: run spec examples'
+task :default => 'spec'

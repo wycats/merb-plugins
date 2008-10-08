@@ -3,7 +3,7 @@ Screw.Matchers = (function($) {
     if(typeof obj == "string") return iframeWindow.$(obj);
     else return obj;
   }
-  
+
   return matchers = {
     expect: function(actual) {
       return {
@@ -37,7 +37,6 @@ Screw.Matchers = (function($) {
         return 'expected ' + $.print(jquerize(actual)) + (not ? ' to not have ' : ' to have ') + $.print(expected);
       }
     },
-    
     have: {
       match: function(expected, actual) {
         return jquerize(actual).find(expected).length > 0;
@@ -46,7 +45,6 @@ Screw.Matchers = (function($) {
         return 'expected ' + $.print(jquerize(actual)) + (not ? ' to not have ' : ' to have ') + $.print(expected);
       }
     },
-    
     be_visible: {
       match: function(expected, actual) {
         return jquerize(actual).is(":visible");

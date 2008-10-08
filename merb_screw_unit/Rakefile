@@ -46,25 +46,34 @@ Rake::GemPackageTask.new(spec) do |pkg|
   pkg.gem_spec = spec
 end
 
-desc "create a gemspec file"
-task :make_spec do
-  File.open("#{NAME}.gemspec", "w") do |file|
+desc "Install the gem"
+task :install do
+  Merb::RakeHelper.install(GEM_NAME, :version => GEM_VERSION)
+end
+
+desc "Uninstall the gem"
+task :uninstall do
+  Merb::RakeHelper.uninstall(GEM_NAME, :version => GEM_VERSION)
+end
+
+desc "Create a gemspec file"
+task :gemspec do
+  File.open("#{GEM_NAME}.gemspec", "w") do |file|
     file.puts spec.to_ruby
   end
 end
 
-##############################################################################
-# Installation
-##############################################################################
-
-desc "Install the gem"
-task :install => [:package] do
-  sh install_command(GEM_NAME, GEM_VERSION)
-end
-
-namespace :jruby do
-"Run :package and install the resulting .gem with jruby"
-  task :install => :package do
-    sh jinstall_command(GEM_NAME, GEM_VERSION)
+desc "Run all examples (or a specific spec with TASK=xxxx)"
+Spec::Rake::SpecTask.new('spec') do |t|
+  t.spec_opts  = ["-cfs"]
+  t.spec_files = begin
+    if ENV["TASK"] 
+      ENV["TASK"].split(',').map { |task| "spec/**/#{task}_spec.rb" }
+    else
+      FileList['spec/**/*_spec.rb']
+    end
   end
 end
+
+desc 'Default: run spec examples'
+task :default => 'spec'

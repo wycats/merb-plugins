@@ -40,6 +40,9 @@ if defined?(Merb::Plugins)
           base.send(:class_inheritable_accessor, :accessible_params_args)
           base.send(:class_inheritable_accessor, :protected_params_args)
           base.send(:class_inheritable_accessor, :log_params_args)
+          # Don't expose these as public methods - otherwise they'll become controller actions
+          base.send(:protected, :accessible_params_args, :protected_params_args, :log_params_args)
+          base.send(:protected, :accessible_params_args=, :protected_params_args=, :log_params_args=)
 
           base.send(:before, :initialize_params_filter)
         end
