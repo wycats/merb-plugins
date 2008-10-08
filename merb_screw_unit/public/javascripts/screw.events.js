@@ -24,9 +24,11 @@
           $(this).addClass('passed');
         })
         .bind('failed', function(e, reason) {
+          reasonText = "<p>" + reason.toString() + "</p>";
+          if(reason.stack) reasonText += ("<pre>" + reason.stack + "</pre>");
           $(this)
             .addClass('failed')
-            .append($('<p class="error">').text(reason.toString()));
+            .append($('<p class="error">').html(reasonText));
         })
     })
     .bind('before', function() {

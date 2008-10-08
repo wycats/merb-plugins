@@ -95,8 +95,11 @@
       return print_array(obj, opts);
     else if (obj.nodeType)
       return print_element(obj);
-    else if (obj instanceof jQuery)
-      return "$(" + $.print(obj.get()) + ")";
+    else if (obj.jquery)
+      if(obj.length)
+        return "$(" + $.print(obj.get()) + ")";
+      else
+        return "$(\"" + obj.selector + "\")";
     else if (obj instanceof Error)
       return print_object(obj, $.extend({}, options, { max_string: 200 }));
     else if (obj instanceof Object)

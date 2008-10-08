@@ -16,7 +16,9 @@ if ( window.jQuery )
 
 var jQuery = window.jQuery = function( selector, context ) {
 	// The jQuery object is actually just the init constructor 'enhanced'
-	return new jQuery.prototype.init( selector, context );
+	var jquery = new jQuery.prototype.init( selector, context );
+	jquery.selector = selector;
+	return jquery;
 };
 
 // Map over the $ in case of overwrite
@@ -46,6 +48,7 @@ jQuery.fn = jQuery.prototype = {
 
 		// Handle HTML strings
 		} else if ( typeof selector == "string" ) {
+		  
 			// Are we dealing with HTML string or an ID?
 			var match = quickExpr.exec( selector );
 
@@ -3405,4 +3408,5 @@ jQuery.fn.offset = function() {
 
 	return results;
 };
+
 })();
