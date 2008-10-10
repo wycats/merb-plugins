@@ -37,7 +37,7 @@ spec = Gem::Specification.new do |s|
   s.homepage = PROJECT_URL
   s.add_dependency('merb-core', '>= 0.9.9')
   s.require_path = 'lib'
-  s.files = %w(LICENSE README Rakefile TODO) + Dir.glob("{lib,spec,merb_generators}/**/*")
+  s.files = %w(LICENSE README Rakefile TODO) + Dir.glob("{lib}/**/*")
 end
 
 Rake::GemPackageTask.new(spec) do |pkg|
