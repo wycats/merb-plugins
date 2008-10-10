@@ -5,9 +5,9 @@ namespace :merb do
     task :required_stuff do
       require 'uri'
       require 'net/http'
-      mkdir_p "public" / "javascripts"    
+      mkdir_p "public" / "javascripts"
     end
-    
+
     desc "Install uncompressed jQuery to public/javascripts/"
     task :install => :required_stuff do
       File.open("public" / "javascripts" / "jquery.js", "w+") do |f|

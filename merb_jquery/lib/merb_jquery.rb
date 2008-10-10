@@ -1,7 +1,7 @@
 module Merb
   module JqueryMixin
     def jquery(string=nil, &blk)
-      if string 
+      if string
         throw_content(:for_jquery, string)
       elsif block_given?
         throw_content(:for_jquery, &blk)
@@ -29,5 +29,5 @@ if defined?(Merb::Plugins)
     # code that can be required after the application loads
   end
 
-  Merb::Plugins.add_rakefiles "merb-jquery/merbtasks"
+  Merb::Plugins.add_rakefiles "merb_jquery/merbtasks"
 end
