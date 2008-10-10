@@ -53,6 +53,7 @@ module Merb
             options[:encoding] = (config[:encoding] || config[:charset])
           end
           options[:database] = config[:database]  if config[:database]
+          options[:db_type] = config[:db_type]  if config[:db_type]
           options[:logger]   = Merb.logger
           options
         end
