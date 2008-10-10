@@ -1,10 +1,10 @@
 ## THESE ARE CRUCIAL
 module Merb
   # Set this to the version of merb-core that you are building against/for
-  VERSION = "0.9.8"
+  VERSION = "0.9.9"
 
   # Set this to the version of merb-more you plan to release
-  MORE_VERSION = "0.9.8"
+  MORE_VERSION = "0.9.9"
 end
 
 GEM_VERSION = Merb::VERSION
@@ -22,6 +22,9 @@ gems = %w[merb_activerecord merb_sequel merb_test_unit merb_stories merb_screw_u
 # Implement standard Rake::GemPackageTask tasks - see merb.thor
 task :clobber_package do; FileUtils.rm_rf('pkg'); end
 task :package do; end
+
+desc "Install all gems"
+task :install => :install_gems
 
 desc "Uninstall all gems"
 task :uninstall => :uninstall_gems
