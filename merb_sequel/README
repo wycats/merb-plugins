@@ -1,10 +1,47 @@
 = merb_sequel
 
-A plugin for the Merb framework that provides Sequel access
+A plugin for the Merb framework that provides support for Sequel models.
 
-After you install the plugin, you have access to the sequel_migration generator in your merb projects
-example: /merb/root/script/generate sequel_migration new_migration
+
+= Connection options
+
+Merb Sequel plugin uses config/database.yml for connection configuration.
+
+Options are:
+
+* adapter. :sqlite is assumed by default.
+* host. localhost is assumed by default.
+* username or user, default is an empty string
+* database, default is "hey_dude_configure_your_database". This should be
+  either :memory: or file path for SQLite.
+* encoding or charset, default is utf8.
+* password. WARNING: default password is an empty string.
+* db_type: default is nil. Use "mssql" to connect to MSSQL using ODBC.
+
+
+= Generators
+
+After you install the plugin, merb-gen can generate Sequel models for you:
+
+merb-gen model --orm=sequel Article
+
+same with resources
+
+merb-gen resource --orm=sequel Article
+
+
+Note that if you have specified that you use Sequel in init.rb or environment
+specific init file (for instance, environments/development.rb)
+via use_orm :sequel, you need no specify --orm option explicitly when
+using merb-gen.
+
 
 = Contributors
 
-originally written by Duane Johnson (canadaduane@gmail.com).
+Originally written by Duane Johnson (canadaduane@gmail.com).
+
+Contributions by:
+* Wayne E. Seguin
+* Lance Carlson
+
+Maintained by Michael S. Klishin (michael at novemberain.com)

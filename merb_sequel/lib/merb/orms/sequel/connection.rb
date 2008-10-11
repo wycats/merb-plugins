@@ -20,7 +20,7 @@ module Merb
             # Convert string keys to symbols
             full_config = Erubis.load_yaml_file(config_file)
             config = (Merb::Plugins.config[:merb_sequel] = {})
-            (full_config[Merb.environment.to_sym] || full_config[Merb.environment]).each do |key, value|
+            (full_config[Merb.environment.to_sym] || full_config[Merb.environment] || full_config[:development]).each do |key, value|
               config[key.to_sym] = value
             end
             config
@@ -45,14 +45,22 @@ module Merb
         
         def config_options(config = {})
           options = {}
+          
+          # Use SQLite by default
           options[:adapter]  = (config[:adapter]  || "sqlite")
-          options[:host]     = (config[:host]     || "localhost")
-          options[:user]     = (config[:username] || config[:user] || "root")
-          options[:password] = config[:password] if config[:password]
-          if (config[:encoding] || config[:charset])
-            options[:encoding] = (config[:encoding] || config[:charset])
-          end
-          options[:database] = config[:database]  if config[:database]
+          # Use localhost as default host
+          options[:host]     = (config[:host]     || "localhost")          
+          # Default user is an empty string. Both username and user keys are supported.
+          options[:user]     = (config[:username] || config[:user] || "")
+          
+          options[:password] = config[:password] || ""
+          
+          # Both encoding and charset options are supported, default is utf8
+          options[:encoding] = (config[:encoding] || config[:charset] || "utf8")
+          # Default database is hey_dude_configure_your_database
+          options[:database] = config[:database] || "hey_dude_configure_your_database"
+          # MSSQL support
+          options[:db_type] = config[:db_type]  if config[:db_type]
           options[:logger]   = Merb.logger
           options
         end
