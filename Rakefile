@@ -17,7 +17,7 @@ require 'fileutils'
 include FileUtils
 
 
-gems = %w[merb_activerecord merb_sequel merb_test_unit merb_stories merb_screw_unit merb_jquery]
+gems = %w[merb_activerecord merb_sequel merb_test_unit merb_stories merb_screw_unit merb_jquery merb_builder]
 
 # Implement standard Rake::GemPackageTask tasks - see merb.thor
 task :clobber_package do; FileUtils.rm_rf('pkg'); end
