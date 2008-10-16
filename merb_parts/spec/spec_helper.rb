@@ -1,6 +1,6 @@
 require 'rubygems'
 require "merb-core"
-require File.join( File.dirname(__FILE__), "..", "lib", "merb-parts" )
+require File.join( File.dirname(__FILE__), "..", "lib", "merb_parts" )
 
 # Require the fixtures
 Dir[File.join(File.dirname(__FILE__), "fixtures", "*/**.rb")].each{|f| require f }

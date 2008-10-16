@@ -3,7 +3,7 @@ require "rubygems"
 require "merb-core"
 require "spec"
 
-require "merb-builder"
+require "merb_builder"
 require File.dirname(__FILE__) / "controllers" / "builder"
 
 Merb.start :environment => 'test', :builder => { "indent" => 4 }
