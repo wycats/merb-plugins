@@ -14,6 +14,8 @@ if defined?(Merb::Plugins)
         Merb.logger.debug "Using Sequel sessions"
         require File.join(File.dirname(__FILE__) / "merb" / "session" / "sequel_session")
       end
+      
+      Merb::Router.root_behavior = Merb::Router.root_behavior.identify(Sequel::Model => :id)
     end
 
   end
