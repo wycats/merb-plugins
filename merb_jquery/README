@@ -3,10 +3,10 @@ merb-jquery
 
 Makes it easy to use jQuery in your application.
 
-$ gem install merb-jquery
+$ gem install merb_jquery
 
 Add
-  require 'merb-jquery'
+  require 'merb_jquery'
 to your init.rb
 
 $ rake merb:jquery:install
@@ -22,3 +22,22 @@ In your views:
 <% jquery do %>
   $('#foo').something();
 <% end %>
+
+jquery is a helper method is a shortcut to
+
+throw_content :for_query and catch_content :for_jquery
+
+You still need to inlude jQuery javascript file manually, for instance,
+using merb-assets:
+
+# in init.rb
+
+dependency "merb-assets", "0.9.10"
+
+# in Erb layout
+
+<%= js_include_tag "jquery" %>
+
+# or in Haml layout
+
+= js_include_tag "jquery"
