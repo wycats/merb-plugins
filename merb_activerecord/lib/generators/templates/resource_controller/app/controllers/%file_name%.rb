@@ -55,7 +55,7 @@ class <%= class_name %> < Application
     @<%= singular_model %> = <%= model_class_name %>.find_by_id(params[:id])
     raise NotFound unless @<%= singular_model %>
     if @<%= singular_model %>.destroy
-      redirect url(:<%= (modules.collect{|m| m.downcase} << singular_model).join("_") %>s)
+      redirect url(:<%= (modules.collect{|m| m.downcase} << plural_model).join("_") %>)
     else
       raise BadRequest
     end
