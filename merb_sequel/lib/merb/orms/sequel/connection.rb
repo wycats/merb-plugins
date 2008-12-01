@@ -32,7 +32,12 @@ module Merb
           if File.exists?(config_file)
             Merb.logger.info!("Connecting to the '#{config[:database]}' database on '#{config[:host]}' using '#{config[:adapter]}' ...")
             connection = ::Sequel.connect(config_options(config))
-            Merb.logger.error!("Connection Error: #{e}") unless connection
+            begin
+              connection.test_connection
+            rescue => e
+              Merb.logger.error!("Connection Error: #{e}")
+              exit(1)
+            end
             connection
           else
             copy_sample_config
