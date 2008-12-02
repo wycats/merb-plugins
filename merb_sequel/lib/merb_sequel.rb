@@ -20,6 +20,16 @@ if defined?(Merb::Plugins)
 
   end
   
+  class Merb::Orms::Sequel::DisconnectBeforeFork < Merb::BootLoader
+    after AfterAppLoads
+    
+    def self.run
+      Merb.logger.debug "Disconnecting database connection before forking."
+      ::Sequel::DATABASES.each { |db| db.disconnect }
+    end
+    
+  end
+  
   generators = File.join(File.dirname(__FILE__), 'generators')
   Merb.add_generators generators / :migration
   Merb.add_generators generators / :model
