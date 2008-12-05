@@ -2,6 +2,7 @@ if defined?(Merb::Plugins)
   
   dependency "activerecord"
   
+  require File.join(File.dirname(__FILE__) / "merb" / "orms" / "active_record" / "cleanup" )
   require File.join(File.dirname(__FILE__) / "merb" / "orms" / "active_record" / "connection")
   Merb::Plugins.add_rakefiles(File.join(File.dirname(__FILE__) / "active_record" / "merbtasks"))
   
