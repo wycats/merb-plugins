@@ -1,15 +1,19 @@
 require File.dirname(__FILE__) + "/spec_helper"
 
+describe Merb::Orms::Sequel::Connect do
+  it "is loaded at plugin bootstrap" do
+    defined?(Merb::Orms::Sequel::Connect).should == "constant"
+  end
+
+  it "is a merb BootLoader" do
+    Merb::Orms::Sequel::Connect.superclass.should eql(Merb::BootLoader)
+  end
+end
+
 describe "merb_sequel" do
 
   it "should do nothing" do
     true.should == true
   end
 
-end
-
-describe "merb_sequel Generators" do
-  it "should description" do
-    
-  end
 end
