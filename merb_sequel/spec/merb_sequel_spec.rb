@@ -9,11 +9,3 @@ describe Merb::Orms::Sequel::Connect do
     Merb::Orms::Sequel::Connect.superclass.should eql(Merb::BootLoader)
   end
 end
-
-describe "merb_sequel" do
-
-  it "should do nothing" do
-    true.should == true
-  end
-
-end
