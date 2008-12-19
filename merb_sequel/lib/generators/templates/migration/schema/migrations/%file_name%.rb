@@ -1,6 +1,6 @@
 # For details on Sequel migrations see 
 # http://sequel.rubyforge.org/
-# http://code.google.com/p/ruby-sequel/wiki/Migrations
+# http://sequel.rubyforge.org/rdoc/classes/Sequel/Database.html#M000607
 
 class <%= class_name %> < Sequel::Migration
 
