@@ -15,7 +15,7 @@ if defined?(Merb::Plugins)
         require File.join(File.dirname(__FILE__) / "merb" / "session" / "sequel_session")
       end
       
-      Merb::Router.root_behavior = Merb::Router.root_behavior.identify(Sequel::Model => :id)
+      Merb::Router.root_behavior = Merb::Router.root_behavior.identify(Sequel::Model => :pk)
     end
 
   end
