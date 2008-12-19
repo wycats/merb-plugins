@@ -24,7 +24,7 @@ namespace :sequel do
       if migration_exists
         puts "\nThe Session Migration File already exists\n\n"
       else
-        sh %{merb-gen database_sessions_migration}
+        sh %{merb-gen session_migration}
       end
     end
     
