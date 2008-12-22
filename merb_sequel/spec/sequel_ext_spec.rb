@@ -1,6 +1,6 @@
 require File.dirname(__FILE__) + "/spec_helper"
 
-describe 'Sequel::Model#new?' do
+describe 'Sequel::Model#new_record?' do
   before(:each) do
     spec_model_up
   end
@@ -10,7 +10,7 @@ describe 'Sequel::Model#new?' do
   end
   
   it "is defined" do
-    SpecModel.instance_methods.should include 'new?'
+    SpecModel.instance_methods.should include 'new_record?'
   end
   
   it "Returns true or new model" do
