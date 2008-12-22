@@ -5,7 +5,6 @@ require 'sequel'
 require 'merb-core'
 require 'merb-core/test'
 require 'merb-core/test/helpers'
-require "merb/session/sequel_session"
 require File.join( File.dirname(__FILE__), "..", "lib", 'merb_sequel')
 
 module Merb
@@ -20,38 +19,22 @@ module Merb
   end
 end
 
-Merb.start :environment => 'test', :adapter => 'runner', :session_store => 'sequel'
+Merb.start :environment => 'test', :adapter => 'runner', :session_store => 'session'
 
 Spec::Runner.configure do |config|
   config.include Merb::Test::RequestHelper
 end
 
+require File.join( File.dirname(__FILE__), 'spec_model')
 
-class SpecModel < Sequel::Model
-end
 
-class CreateSpecModel < Sequel::Migration
-  def up
-    create_table! :spec_models do
-      primary_key :id
-      text :name
-    end
-  end
-  
-  def down
-    drop_table :spec_models
-  end
-end
 
-describe "it has a SpecModel", :shared => true do
-  before(:each) do
-    CreateSpecModel.apply(SpecModel.db, :up)
-  end
-  
-  after(:each) do
-    CreateSpecModel.apply(SpecModel.db, :down)
-  end
-end
+
+
+
+
+
+
 
 
 
