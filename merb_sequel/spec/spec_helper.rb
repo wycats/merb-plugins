@@ -28,7 +28,7 @@ describe "having a spec model", :shared => true do
   end
   
   after(:each) do
-    CreateSpecModel.apply(DB, :up)
+    CreateSpecModel.apply(DB, :down)
   end
 end
 
