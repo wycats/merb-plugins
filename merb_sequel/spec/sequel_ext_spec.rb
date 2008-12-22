@@ -9,8 +9,8 @@ describe 'Sequel::Model#new_record?' do
   
   it "Returns true or new model" do
     a = SpecModel.new
-    a.should be_new
+    a.should be_new_record
     a.save
-    a.should_not be_new
+    a.should_not be_new_record
   end
 end
