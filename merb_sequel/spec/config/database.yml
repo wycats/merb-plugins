@@ -1,0 +1,11 @@
+---
+development: &defaults
+  adapter: sqlite
+  encoding: utf8
+  database: spec/test.db
+ 
+test:
+  <<: *defaults
+ 
+production:
+  <<: *defaults

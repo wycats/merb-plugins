@@ -42,8 +42,8 @@ module Merb
           else
             copy_sample_config
             Merb.logger.set_log(STDERR)
-            Merb.logger.error! "No database.yml file found in #{Merb.root}/config."
-            Merb.logger.error! "A sample file was created called config/database.yml.sample for you to copy and edit."
+            Merb.logger.error! "No database.yml file found at #{config_file}."
+            Merb.logger.error! "A sample file was created called #{sample_dest} for you to copy and edit."
             exit(1)
           end
         end
