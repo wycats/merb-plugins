@@ -1,20 +1,4 @@
-$:.push File.join(File.dirname(__FILE__), '..', 'lib')
-require 'rubygems'
-require 'merb-core'
-require 'merb-core/test'
-require 'merb-core/test/helpers'
-
-Merb::BootLoader.before_app_loads do
-  require 'sequel'
-  DB = Sequel.sqlite
-  require "merb/session/sequel_session"
-end
-
-Merb.start :environment => 'test', :adapter => 'runner', :session_store => 'sequel'
-
-Spec::Runner.configure do |config|
-  config.include Merb::Test::RequestHelper
-end
+require File.dirname(__FILE__) + "/spec_helper"
 
 # # Load up the shared specs from merb-core
 # if (gem_spec = Gem.source_index.search(Gem::Dependency.new('merb-core', '>=0.9.6')).last) && 

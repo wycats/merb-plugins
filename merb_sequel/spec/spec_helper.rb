@@ -1,13 +1,34 @@
 $:.push File.join(File.dirname(__FILE__), "..", "lib")
 require 'rubygems'
 require 'spec'
+require 'sequel'
 require 'merb-core'
 require 'merb-core/test'
 require 'merb-core/test/helpers'
+require "merb/session/sequel_session"
 require File.join( File.dirname(__FILE__), "..", "lib", 'merb_sequel')
 
-require 'sequel'
-DB = Sequel.sqlite
+module Merb
+  module Orms
+    module Sequel
+      class << self
+        def connect
+          ::Sequel.connect(:adapter => 'sqlite')
+        end
+      end
+    end
+  end
+end
+
+Merb.start :environment => 'test', :adapter => 'runner', :session_store => 'sequel'
+
+Spec::Runner.configure do |config|
+  config.include Merb::Test::RequestHelper
+end
+
+
+class SpecModel < Sequel::Model
+end
 
 class CreateSpecModel < Sequel::Migration
   def up
@@ -22,16 +43,15 @@ class CreateSpecModel < Sequel::Migration
   end
 end
 
-describe "having a spec model", :shared => true do
+describe "it has a SpecModel", :shared => true do
   before(:each) do
-    CreateSpecModel.apply(DB, :up)
+    CreateSpecModel.apply(SpecModel.db, :up)
   end
   
   after(:each) do
-    CreateSpecModel.apply(DB, :down)
+    CreateSpecModel.apply(SpecModel.db, :down)
   end
 end
 
-class SpecModel < Sequel::Model
-  set_dataset DB[:spec_models]
-end
+
+

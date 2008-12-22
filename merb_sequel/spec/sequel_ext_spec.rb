@@ -1,7 +1,7 @@
 require File.dirname(__FILE__) + "/spec_helper"
 
 describe 'Sequel::Model#new_record?' do
-  it_should_behave_like "having a spec model"
+  it_should_behave_like "it has a SpecModel"
   
   it "is defined" do
     SpecModel.instance_methods.should include 'new_record?'
