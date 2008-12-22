@@ -22,14 +22,16 @@ class CreateSpecModel < Sequel::Migration
   end
 end
 
-def spec_model_up
-  CreateSpecModel.apply(DB, :up)
-end
-def spec_model_down
-  CreateSpecModel.apply(DB, :up)
+describe "having a spec model", :shared => true do
+  before(:each) do
+    CreateSpecModel.apply(DB, :up)
+  end
+  
+  after(:each) do
+    CreateSpecModel.apply(DB, :up)
+  end
 end
 
 class SpecModel < Sequel::Model
   set_dataset DB[:spec_models]
-
 end
