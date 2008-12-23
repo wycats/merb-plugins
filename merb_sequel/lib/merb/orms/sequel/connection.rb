@@ -7,8 +7,8 @@ module Merb
 
       class << self
 
-        def config_file() Merb.root / "config" / "database.yml" end
-        def sample_dest() Merb.root / "config" / "database.yml.sample" end
+        def config_file() Merb.dir_for(:config) / "database.yml" end
+        def sample_dest() Merb.dir_for(:config) / "database.yml.sample" end
         def sample_source() File.dirname(__FILE__) / "database.yml.sample" end
       
         def copy_sample_config

@@ -9,10 +9,6 @@ require 'merb-core/test/helpers'
 
 require File.join( File.dirname(__FILE__), "..", "lib", 'merb_sequel')
 
-Merb::Config.use do |c|
-  c[:session_store] = 'sequel'
-end
-
 Merb.start :environment => 'test', :adapter => 'runner', :session_store => 'sequel', :merb_root => File.dirname(__FILE__)
 
 Spec::Runner.configure do |config|
