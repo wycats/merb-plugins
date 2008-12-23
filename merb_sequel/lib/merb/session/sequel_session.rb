@@ -4,7 +4,32 @@ require 'base64'
 
 module Merb
 
-  table_name = (Merb::Plugins.config[:merb_sequel][:session_table_name] || "sessions")
+  Merb::Plugins.config[:merb_sequel][:session_table_name] ||= "sessions"
+
+  # Default session migration run if a sessions table does not yet exist.
+  #
+  # Will create a table with a name of 'sessions' by default, or as 
+  # set by Merb::Plugins.config[:merb_sequel][:session_table_name]
+  
+  class CreateSessionMigration < Sequel::Migration
+    def up
+      table_name = Merb::Plugins.config[:merb_sequel][:session_table_name].to_sym
+      unless table_exists?(table_name)
+        puts "Warning: The database did not contain a '#{table_name}' table for sessions."
+        
+        create_table table_name do
+          primary_key :id
+          varchar :session_id
+          text :data
+          timestamp :created_at
+        end
+        
+        puts "Created '#{table_name}' session table."
+      end
+    end
+  end
+
+  CreateSessionMigration.apply(Sequel::Model.db, :up)
 
   # Sessions stored in Sequel model.
   #
@@ -12,14 +37,7 @@ module Merb
   #
   # Merb::Config[:session_store] = 'sequel'
 
-  class SequelSessionStore < Sequel::Model(table_name.to_sym)
-    
-    set_schema do
-      primary_key :id
-      varchar :session_id
-      text :data
-      timestamp :created_at
-    end
+  class SequelSessionStore < Sequel::Model(Merb::Plugins.config[:merb_sequel][:session_table_name].to_sym)
 
     class << self
       
@@ -85,12 +103,6 @@ module Merb
       end    
     end
     
-  end
-
-  unless Sequel::Model.db.table_exists?(table_name.to_sym)
-    puts "Warning: The database did not contain a '#{table_name}' table for sessions."
-    SequelSessionStore.class_eval { create_table unless table_exists? }
-    puts "Created sessions table."
   end
   
   class SequelSession < SessionStoreContainer
