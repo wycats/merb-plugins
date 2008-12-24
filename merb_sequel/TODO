@@ -1,2 +1,2 @@
 TODO:
-* Some specs would be nice.
+ * Figure out why using a sqlite3 memory store for the session bombs with stream errors.
