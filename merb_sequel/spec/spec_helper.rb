@@ -1,9 +1,9 @@
 $:.insert 0, File.join(File.dirname(__FILE__), "..", "lib")
 require 'rubygems'
+require 'merb-core'
 require 'spec'
 require 'spec/mocks'
-require 'sequel'
-require 'merb-core'
+dependency 'sequel'
 require 'merb-core/test'
 require 'merb-core/test/helpers'
 
@@ -21,15 +21,3 @@ end
 
 require File.join( File.dirname(__FILE__), 'spec_model')
 require File.join( File.dirname(__FILE__), 'spec_controller')
-
-
-
-
-
-
-
-
-
-
-
-
