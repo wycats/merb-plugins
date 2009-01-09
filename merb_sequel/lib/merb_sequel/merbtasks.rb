@@ -16,7 +16,7 @@ namespace :sequel do
     
     desc "Drop all tables and perform migrations"
     task :reset => :merb_start do
-      Sequel::Model.db.drop_table Sequel::Model.db.tables
+      Sequel::Model.db.drop_table *Sequel::Model.db.tables
       Sequel::Migrator.apply(Sequel::Model.db, "schema/migrations", ENV["VERSION"] ? ENV["VERSION"].to_i : nil)
     end
 
