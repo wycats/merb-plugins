@@ -7,7 +7,6 @@ if defined?(Merb::Plugins)
   Merb::Plugins.add_rakefiles(File.join(File.dirname(__FILE__) / "active_record" / "merbtasks"))
   
   class Merb::Orms::ActiveRecord::Connect < Merb::BootLoader
-
     after BeforeAppLoads
 
     def self.run
@@ -21,6 +20,16 @@ if defined?(Merb::Plugins)
       Merb::Router.root_behavior = Merb::Router.root_behavior.identify(ActiveRecord::Base => :id)
     end
 
+  end
+  
+  class Merb::Orms::ActiveRecord::DisconnectBeforeFork < Merb::BootLoader
+    after AfterAppLoads
+    
+    def self.run      
+      Merb.logger.debug "Disconnecting database connection before forking."
+      ::ActiveRecord::Base.connection.disconnect!
+    end
+    
   end
   
   generators = File.join(File.dirname(__FILE__), 'generators')

@@ -17,7 +17,7 @@ GEM_EMAIL  = "canadaduane@gmail.com"
 
 GEM_NAME    = "merb_activerecord"
 PKG_BUILD   = ENV['PKG_BUILD'] ? '.' + ENV['PKG_BUILD'] : ''
-GEM_VERSION = (Merb::MORE_VERSION rescue "0.9.9") + PKG_BUILD
+GEM_VERSION = ("1.0.0") + PKG_BUILD
 
 RELEASE_NAME  = "REL #{GEM_VERSION}"
 
