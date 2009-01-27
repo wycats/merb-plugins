@@ -27,10 +27,10 @@ if defined?(Merb::Plugins)
     
     def self.run      
       Merb.logger.debug "Disconnecting database connection before forking."
-      ::ActiveRecord::Base.connection.disconnect!
+      ::ActiveRecord::Base.clear_active_connections!
     end
-    
-  end
+  end  
+  
   
   generators = File.join(File.dirname(__FILE__), 'generators')
   Merb.add_generators generators / :migration

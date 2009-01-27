@@ -53,14 +53,21 @@ namespace :db do
   end
   
   def drop_database(config)
-    case config[:adapter]
-    when 'mysql'
-      ActiveRecord::Base.connection.drop_database config[:database]
-    when /^sqlite/
-      FileUtils.rm(File.join(Merb.root, config[:database]))
-    when 'postgresql'
-      ActiveRecord::Base.clear_active_connections!    
-      `dropdb "#{config[:database]}"`
+    begin
+      ActiveRecord::Base.establish_connection(config)
+      ActiveRecord::Base.connection
+    rescue
+      puts "could not connect to #{config[:database]}, database not dropped"
+    else
+      case config[:adapter]
+      when 'mysql'
+        ActiveRecord::Base.connection.drop_database config[:database]
+      when /^sqlite/
+        FileUtils.rm(File.join(Merb.root, config[:database]))
+      when 'postgresql'
+        ActiveRecord::Base.clear_active_connections!    
+        `dropdb "#{config[:database]}"`
+      end
     end
   end
   
