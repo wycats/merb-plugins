@@ -13,6 +13,12 @@ namespace :sequel do
     task :migrate => :sequel_env do
       Sequel::Migrator.apply(Sequel::Model.db, "schema/migrations", ENV["VERSION"] ? ENV["VERSION"].to_i : nil)
     end
+    
+    desc "Drop all tables and perform migrations"
+    task :reset => :merb_start do
+      Sequel::Model.db.drop_table *Sequel::Model.db.tables
+      Sequel::Migrator.apply(Sequel::Model.db, "schema/migrations", ENV["VERSION"] ? ENV["VERSION"].to_i : nil)
+    end
 
     desc "Drop all tables and perform migrations"
     task :reset => :sequel_env do
