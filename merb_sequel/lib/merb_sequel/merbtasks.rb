@@ -2,24 +2,29 @@ require "fileutils"
 
 namespace :sequel do
 
-  task :merb_start do
-    Merb.start :adapter => 'runner',
-               :environment => ENV['MERB_ENV'] || 'development'
+  desc "Minimalistic Sequel environment"
+  task :sequel_env do
+    Merb::Orms::Sequel.connect
   end
-
+      
   namespace :db do
 
     desc "Perform migration using migrations in schema/migrations"
-    task :migrate => :merb_start do
+    task :migrate => :sequel_env do
       Sequel::Migrator.apply(Sequel::Model.db, "schema/migrations", ENV["VERSION"] ? ENV["VERSION"].to_i : nil)
     end
 
+    desc "Truncate all tables in database"
+    task :truncate => :sequel_env do
+      db = Sequel::Model.db 
+      db << "TRUNCATE #{db.tables.join(', ')} CASCADE;"
+    end
   end
   
   namespace :sessions do
 
     desc "Creates session migration"
-    task :create => :merb_start do
+    task :create => :sequel_env do
       migration_exists = Dir[File.join(Merb.root,"schema", "migrations", "*.rb")].detect{ |f| f =~ /database_sessions\.rb/ }
       if migration_exists
         puts "\nThe Session Migration File already exists\n\n"
@@ -29,10 +34,9 @@ namespace :sequel do
     end
     
     desc "Clears sessions"
-    task :clear => :merb_start do
+    task :clear => :sequel_env do
       table_name = ((Merb::Plugins.config[:sequel] || {})[:session_table_name] || "sessions")
-      
-      Merb::Orms::Sequel.connect.execute("DELETE FROM #{table_name}")
+      Model.db.connect.execute("DELETE FROM #{table_name}")
     end
 
   end
