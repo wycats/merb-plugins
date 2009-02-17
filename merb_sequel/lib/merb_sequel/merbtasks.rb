@@ -20,12 +20,6 @@ namespace :sequel do
       Sequel::Migrator.apply(Sequel::Model.db, "schema/migrations", ENV["VERSION"] ? ENV["VERSION"].to_i : nil)
     end
 
-    desc "Drop all tables and perform migrations"
-    task :reset => :sequel_env do
-      Sequel::Model.db.drop_table *Sequel::Model.db.tables
-      Sequel::Migrator.apply(Sequel::Model.db, "schema/migrations", ENV["VERSION"] ? ENV["VERSION"].to_i : nil)
-    end
-
     desc "Truncate all tables in database"
     task :truncate => :sequel_env do
       db = Sequel::Model.db 
@@ -48,7 +42,7 @@ namespace :sequel do
     desc "Clears sessions"
     task :clear => :sequel_env do
       table_name = ((Merb::Plugins.config[:sequel] || {})[:session_table_name] || "sessions")
-      Model.db.connect.execute("DELETE FROM #{table_name}")
+      Sequel::Model.db.connect.execute("DELETE FROM #{table_name}")
     end
 
   end
